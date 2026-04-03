@@ -1,0 +1,213 @@
+// prisma/schema.prisma
+
+generator client {
+  provider     = "prisma-client-js"
+  output       = "../generated/prisma"
+  relationMode = "prisma"
+}
+
+datasource db {
+  provider     = "mysql"
+  relationMode = "prisma"
+}
+
+// ─────────────────────────────────────────
+// AUTENTICACIÓN (requerido por Auth.js)
+// ─────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String? // null si se registró con Google
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─────────────────────────────────────────
+// CATÁLOGO DE VEHÍCULOS
+// ─────────────────────────────────────────
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum EstadoVehiculo {
+  NUEVO
+  USADO
+}
+
+enum EstadoPublicacion {
+  BORRADOR
+  PUBLICADO
+  VENDIDO
+  PAUSADO
+}
+
+enum Transmision {
+  MANUAL
+  AUTOMATICA
+  CVT
+}
+
+enum Combustible {
+  NAFTA
+  DIESEL
+  ELECTRICO
+  HIBRIDO
+  GNC
+}
+
+model Categoria {
+  id        String   @id @default(cuid())
+  nombre    String   @unique // "Auto", "Camioneta", "Moto", "SUV", etc.
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  vehiculos Vehiculo[]
+
+  @@map("categorias")
+}
+
+model Vehiculo {
+  id          String @id @default(cuid())
+  categoriaId String
+
+  // Identificación
+  marca   String
+  modelo  String
+  anio    Int
+  version String? // Ej: "Sport", "Limited", "Base"
+
+  // Estado y precio
+  estado      EstadoVehiculo @default(USADO)
+  precio      Decimal        @db.Decimal(12, 2)
+  moneda      String         @default("ARS")
+  kilometraje Int            @default(0)
+
+  // Características técnicas
+  color       String?
+  motor       String? // Ej: "2.0 TDI", "1.6 16v"
+  transmision Transmision?
+  combustible Combustible?
+  puertas     Int?
+  potencia    Int? // en CV
+
+  // Descripción libre
+  descripcion String? @db.Text
+
+  // Estado de la publicación
+  publicacion EstadoPublicacion @default(BORRADOR)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categoria Categoria        @relation(fields: [categoriaId], references: [id])
+  imagenes  ImagenVehiculo[]
+  consultas Consulta[]
+
+  @@index([categoriaId])
+  @@index([publicacion])
+  @@index([marca, modelo])
+  @@map("vehiculos")
+}
+
+model ImagenVehiculo {
+  id          String   @id @default(cuid())
+  vehiculoId  String
+  url         String   @db.Text // URL de la imagen (local o servicio externo)
+  altText     String?
+  orden       Int      @default(0) // para ordenar las fotos
+  esPrincipal Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  vehiculo Vehiculo @relation(fields: [vehiculoId], references: [id], onDelete: Cascade)
+
+  @@index([vehiculoId])
+  @@map("imagenes_vehiculos")
+}
+
+// ─────────────────────────────────────────
+// CONSULTAS DE CLIENTES
+// ─────────────────────────────────────────
+
+enum EstadoConsulta {
+  PENDIENTE
+  VISTA
+  RESPONDIDA
+  CERRADA
+}
+
+model Consulta {
+  id         String  @id @default(cuid())
+  vehiculoId String? // opcional: puede ser una consulta general
+
+  // Datos del cliente
+  nombre   String
+  email    String
+  telefono String?
+
+  // Contenido
+  mensaje String? @db.Text
+
+  // Estado interno para el admin
+  estado EstadoConsulta @default(PENDIENTE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  vehiculo Vehiculo? @relation(fields: [vehiculoId], references: [id], onDelete: SetNull)
+
+  @@index([vehiculoId])
+  @@index([estado])
+  @@map("consultas")
+}
