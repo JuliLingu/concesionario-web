@@ -6,10 +6,6 @@ import { redirect } from "next/navigation";
 export default async function NewVehiclePage() {
   const session = await auth();
 
-  // Solo administradores pueden acceder
-  if (session?.user?.role !== "ADMIN") {
-    redirect("/dashboard");
-  }
 
   // Obtenemos las categorías dinámicamente para el formulario
   const categorias = await prisma.categoria.findMany({

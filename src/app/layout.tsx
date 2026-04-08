@@ -1,36 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { SessionProvider } from "next-auth/react";
-import { auth } from "@/auth";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Concesionario Web",
-  description: "Catálogo de vehículos y consultas online",
+  title: "Concesionario Web | Tu próximo auto está aquí",
+  description: "Venta de vehículos nuevos y usados con la mejor financiación.",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
-
   return (
-    <html lang="es">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <SessionProvider session={session}>{children}</SessionProvider>
+    <html lang="es" data-scroll-behavior="smooth">
+      <body className={inter.className}>
+        <Header />
+
+        <main>{children}</main>
+
+        <Footer />
       </body>
     </html>
   );

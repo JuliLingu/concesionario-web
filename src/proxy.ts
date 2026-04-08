@@ -1,5 +1,5 @@
 import NextAuth from "next-auth";
-import authConfig from "./auth.config";
+import { authConfig } from "./auth.config";
 import { NextResponse } from "next/server";
 
 const { auth } = NextAuth(authConfig);
@@ -11,14 +11,14 @@ export default auth((req) => {
 
   const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
   const isAuthRoute = ["/login", "/register"].includes(nextUrl.pathname);
-  const isAdminRoute = nextUrl.pathname.startsWith("/admin");
+  // Consideramos tanto /admin como /dashboard como rutas que requieren rol ADMIN
+  const isAdminRoute =
+    nextUrl.pathname.startsWith("/admin") ||
+    nextUrl.pathname.startsWith("/dashboard");
 
-  const isGestionRoute = nextUrl.pathname.startsWith("/admin");
-
-  const isProtectedRoute = [
-    "/dashboard",
-    "/vehicles",
-  ].some((route) => nextUrl.pathname.startsWith(route));
+  const isProtectedRoute = ["/dashboard", "/vehicles"].some((route) =>
+    nextUrl.pathname.startsWith(route),
+  );
 
   if (isApiAuthRoute) return NextResponse.next();
 
@@ -31,7 +31,7 @@ export default auth((req) => {
   }
 
   // 2. Lógica de ADMIN
-  if (isAdminRoute || isGestionRoute) {
+  if (isAdminRoute) {
     if (!isLoggedIn) {
       const callbackUrl = nextUrl.pathname + nextUrl.search;
       return NextResponse.redirect(
@@ -43,8 +43,8 @@ export default auth((req) => {
     }
 
     if (userRole !== "ADMIN") {
-      // Redirigir si no tiene permisos
-      return NextResponse.redirect(new URL("/dashboard", nextUrl));
+      // Si no es ADMIN, lo mandamos al inicio para evitar bucles en /dashboard
+      return NextResponse.redirect(new URL("/", nextUrl));
     }
 
     return NextResponse.next();
@@ -63,3 +63,6 @@ export default auth((req) => {
 
   return NextResponse.next();
 });
+export const config = {
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+};

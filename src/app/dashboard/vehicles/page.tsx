@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 
 export default async function VehiclesAdminPage() {
   const session = await auth();
-  if (session?.user?.role !== "ADMIN") redirect("/dashboard");
 
   const vehicles = await getVehicles();
 

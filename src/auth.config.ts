@@ -1,33 +1,26 @@
 import type { NextAuthConfig } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
-import { LoginSchema } from "@/schemas/auth";
-import { prisma } from "@/lib/prisma";
 
-export default {
-  providers: [
-    Credentials({
-      async authorize(credentials) {
-        const validatedFields = LoginSchema.safeParse(credentials);
+export const authConfig = {
+  session: { strategy: "jwt" },
+  providers: [],
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        token.id = (user as any).id;
+        token.role = (user as any).role;
+        token.telefono = (user as any).telefono;
+        token.image = (user as any).image;
+      }
+      return token;
+    },
+    session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+        session.user.image = token.image as string | null;
+      }
 
-        if (validatedFields.success) {
-          const { email, password } = validatedFields.data;
-          
-          const user = await prisma.user.findUnique({
-            where: { email },
-          });
-
-          // Si el usuario no tiene contraseña, probablemente se registró con Google/OAuth
-          if (!user || !user.password) return null;
-
-          const passwordsMatch = await bcrypt.compare(password, user.password);
-
-          if (passwordsMatch) return user;
-        }
-
-        return null;
-      },
-    }),
-  ],
-
+      return session;
+    },
+  },
 } satisfies NextAuthConfig;
