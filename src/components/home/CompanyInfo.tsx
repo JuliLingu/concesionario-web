@@ -1,45 +1,48 @@
-import { MapPin, Phone } from "lucide-react";
+import Image from "next/image";
 
 export function CompanyInfo() {
   return (
-    <section id="contact" className="bg-white py-20 border-t">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+    <section id="nosotros" className="py-32 bg-background overflow-hidden relative">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
+        {/* Content Area */}
         <div>
-          <h2 className="text-4xl font-black text-gray-900 mb-6 tracking-tight">Nuestra Empresa</h2>
-          <p className="text-gray-600 leading-relaxed mb-6 text-lg">
-            En <strong>Concesionario Web</strong>, no solo vendemos autos; construimos relaciones a largo plazo. 
-            Contamos con un taller especializado propio y certificación de calidad en cada unidad que ingresa.
+          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary mb-8 block">
+            Our DNA / Legacy
+          </span>
+          <h2 className="text-6xl md:text-7xl font-bold text-foreground uppercase tracking-tight tight-editorial mb-12">
+            La Maestría <br /> 
+            detrás del <br /> 
+            volante.
+          </h2>
+          <p className="text-foreground/60 leading-relaxed mb-16 text-lg font-medium max-w-md">
+            En JBJ Automotores, operamos bajo el principio de que un vehículo es una extensión de la identidad. Nuestra trayectoria de dos décadas redefine la curaduría automotriz, seleccionando piezas que trascienden lo convencional.
           </p>
-          
-          <div className="space-y-4">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-blue-50 rounded-lg text-blue-600"><MapPin size={24} /></div>
-              <div>
-                <h4 className="font-bold text-gray-900">Ubicación</h4>
-                <p className="text-gray-600">Av. de los Incas 1234, CABA, Argentina</p>
-              </div>
+
+          <div className="grid grid-cols-2 gap-16 pt-12 border-t border-foreground/[0.05]">
+            <div>
+              <p className="text-5xl font-bold font-space text-foreground mb-4">5K<span className="text-primary italic">+</span></p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Relaciones Consolidadas</p>
             </div>
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-blue-50 rounded-lg text-blue-600"><Phone size={24} /></div>
-              <div>
-                <h4 className="font-bold text-gray-900">Atención al cliente</h4>
-                <p className="text-gray-600">+54 11 4567-8900 (Lun a Vie 9-19hs)</p>
-              </div>
+            <div>
+              <p className="text-5xl font-bold font-space text-foreground mb-4">24<span className="text-primary italic">/</span>7</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Soporte de Ingeniería</p>
             </div>
           </div>
         </div>
 
-        <div className="h-[400px] rounded-3xl overflow-hidden border-8 border-gray-100 shadow-2xl relative">
-          <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3285.218552991631!2d-58.4613291!3d-34.573351!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bcb59020000001%3A0x123456789!2sAv.%20de%20los%20Incas%201234!5e0!3m2!1ses!2sar!4v1710000000000!5m2!1ses!2sar" 
-            width="100%" 
-            height="100%" 
-            style={{ border: 0 }} 
-            allowFullScreen 
-            loading="lazy">
-          </iframe>
+        {/* Image Area with Editorial Overlap */}
+        <div className="relative">
+           <div className="aspect-square bg-surface-low rounded-lg shadow-premium relative z-10 overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center">
+                 <span className="text-[15rem] font-black text-foreground/[0.02] -rotate-12 italic">JBJ</span>
+              </div>
+           </div>
+           {/* Decorative overlapping element */}
+           <div className="absolute -top-12 -right-12 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+           <div className="absolute bottom-12 -left-12 w-48 h-48 border-[20px] border-surface-low z-0" />
         </div>
       </div>
     </section>
   );
 }
+

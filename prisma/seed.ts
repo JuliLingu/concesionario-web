@@ -1,47 +1,37 @@
-import { PrismaClient } from "../generated/prisma";
-
-const prisma = new PrismaClient();
+import { prisma } from "../src/lib/prisma";
 
 async function main() {
-  // 1. Limpiar datos existentes (Opcional, cuidado en producción)
-  await prisma.vehiculo.deleteMany();
-  await prisma.categoria.deleteMany();
+  const categorias = [
+    { nombre: "Auto", slug: "auto" },
+    { nombre: "Camioneta", slug: "camioneta" },
+    { nombre: "SUV", slug: "suv" },
+    { nombre: "Deportivo", slug: "deportivo" },
+    { nombre: "Clásico", slug: "clasico" },
+    { nombre: "Moto", slug: "moto" },
+  ];
 
-  // 2. Crear Categorías
-  const catAuto = await prisma.categoria.create({
-    data: { nombre: "Auto", slug: "auto" },
-  });
-  const catSuv = await prisma.categoria.create({
-    data: { nombre: "SUV", slug: "suv" },
-  });
+  console.log("Iniciando la carga de categorías por defecto...");
 
-  // 3. Crear Vehículos de prueba
-  await prisma.vehiculo.create({
-    data: {
-      marca: "Toyota",
-      modelo: "Corolla",
-      anio: 2023,
-      version: "XEI",
-      precio: 25000,
-      moneda: "USD",
-      kilometraje: 0,
-      estado: "NUEVO",
-      transmision: "AUTOMATICA",
-      combustible: "NAFTA",
-      categoriaId: catAuto.id,
-      publicacion: "PUBLICADO",
-      descripcion: "Toyota Corolla XEI 0km, listo para entregar.",
-    },
-  });
+  for (const cat of categorias) {
+    const categoria = await prisma.categoria.upsert({
+      where: { slug: cat.slug },
+      update: {},
+      create: {
+        nombre: cat.nombre,
+        slug: cat.slug,
+      },
+    });
+    console.log(`Categoría habilitada: ${categoria.nombre}`);
+  }
 
-  console.log("Base de datos poblada con éxito.");
+  console.log("Carga de categorías completada correctamente.");
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
+  .then(() => {
+    process.exit(0);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
+  .catch((e) => {
+    console.error("Error al correr el seed:", e);
+    process.exit(1);
   });

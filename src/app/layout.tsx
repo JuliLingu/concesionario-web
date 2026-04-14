@@ -1,14 +1,22 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Space_Grotesk, Manrope } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
-const inter = Inter({ subsets: ["latin"] });
+const spaceGrotesk = Space_Grotesk({ 
+  subsets: ["latin"],
+  variable: '--font-space',
+});
+
+const manrope = Manrope({ 
+  subsets: ["latin"],
+  variable: '--font-manrope',
+});
 
 export const metadata: Metadata = {
-  title: "Concesionario Web | Tu próximo auto está aquí",
-  description: "Venta de vehículos nuevos y usados con la mejor financiación.",
+  title: "JBJ Automotores | The Kinetic Gallery",
+  description: "Una experiencia automotriz editorial y premium.",
 };
 
 export default function RootLayout({
@@ -17,12 +25,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" data-scroll-behavior="smooth">
-      <body className={inter.className}>
+    <html lang="es" className={`${spaceGrotesk.variable} ${manrope.variable}`}>
+      <body className={manrope.className}>
         <Header />
-
         <main>{children}</main>
-
         <Footer />
       </body>
     </html>

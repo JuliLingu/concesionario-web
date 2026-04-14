@@ -19,16 +19,27 @@ export const createVehicle = async (values: z.infer<typeof VehicleSchema>) => {
     return { error: "Campos inválidos" };
   }
 
+  const { imagenes, ...data } = validatedFields.data;
+
   try {
     await prisma.vehiculo.create({
       data: {
-        ...validatedFields.data,
+        ...data,
+        imagenes: {
+          create: imagenes?.map((url, index) => ({
+            url,
+            esPrincipal: index === 0,
+            orden: index,
+          })),
+        },
       },
     });
 
     revalidatePath("/dashboard/vehicles");
+    revalidatePath("/catalogo");
     return { success: "Vehículo creado con éxito" };
   } catch (error) {
+    console.error(error);
     return { error: "Error al crear el vehículo" };
   }
 };
@@ -38,7 +49,9 @@ export const getVehicles = async () => {
     const vehicles = await prisma.vehiculo.findMany({
       include: {
         categoria: true,
-        imagenes: true,
+        imagenes: {
+          orderBy: { orden: "asc" }
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -57,8 +70,49 @@ export const deleteVehicle = async (id: string) => {
   try {
     await prisma.vehiculo.delete({ where: { id } });
     revalidatePath("/dashboard/vehicles");
+    revalidatePath("/catalogo");
     return { success: "Vehículo eliminado correctamente" };
   } catch {
     return { error: "Error al eliminar el vehículo" };
+  }
+};
+
+export const updateVehicle = async (id: string, values: z.infer<typeof VehicleSchema>) => {
+  const session = await auth();
+
+  if (session?.user?.role !== "ADMIN") {
+    return { error: "No autorizado" };
+  }
+
+  const validatedFields = VehicleSchema.safeParse(values);
+
+  if (!validatedFields.success) {
+    return { error: "Campos inválidos" };
+  }
+
+  const { imagenes, ...data } = validatedFields.data;
+
+  try {
+    await prisma.vehiculo.update({
+      where: { id },
+      data: {
+        ...data,
+        imagenes: {
+          deleteMany: {},
+          create: imagenes?.map((url, index) => ({
+            url,
+            esPrincipal: index === 0,
+            orden: index,
+          })),
+        },
+      },
+    });
+
+    revalidatePath("/dashboard/vehicles");
+    revalidatePath("/catalogo");
+    return { success: "Vehículo actualizado con éxito" };
+  } catch (error) {
+    console.error(error);
+    return { error: "Error al actualizar el vehículo" };
   }
 };

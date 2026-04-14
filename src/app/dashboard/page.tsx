@@ -19,7 +19,7 @@ export default async function NewVehiclePage() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto py-12 px-6">
+    <div className="max-w-5xl mx-auto pt-32 pb-16 px-6 min-h-screen">
       <div className="mb-10">
         <h1 className="text-4xl font-black text-gray-900 tracking-tight">Nuevo Vehículo</h1>
         <p className="text-gray-500 font-medium">Completa la información técnica para dar de alta el auto en el catálogo.</p>
