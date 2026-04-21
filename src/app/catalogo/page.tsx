@@ -39,7 +39,7 @@ export default async function CatalogoPage({
   }
 
   // Fetch db
-  const vehiculos = await prisma.vehiculo.findMany({
+  const rawVehiculos = await prisma.vehiculo.findMany({
     where,
     include: {
       imagenes: {
@@ -50,6 +50,11 @@ export default async function CatalogoPage({
       createdAt: "desc"
     }
   });
+
+  const vehiculos = rawVehiculos.map((v) => ({
+    ...v,
+    precio: Number(v.precio),
+  }));
 
   // Extract distinct marcas for the filters
   const dbMarcasRows = await prisma.vehiculo.findMany({

@@ -36,7 +36,7 @@ export async function Header() {
                 href="/dashboard"
                 className="text-zinc-600 dark:text-zinc-400 font-medium hover:text-primary transition-colors duration-300 border-r border-zinc-200 dark:border-zinc-800 pr-6"
               >
-                Panel
+                Administrador 
               </Link>
               <form action={async () => {
                 "use server";

@@ -326,6 +326,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
             ))}
           </select>
         </div>
+      </div>
       <div className="flex flex-col gap-6 py-6 border-t border-foreground/[0.05]">
         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Galería de Imágenes</label>
         

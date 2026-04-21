@@ -17,6 +17,6 @@ export const VehicleSchema = z.object({
   potencia: z.number().optional(),
   color: z.string().optional(),
   descripcion: z.string().optional(),
-  publicacion: z.nativeEnum(EstadoPublicacion).default(EstadoPublicacion.BORRADOR),
+  publicacion: z.nativeEnum(EstadoPublicacion),
   imagenes: z.array(z.string()).optional(),
 });

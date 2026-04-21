@@ -4,7 +4,7 @@ import { VehicleCard } from "../catalog/VehicleCard";
 import { ArrowRight } from "lucide-react";
 
 export async function RecentVehicles() {
-  const recentVehicles = await prisma.vehiculo.findMany({
+  const rawVehicles = await prisma.vehiculo.findMany({
     take: 3,
     orderBy: {
       createdAt: "desc",
@@ -12,8 +12,13 @@ export async function RecentVehicles() {
     include: {
       imagenes: true,
       categoria: true,
-    },
+    }
   });
+
+  const recentVehicles = rawVehicles.map((v) => ({
+    ...v,
+    precio: Number(v.precio),
+  }));
 
   return (
     <section className="bg-surface-low py-32">
@@ -45,4 +50,4 @@ export async function RecentVehicles() {
     </section>
   );
 }
-
+
