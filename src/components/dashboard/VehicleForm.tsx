@@ -81,9 +81,11 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
   const onUpload = (result: any) => {
     const info = result.info;
     if (info && info.secure_url) {
-      const newImages = [...imagenes, info.secure_url];
-      setImagenes(newImages);
-      form.setValue("imagenes", newImages);
+      setImagenes((prev) => {
+        const newImages = [...prev, info.secure_url];
+        form.setValue("imagenes", newImages);
+        return newImages;
+      });
     }
   };
 
@@ -332,12 +334,12 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
         
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {imagenes.map((url) => (
-            <div key={url} className="relative aspect-square group overflow-hidden rounded-sm bg-surface-low border border-foreground/5">
+            <div key={url} className="relative aspect-[4/3] group overflow-hidden rounded-sm bg-surface-low border border-foreground/5">
               <Image 
                 src={url} 
                 alt="Imagen vehículo" 
                 fill 
-                className="object-cover transition-transform group-hover:scale-110 duration-500"
+                className="object-cover object-center transition-transform group-hover:scale-110 duration-500"
               />
               <button
                 type="button"
@@ -356,7 +358,11 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
               multiple: true,
               maxFiles: 10,
               resourceType: "image",
-              clientAllowedFormats: ["webp", "png", "jpg", "jpeg"]
+              clientAllowedFormats: ["webp", "png", "jpg", "jpeg"],
+              cropping: true,
+              croppingAspectRatio: 4/3,
+              croppingShowDimensions: true,
+              croppingDefaultSelectionRatio: 4/3
             }}
           >
             {({ open }) => (

@@ -15,7 +15,7 @@ export default async function CatalogoPage({
   const isAdmin = session?.user?.role === "ADMIN";
 
   // Parse searchParams
-  const marcasArray = searchParams.marca
+  const marcasArray = await searchParams.marca
     ? Array.isArray(searchParams.marca)
       ? searchParams.marca
       : [searchParams.marca]

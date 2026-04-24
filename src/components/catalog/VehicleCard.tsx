@@ -25,13 +25,13 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [] }: Vehi
     <div className="bg-surface-lowest transition-all hover:shadow-premium relative flex flex-col group">
 
       {/* Top Image Section */}
-      <div className="relative aspect-square w-full bg-surface-low overflow-hidden">
+      <div className="relative aspect-[4/3] w-full bg-surface-low overflow-hidden">
         {imagenPrincipal ? (
           <Image
             src={imagenPrincipal}
             alt={`${vehiculo.marca} ${vehiculo.modelo}`}
             fill
-            className="object-cover transition-transform group-hover:scale-105 duration-700"
+            className="object-cover object-center transition-transform group-hover:scale-105 duration-700"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-foreground/5 font-black text-4xl italic">
@@ -94,7 +94,7 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [] }: Vehi
         <div className="mt-auto flex items-center justify-between">
           <div>
             <p className="text-2xl font-black text-primary tracking-tighter">
-              U$D {vehiculo.precio.toLocaleString()}
+              U$D {vehiculo.precio.toLocaleString("es-AR")}
             </p>
           </div>
           <Link

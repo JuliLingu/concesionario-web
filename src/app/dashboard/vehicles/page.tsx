@@ -39,13 +39,13 @@ export default async function VehiclesAdminPage() {
               <tr key={v.id} className="hover:bg-gray-50/50 transition-colors">
                 <td className="p-4">
                   <div className="font-bold text-gray-900">{v.marca} {v.modelo}</div>
-                  <div className="text-xs text-gray-400">{v.anio} • {v.kilometraje.toLocaleString()} KM</div>
+                  <div className="text-xs text-gray-400">{v.anio} • {v.kilometraje.toLocaleString("es-AR")} KM</div>
                 </td>
                 <td className="p-4 text-sm text-gray-600">
                   <span className="bg-gray-100 px-2 py-1 rounded-md">{v.categoria.nombre}</span>
                 </td>
                 <td className="p-4 font-bold text-gray-900">
-                  {v.moneda} ${Number(v.precio).toLocaleString()}
+                  {v.moneda} ${Number(v.precio).toLocaleString("es-AR")}
                 </td>
                 <td className="p-4 text-sm">
                   <span className={`font-semibold ${v.publicacion === "PUBLICADO" ? "text-green-600" : "text-amber-600"}`}>

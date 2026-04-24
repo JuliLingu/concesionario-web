@@ -116,3 +116,20 @@ export const updateVehicle = async (id: string, values: z.infer<typeof VehicleSc
     return { error: "Error al actualizar el vehículo" };
   }
 };
+
+export const getVehicleById = async (id: string) => {
+  try {
+    const vehicle = await prisma.vehiculo.findUnique({
+      where: { id },
+      include: {
+        categoria: true,
+        imagenes: {
+          orderBy: { orden: "asc" },
+        },
+      },
+    });
+    return vehicle;
+  } catch {
+    return null;
+  }
+};
