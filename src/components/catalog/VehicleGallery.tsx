@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { ImagenVehiculo } from "../../../generated/prisma";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { getCldUrl } from "@/lib/cloudinary";
 
 interface VehicleGalleryProps {
   images: ImagenVehiculo[];
@@ -34,14 +35,15 @@ export const VehicleGallery = ({ images, altText }: VehicleGalleryProps) => {
       {/* Main Image */}
       <div className="relative w-full aspect-[4/3] bg-surface-lowest border border-foreground/5 rounded-md overflow-hidden group">
         <Image
-          src={images[currentIndex].url}
+          src={getCldUrl(images[currentIndex].url, "4:3")}
           alt={`${altText} - Imagen ${currentIndex + 1}`}
           fill
           priority
+          sizes="(max-width: 1024px) 100vw, 65vw"
           className="object-cover object-center"
         />
         
-        {/* Navigation Arrows (Visible on Hover or Mobile) */}
+        {/* Navigation Arrows */}
         {images.length > 1 && (
           <>
             <button 
@@ -57,6 +59,13 @@ export const VehicleGallery = ({ images, altText }: VehicleGalleryProps) => {
               <ChevronRight size={24} />
             </button>
           </>
+        )}
+
+        {/* Image counter */}
+        {images.length > 1 && (
+          <div className="absolute bottom-3 right-3 bg-black/50 text-white text-[10px] font-black px-2 py-1 rounded-sm tracking-widest">
+            {currentIndex + 1} / {images.length}
+          </div>
         )}
       </div>
 
@@ -74,9 +83,10 @@ export const VehicleGallery = ({ images, altText }: VehicleGalleryProps) => {
               }`}
             >
               <Image
-                src={img.url}
+                src={getCldUrl(img.url, "4:3")}
                 alt={`${altText} miniatura ${index + 1}`}
                 fill
+                sizes="96px"
                 className="object-cover object-center"
               />
             </button>

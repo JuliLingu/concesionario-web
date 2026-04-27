@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Fuel, AlignJustify, Disc, MessageCircle } from "lucide-react";
 import { VehicleGallery } from "@/components/catalog/VehicleGallery";
+import { ContactForm } from "@/components/catalog/ContactForm";
 
 interface VehiclePageProps {
   params: Promise<{
@@ -18,6 +19,12 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
     notFound();
   }
 
+  const vehiculoNombre = `${vehicle.marca} ${vehicle.modelo} ${vehicle.anio}`;
+  const whatsappText = encodeURIComponent(
+    `Hola, me interesa el ${vehiculoNombre}. ¿Podría darme más información?`
+  );
+  const whatsappUrl = `https://wa.me/5492234214414?text=${whatsappText}`;
+
   return (
     <div className="min-h-screen bg-surface-lowest text-foreground font-manrope">
       {/* Navbar Minimalista */}
@@ -29,7 +36,7 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
         </div>
       </div>
 
-      {/* Contenedor Principal (Más compacto, max-w-6xl) */}
+      {/* Contenedor Principal */}
       <div className="max-w-6xl mx-auto px-6 py-8 md:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
@@ -37,7 +44,7 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
           <div className="lg:col-span-7 xl:col-span-8">
              <VehicleGallery 
                images={vehicle.imagenes} 
-               altText={`${vehicle.marca} ${vehicle.modelo}`} 
+               altText={vehiculoNombre}
              />
           </div>
 
@@ -66,17 +73,17 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
               U$D {Number(vehicle.precio).toLocaleString("es-AR")}
             </div>
 
-            {/* CTA */}
+            {/* CTA WhatsApp */}
             <a 
-              href={`https://wa.me/5491100000000?text=Hola,%20me%20interesa%20el%20${vehicle.marca}%20${vehicle.modelo}%20(ID:%20${vehicle.id})`}
+              href={whatsappUrl}
               target="_blank"
               rel="noreferrer"
               className="w-full bg-racing text-white flex items-center justify-center gap-2 py-4 rounded-md shadow-premium hover:bg-black transition-all text-sm font-black uppercase tracking-widest mb-10"
             >
-              Consultar Unidad <MessageCircle size={18} />
+              Consultar por WhatsApp <MessageCircle size={18} />
             </a>
 
-            {/* Detalles Principales Rápidos (Opcional, estilo e-commerce) */}
+            {/* Ficha Rápida */}
             <div className="bg-surface-low rounded-lg p-5 flex flex-col gap-4 border border-foreground/5 mb-8">
                <h3 className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Ficha Rápida</h3>
                <div className="flex justify-between items-center border-b border-foreground/5 pb-2">
@@ -99,27 +106,27 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
           </div>
         </div>
 
-        {/* Detalles Técnicos Extendidos y Descripción */}
+        {/* Detalles Técnicos + Descripción + Formulario de Consulta */}
         <div className="mt-16 lg:mt-24 pt-12 border-t border-foreground/5">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             
-            {/* Columna de Specs Completas */}
+            {/* Especificaciones */}
             <div className="lg:col-span-1">
               <h2 className="text-lg font-space font-black uppercase tracking-tight text-foreground mb-6">
                 Especificaciones
               </h2>
               <div className="flex flex-col gap-3">
-                <SpecRow label="Año" value={vehicle.anio} />
-                <SpecRow label="Kilometraje" value={`${vehicle.kilometraje.toLocaleString("es-AR")} KM`} />
-                <SpecRow label="Combustible" value={vehicle.combustible || "N/A"} />
-                <SpecRow label="Transmisión" value={vehicle.transmision || "N/A"} />
-                <SpecRow label="Potencia" value={vehicle.potencia ? `${vehicle.potencia} CV` : "N/A"} />
-                <SpecRow label="Color" value={vehicle.color || "N/A"} />
-                <SpecRow label="Puertas" value={vehicle.puertas || "N/A"} />
+                <SpecRow label="Año"          value={vehicle.anio} />
+                <SpecRow label="Kilometraje"  value={`${vehicle.kilometraje.toLocaleString("es-AR")} KM`} />
+                <SpecRow label="Combustible"  value={vehicle.combustible || "N/A"} />
+                <SpecRow label="Transmisión"  value={vehicle.transmision || "N/A"} />
+                <SpecRow label="Potencia"     value={vehicle.potencia ? `${vehicle.potencia} CV` : "N/A"} />
+                <SpecRow label="Color"        value={vehicle.color || "N/A"} />
+                <SpecRow label="Puertas"      value={vehicle.puertas || "N/A"} />
               </div>
             </div>
 
-            {/* Columna de Descripción */}
+            {/* Descripción */}
             <div className="lg:col-span-2">
               <h2 className="text-lg font-space font-black uppercase tracking-tight text-foreground mb-6">
                 Descripción
@@ -129,18 +136,55 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
                   {vehicle.descripcion}
                 </p>
               ) : (
-                <p className="text-sm text-foreground/40 italic">El vendedor no ha añadido una descripción para este vehículo.</p>
+                <p className="text-sm text-foreground/40 italic">
+                  El vendedor no ha añadido una descripción para este vehículo.
+                </p>
               )}
             </div>
 
           </div>
         </div>
+
+        {/* Sección de Consulta */}
+        <div className="mt-16 lg:mt-24 pt-12 border-t border-foreground/5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            
+            {/* Texto izquierdo */}
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary block mb-4">
+                ¿Te interesa?
+              </span>
+              <h2 className="text-3xl font-space font-black tracking-tight text-foreground uppercase mb-4">
+                Consultá por esta unidad
+              </h2>
+              <p className="text-foreground/60 font-medium leading-relaxed mb-6">
+                Completá el formulario y un asesor de JBJ Automotores se comunicará con vos a la brevedad para coordinar una visita o responder todas tus preguntas.
+              </p>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-foreground/50 hover:text-primary transition-colors"
+              >
+                <MessageCircle size={14} />
+                O escribinos directo por WhatsApp
+              </a>
+            </div>
+
+            {/* Formulario derecho */}
+            <ContactForm
+              vehiculoId={vehicle.id}
+              vehiculoNombre={vehiculoNombre}
+            />
+          </div>
+        </div>
+
       </div>
     </div>
   );
 }
 
-const SpecRow = ({ label, value }: { label: string, value: string | number }) => (
+const SpecRow = ({ label, value }: { label: string; value: string | number }) => (
   <div className="flex justify-between items-center py-3 border-b border-foreground/5">
     <span className="text-sm font-medium text-foreground/60">{label}</span>
     <span className="text-sm font-bold text-foreground truncate pl-4">{value}</span>

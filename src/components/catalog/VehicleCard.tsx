@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Vehiculo, ImagenVehiculo } from "../../../generated/prisma";
 import { Calendar, Fuel, AlignJustify, ArrowRight, Settings2 } from "lucide-react";
 import { EditModal } from "./EditModal";
+import { getCldUrl } from "@/lib/cloudinary";
 
 interface VehicleCardProps {
   vehiculo: Omit<Vehiculo, "precio"> & {
@@ -28,9 +29,10 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [] }: Vehi
       <div className="relative aspect-[4/3] w-full bg-surface-low overflow-hidden">
         {imagenPrincipal ? (
           <Image
-            src={imagenPrincipal}
+            src={getCldUrl(imagenPrincipal, "4:3")}
             alt={`${vehiculo.marca} ${vehiculo.modelo}`}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className="object-cover object-center transition-transform group-hover:scale-105 duration-700"
           />
         ) : (
@@ -43,9 +45,10 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [] }: Vehi
         {isAdmin && (
           <button
             onClick={(e) => { e.preventDefault(); setIsEditModalOpen(true); }}
-            className="absolute top-4 right-4 z-10 bg-primary shadow-lg p-3 text-white rounded-full hover:scale-110 transition-transform hover:bg-black"
+            className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm text-white text-[9px] font-black uppercase tracking-widest px-3 py-1.5 hover:bg-primary transition-all"
           >
-            <Settings2 size={16} />
+            <Settings2 size={11} />
+            Editar
           </button>
         )}
       </div>
@@ -99,7 +102,7 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [] }: Vehi
           </div>
           <Link
             href={`/catalogo/${vehiculo.id}`}
-            className="bg-foreground text-white flex items-center gap-2 px-5 py-3 hover:bg-primary transition-all text-[11px] font-black uppercase tracking-widest"
+            className="bg-racing text-white flex items-center gap-2 px-5 py-3 hover:opacity-90 active:scale-95 transition-all text-[11px] font-black uppercase tracking-widest shadow-md shadow-primary/20"
           >
             Ver Detalles <ArrowRight size={14} />
           </Link>

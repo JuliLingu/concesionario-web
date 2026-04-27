@@ -9,6 +9,7 @@ import { createVehicle, updateVehicle } from "@/actions/vehicle";
 import { CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
 import { ImagePlus, X } from "lucide-react";
+import { getCldUrl } from "@/lib/cloudinary";
 import { 
   Combustible, 
   Transmision, 
@@ -336,9 +337,10 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
           {imagenes.map((url) => (
             <div key={url} className="relative aspect-[4/3] group overflow-hidden rounded-sm bg-surface-low border border-foreground/5">
               <Image 
-                src={url} 
+                src={getCldUrl(url, "4:3")} 
                 alt="Imagen vehículo" 
                 fill 
+                sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 16vw"
                 className="object-cover object-center transition-transform group-hover:scale-110 duration-500"
               />
               <button
