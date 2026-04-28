@@ -3,6 +3,7 @@ import { Space_Grotesk, Manrope } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { auth } from "@/auth";
 
 const spaceGrotesk = Space_Grotesk({ 
   subsets: ["latin"],
@@ -19,15 +20,17 @@ export const metadata: Metadata = {
   description: "Una experiencia automotriz editorial y premium.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+
   return (
-    <html lang="es" className={`${spaceGrotesk.variable} ${manrope.variable}`}>
+    <html lang="es" className={`${spaceGrotesk.variable} ${manrope.variable}`} data-scroll-behavior="smooth">
       <body className={manrope.className}>
-        <Header />
+        <Header session={session} />
         <main>{children}</main>
         <Footer />
       </body>

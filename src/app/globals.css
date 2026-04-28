@@ -70,7 +70,6 @@
 }
 
 html {
-  scroll-behavior: smooth;
   background-color: hsl(var(--background));
   font-size: 80%; /* Escala general reducida para que todo se preste mejor en pantalla */
 }

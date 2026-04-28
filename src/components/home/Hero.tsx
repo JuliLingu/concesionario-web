@@ -30,7 +30,7 @@ export function Hero() {
               Explorar Galería
             </Link>
             <Link 
-              href="#contacto" 
+              href="#ubicacion" 
               className="bg-surface-low text-foreground px-10 py-5 text-[10px] font-black uppercase tracking-[0.3em] rounded-sm hover:bg-foreground hover:text-white transition-all text-center"
             >
               Agendar Visita

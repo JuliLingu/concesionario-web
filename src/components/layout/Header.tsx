@@ -1,83 +1,104 @@
+"use client";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { Car, DoorOpen } from "lucide-react";
 import Link from "next/link";
-import { auth, signOut } from "@/auth";
+import { handleSignOut } from "@/actions/auth-actions";
+import Image from "next/image";
 
-export async function Header() {
-  const session = await auth();
+interface HeaderProps {
+  session: any;
+}
 
+export function Header({ session }: HeaderProps) {
   return (
-    <header className="fixed top-0 w-full z-50 glass-nav transition-all duration-300">
-      <nav
-        className="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto"
-        aria-label="Global"
-      >
-        {/* ── Brand Logo ── */}
-        <Link href="/" className="flex items-center shrink-0">
-          <span className="text-2xl font-black tracking-tighter text-foreground font-space">
-            JBJ
+    <motion.header
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl
+                shadow-[0_20px_40px_rgba(26,28,30,0.06)] w-full"
+      style={{ background: "rgba(255,255,255,0.80)" }}
+    >
+      <div className="container flex items-center justify-between h-16 mx-auto px-4 select-none">
+        <Link href="/" className="flex items-center gap-2">
+          <Car className="w-6 h-6" style={{ color: "#b5000b" }} />
+          <span className="font-bold tracking-tight text-[#1a1c1e] uppercase text-sm">
+            {'JBJ '}
           </span>
-          <span className="text-2xl font-black tracking-tighter text-primary font-space">
-            AUTO
-          </span>
-          <span className="text-2xl font-black tracking-tighter text-foreground font-space">
-            MOTORES
+          <span className="font-bold tracking-tight uppercase text-sm" style={{ color: "#b5000b" }}>
+            {'Automotores'}
           </span>
         </Link>
 
-        {/* ── Navigation Links (Desktop) — includes Admin if logged in ── */}
-        <div className="hidden md:flex items-center gap-8 font-space">
-          <Link
-            href="/catalogo"
-            className="text-foreground/60 font-medium hover:text-primary transition-colors duration-300 text-sm uppercase tracking-widest"
-          >
-            Catálogo
-          </Link>
-          <Link
-            href="#nosotros"
-            className="text-foreground/60 font-medium hover:text-primary transition-colors duration-300 text-sm uppercase tracking-widest"
-          >
-            Nosotros
-          </Link>
-          <Link
-            href="#financiacion"
-            className="text-foreground/60 font-medium hover:text-primary transition-colors duration-300 text-sm uppercase tracking-widest"
-          >
-            Financiación
+        <nav className="hidden md:flex items-center gap-8">
+          <Link href="/" className="cursor-pointer text-sm text-[#1a1c1e]/60 hover:text-[#1a1c1e] transition-colors">
+            <Button variant="link" size="sm">
+              Inicio
+            </Button>
           </Link>
 
-          {/* Administrador aparece en la nav junto al resto, solo si hay sesión */}
-          {session && (
-            <Link
-              href="/dashboard"
-              className="text-foreground/60 font-medium hover:text-primary transition-colors duration-300 text-sm uppercase tracking-widest"
-            >
-              Administrador
+          <Link href="/#nosotros" className="cursor-pointer text-sm text-[#1a1c1e]/60 hover:text-[#1a1c1e] transition-colors">
+            <Button variant="link" size="sm">
+              Nosotros
+            </Button>
+          </Link>
+
+          <Link href="/#ubicacion" className="cursor-pointer text-sm text-[#1a1c1e]/60 hover:text-[#1a1c1e] transition-colors">
+            <Button variant="link" size="sm">
+              Ubicación
+            </Button>
+          </Link>
+
+          {session?.user?.role === "ADMIN" && (
+            <Link href="/dashboard" className="cursor-pointer text-sm text-[#1a1c1e]/60 hover:text-[#1a1c1e] transition-colors">
+              <Button variant="link" size="sm">
+                Administrador
+              </Button>
             </Link>
           )}
-        </div>
 
-        {/* ── Trailing: solo acción de sesión, separada ── */}
-        <div className="flex items-center font-space">
-          {session ? (
-            <form
-              action={async () => {
-                "use server";
-                await signOut();
+          <Link href="/catalogo" className="cursor-pointer text-sm">
+            <Button
+              size="sm"
+              style={{
+                background: "linear-gradient(135deg, #b5000b 0%, #e30613 100%)",
+                color: "#ffffff",
+                border: "none",
               }}
             >
-              <button className="bg-racing text-white px-6 py-2.5 text-[11px] font-black uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20">
-                Salir
-              </button>
-            </form>
-          ) : (
-            <Link
-              href="/login"
-              className="bg-racing text-white px-6 py-2.5 text-[11px] font-black uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20"
-            >
-              Iniciar Sesión
+              Ver Vehículos
+            </Button>
+          </Link>
+        </nav>
+
+        {session ? (
+          <div className="flex items-center gap-4">
+            <Link className="flex flex-row items-center gap-2" href="/dashboard">
+              <span className="text-sm font-bold text-[#1a1c1e] hidden sm:block">
+                {session.user?.name}
+              </span>
             </Link>
-          )}
-        </div>
-      </nav>
-    </header>
+            <form action={handleSignOut}>
+              <Button variant="rojo" size="sm" type="submit">
+                Salir
+              </Button>
+            </form>
+          </div>
+        ) : (
+          <Link href="/login">
+            <Button
+              size="sm"
+              style={{
+                background: "linear-gradient(135deg, #b5000b 0%, #e30613 100%)",
+                color: "#ffffff",
+                border: "none",
+              }}
+            >
+              <DoorOpen className="w-4 h-4 mr-2" /> Iniciar Sesión
+            </Button>
+          </Link>
+        )}
+      </div>
+    </motion.header>
   );
 }
