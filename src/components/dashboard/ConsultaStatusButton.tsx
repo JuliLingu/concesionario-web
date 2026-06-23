@@ -4,12 +4,13 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateConsultaEstado } from "@/actions/consulta";
 import { EstadoConsulta } from "../../../generated/prisma";
+import { Box, Button, Chip, Stack } from "@mui/material";
 
-const ESTADO_CONFIG: Record<EstadoConsulta, { label: string; className: string }> = {
-  PENDIENTE:  { label: "Pendiente",  className: "bg-primary/10 text-primary" },
-  VISTA:      { label: "Vista",      className: "bg-blue-500/10 text-blue-700" },
-  RESPONDIDA: { label: "Respondida", className: "bg-green-500/10 text-green-700" },
-  CERRADA:    { label: "Cerrada",    className: "bg-foreground/10 text-foreground/40" },
+const ESTADO_CONFIG: Record<EstadoConsulta, { label: string; color: "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" }> = {
+  PENDIENTE:  { label: "Pendiente",  color: "primary" },
+  VISTA:      { label: "Vista",      color: "info" },
+  RESPONDIDA: { label: "Respondida", color: "success" },
+  CERRADA:    { label: "Cerrada",    color: "default" },
 };
 
 const NEXT_ESTADOS: Record<EstadoConsulta, { value: EstadoConsulta; label: string }[]> = {
@@ -38,23 +39,43 @@ export const ConsultaStatusButton = ({ consultaId, estadoActual }: ConsultaStatu
   };
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <Stack direction="row" alignItems="center" spacing={2} sx={{ flexWrap: 'wrap' }}>
       {/* Current state badge */}
-      <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 ${ESTADO_CONFIG[estadoActual].className}`}>
-        {ESTADO_CONFIG[estadoActual].label}
-      </span>
+      <Chip 
+        label={ESTADO_CONFIG[estadoActual].label} 
+        color={ESTADO_CONFIG[estadoActual].color} 
+        size="small" 
+        sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', borderRadius: 1 }}
+      />
 
       {/* Action buttons */}
       {next.map((n) => (
-        <button
+        <Button
           key={n.value}
           onClick={() => handle(n.value)}
           disabled={isPending}
-          className="text-[10px] font-black uppercase tracking-widest text-foreground/40 hover:text-primary transition-colors disabled:opacity-50 underline underline-offset-2"
+          variant="text"
+          size="small"
+          sx={{
+            fontSize: '10px',
+            fontWeight: 900,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color: 'text.secondary',
+            textDecoration: 'underline',
+            textUnderlineOffset: '2px',
+            minWidth: 0,
+            p: 0,
+            '&:hover': {
+              color: 'primary.main',
+              bgcolor: 'transparent',
+              textDecoration: 'underline'
+            }
+          }}
         >
           {isPending ? "..." : n.label}
-        </button>
+        </Button>
       ))}
-    </div>
+    </Stack>
   );
 };

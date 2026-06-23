@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
+import { Box, Typography, Stack, Checkbox, FormControlLabel, Select, MenuItem, IconButton, Button } from "@mui/material";
 
 interface CatalogFiltersProps {
   marcasDisponibles: string[];
@@ -76,38 +77,45 @@ export const CatalogFilters = ({
   for (let y = anioMax; y >= anioMin; y--) years.push(y);
 
   return (
-    <div
-      className={`w-full bg-surface-lowest p-6 shadow-sm border border-foreground/[0.05] transition-opacity ${
-        isPending ? "opacity-60 pointer-events-none" : ""
-      }`}
+    <Box
+      sx={{
+        width: '100%',
+        bgcolor: 'background.paper',
+        p: 3,
+        border: '1px solid rgba(255,255,255,0.05)',
+        transition: 'opacity 0.2s',
+        opacity: isPending ? 0.6 : 1,
+        pointerEvents: isPending ? 'none' : 'auto'
+      }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal size={14} className="text-primary" />
-          <h4 className="font-black text-foreground text-sm uppercase tracking-widest">
+      <Stack direction="row" sx={{ mb: 4, alignItems: "center", justifyContent: "space-between" }}>
+        <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
+          <SlidersHorizontal size={14} color="#c2410c" />
+          <Typography sx={{ fontWeight: 900, textTransform: 'uppercase', fontSize: '0.875rem', letterSpacing: '0.1em' }}>
             Filtros
-          </h4>
+          </Typography>
           {hasFilters && (
-            <span className="w-5 h-5 rounded-full bg-primary text-white text-[9px] font-black flex items-center justify-center">
+            <Box sx={{ width: 20, height: 20, borderRadius: '50%', bgcolor: 'primary.main', color: 'white', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {currentMarcas.length +
                 currentTransmisiones.length +
                 currentCombustibles.length +
                 (currentAnioDesde ? 1 : 0) +
                 (currentAnioHasta ? 1 : 0)}
-            </span>
+            </Box>
           )}
-        </div>
+        </Stack>
         {hasFilters && (
-          <button
+          <Button
             onClick={() => navigate("")}
-            className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-primary hover:text-foreground transition-colors"
+            variant="text"
+            startIcon={<X size={11} />}
+            sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'primary.main', minWidth: 0, p: 0.5, '&:hover': { color: 'text.primary', bgcolor: 'transparent' } }}
           >
-            <X size={11} />
             Limpiar todo
-          </button>
+          </Button>
         )}
-      </div>
+      </Stack>
 
       {/* ── Marca ── */}
       <FilterSection title="Marca">
@@ -149,48 +157,46 @@ export const CatalogFilters = ({
 
       {/* ── Año ── */}
       <FilterSection title="Año" noBorder>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex flex-col gap-1">
-            <span className="text-[9px] font-black uppercase tracking-widest text-foreground/40">
+        <Stack direction="row" spacing={1.5}>
+          <Box sx={{ flex: 1 }}>
+            <Typography sx={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary', mb: 0.5 }}>
               Desde
-            </span>
-            <select
+            </Typography>
+            <Select
               value={currentAnioDesde}
-              onChange={(e) =>
-                navigate(buildParams({ anioDesde: e.target.value || null }))
-              }
-              className="bg-surface-low border-none p-2.5 text-[12px] font-medium outline-none text-foreground cursor-pointer focus:ring-1 focus:ring-primary/20 rounded-sm"
+              onChange={(e) => navigate(buildParams({ anioDesde: e.target.value || null }))}
+              displayEmpty
+              fullWidth
+              size="small"
+              sx={{ bgcolor: '#0a0a0a', fontSize: '12px', fontWeight: 500, '& .MuiOutlinedInput-notchedOutline': { border: 'none' } }}
             >
-              <option value="">Todos</option>
+              <MenuItem value="" sx={{ fontSize: '12px' }}>Todos</MenuItem>
               {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
+                <MenuItem key={y} value={y.toString()} sx={{ fontSize: '12px' }}>{y}</MenuItem>
               ))}
-            </select>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-[9px] font-black uppercase tracking-widest text-foreground/40">
+            </Select>
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography sx={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary', mb: 0.5 }}>
               Hasta
-            </span>
-            <select
+            </Typography>
+            <Select
               value={currentAnioHasta}
-              onChange={(e) =>
-                navigate(buildParams({ anioHasta: e.target.value || null }))
-              }
-              className="bg-surface-low border-none p-2.5 text-[12px] font-medium outline-none text-foreground cursor-pointer focus:ring-1 focus:ring-primary/20 rounded-sm"
+              onChange={(e) => navigate(buildParams({ anioHasta: e.target.value || null }))}
+              displayEmpty
+              fullWidth
+              size="small"
+              sx={{ bgcolor: '#0a0a0a', fontSize: '12px', fontWeight: 500, '& .MuiOutlinedInput-notchedOutline': { border: 'none' } }}
             >
-              <option value="">Todos</option>
+              <MenuItem value="" sx={{ fontSize: '12px' }}>Todos</MenuItem>
               {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
+                <MenuItem key={y} value={y.toString()} sx={{ fontSize: '12px' }}>{y}</MenuItem>
               ))}
-            </select>
-          </div>
-        </div>
+            </Select>
+          </Box>
+        </Stack>
       </FilterSection>
-    </div>
+    </Box>
   );
 };
 
@@ -205,12 +211,12 @@ const FilterSection = ({
   children: React.ReactNode;
   noBorder?: boolean;
 }) => (
-  <div className={`mb-6 ${!noBorder ? "pb-6 border-b border-foreground/[0.05]" : ""}`}>
-    <h5 className="text-[10px] font-black uppercase tracking-[0.25em] text-foreground/40 mb-3">
+  <Box sx={{ mb: 3, pb: noBorder ? 0 : 3, borderBottom: noBorder ? 'none' : '1px solid rgba(255,255,255,0.05)' }}>
+    <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.25em', color: 'text.secondary', mb: 1.5 }}>
       {title}
-    </h5>
-    <div className="space-y-2.5">{children}</div>
-  </div>
+    </Typography>
+    <Stack spacing={1}>{children}</Stack>
+  </Box>
 );
 
 const CheckItem = ({
@@ -222,24 +228,19 @@ const CheckItem = ({
   checked: boolean;
   onChange: () => void;
 }) => (
-  <label className="flex items-center gap-3 cursor-pointer group select-none">
-    <div
-      onClick={onChange}
-      className={`w-4 h-4 flex items-center justify-center flex-shrink-0 transition-all ${
-        checked
-          ? "bg-primary"
-          : "border border-foreground/20 group-hover:border-primary/50"
-      }`}
-    >
-      {checked && <div className="w-2 h-2 bg-white" />}
-    </div>
-    <span
-      onClick={onChange}
-      className={`text-[13px] font-medium transition-colors ${
-        checked ? "text-foreground font-bold" : "text-foreground/60 group-hover:text-foreground"
-      }`}
-    >
-      {label}
-    </span>
-  </label>
+  <FormControlLabel
+    control={
+      <Checkbox
+        checked={checked}
+        onChange={onChange}
+        size="small"
+        sx={{
+          color: 'rgba(255,255,255,0.2)',
+          '&.Mui-checked': { color: 'primary.main' }
+        }}
+      />
+    }
+    label={<Typography sx={{ fontSize: '13px', fontWeight: checked ? 700 : 500, color: checked ? 'text.primary' : 'text.secondary' }}>{label}</Typography>}
+    sx={{ m: 0, '&:hover .MuiTypography-root': { color: 'text.primary' } }}
+  />
 );

@@ -16,6 +16,7 @@ import {
   EstadoVehiculo, 
   EstadoPublicacion 
 } from "../../../generated/prisma";
+import { Box, Button, CircularProgress, Grid, IconButton, MenuItem, Select, TextField, Typography, Stack } from "@mui/material";
 
 interface Category {
   id: string;
@@ -128,287 +129,447 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
   };
 
   return (
-    <form 
+    <Box 
+      component="form" 
       onSubmit={form.handleSubmit(onSubmit)}
-      className="space-y-8 bg-surface-lowest p-10 md:p-14 shadow-premium rounded-sm"
+      sx={{ 
+        bgcolor: 'background.paper', 
+        p: { xs: 4, md: 6 }, 
+        borderRadius: 1, 
+        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 4
+      }}
     >
-      <div className="mb-12">
-        <h2 className="text-3xl font-bold font-space uppercase tracking-tight text-foreground">
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h2" sx={{ fontSize: '1.875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '-0.02em', color: 'text.primary' }}>
           {isEditing ? "Editar Vehículo" : "Gestión de Inventario"}
-        </h2>
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mt-2">
+        </Typography>
+        <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.4em', color: 'primary.main', mt: 1 }}>
           {isEditing ? "Vehicle Modification" : "Vehicle Specification / Entry"}
-        </p>
-      </div>
+        </Typography>
+      </Box>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <Grid container spacing={3}>
         {/* Marca */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Marca</label>
-          <input
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
             {...form.register("marca")}
+            label="Marca"
             placeholder="Ej: Toyota"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            error={!!form.formState.errors.marca}
+            helperText={form.formState.errors.marca?.message}
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           />
-          {form.formState.errors.marca && (
-            <span className="text-primary text-[10px] font-black uppercase mt-1">{form.formState.errors.marca.message}</span>
-          )}
-        </div>
+        </Grid>
 
         {/* Modelo */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Modelo</label>
-          <input
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
             {...form.register("modelo")}
+            label="Modelo"
             placeholder="Ej: Corolla"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            error={!!form.formState.errors.modelo}
+            helperText={form.formState.errors.modelo?.message}
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           />
-          {form.formState.errors.modelo && (
-            <span className="text-primary text-[10px] font-black uppercase mt-1">{form.formState.errors.modelo.message}</span>
-          )}
-        </div>
+        </Grid>
         
         {/* Version */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Versión</label>
-          <input
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
             {...form.register("version")}
+            label="Versión"
             placeholder="Ej: XEI, Sport, M Comp"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           />
-        </div>
+        </Grid>
 
         {/* Año */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Año</label>
-          <input
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
             {...form.register("anio", { valueAsNumber: true })}
             type="number"
+            label="Año"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           />
-        </div>
+        </Grid>
 
         {/* Precio */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Precio (USD)</label>
-          <input
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
             {...form.register("precio", { valueAsNumber: true })}
             type="number"
+            label="Precio (USD)"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           />
-        </div>
+        </Grid>
 
         {/* Kilometraje */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Kilometraje (KM)</label>
-          <input
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
             {...form.register("kilometraje", { valueAsNumber: true })}
             type="number"
+            label="Kilometraje (KM)"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           />
-        </div>
+        </Grid>
 
         {/* Motor */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Motor</label>
-          <input
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
             {...form.register("motor")}
+            label="Motor"
             placeholder="Ej: 2.0 TDI, V8 Twinturbo"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           />
-        </div>
+        </Grid>
 
         {/* Potencia */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Potencia (CV)</label>
-          <input
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
             {...form.register("potencia", { valueAsNumber: true })}
             type="number"
+            label="Potencia (CV)"
             placeholder="Ej: 300"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           />
-        </div>
+        </Grid>
 
         {/* Puertas */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Puertas</label>
-          <input
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
             {...form.register("puertas", { valueAsNumber: true })}
             type="number"
+            label="Puertas"
             placeholder="Ej: 4"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           />
-        </div>
+        </Grid>
 
         {/* Color */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Color</label>
-          <input
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
             {...form.register("color")}
+            label="Color"
             placeholder="Ej: Blanco"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           />
-        </div>
+        </Grid>
 
         {/* Combustible */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Combustible</label>
-          <select
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
+            select
             {...form.register("combustible")}
+            defaultValue={initialData?.combustible || Combustible.NAFTA}
+            label="Combustible"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none appearance-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           >
             {Object.values(Combustible).map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <MenuItem key={c} value={c}>{c}</MenuItem>
             ))}
-          </select>
-        </div>
+          </TextField>
+        </Grid>
         
         {/* Transmisión */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Transmisión</label>
-          <select
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
+            select
             {...form.register("transmision")}
+            defaultValue={initialData?.transmision || Transmision.MANUAL}
+            label="Transmisión"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none appearance-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           >
             {Object.values(Transmision).map((t) => (
-              <option key={t} value={t}>{t}</option>
+              <MenuItem key={t} value={t}>{t}</MenuItem>
             ))}
-          </select>
-        </div>
+          </TextField>
+        </Grid>
 
         {/* Estado Vehículo */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Estatus Físico</label>
-          <select
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
+            select
             {...form.register("estado")}
+            defaultValue={initialData?.estado || EstadoVehiculo.USADO}
+            label="Estatus Físico"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none appearance-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           >
             {Object.values(EstadoVehiculo).map((o) => (
-              <option key={o} value={o}>{o}</option>
+              <MenuItem key={o} value={o}>{o}</MenuItem>
             ))}
-          </select>
-        </div>
+          </TextField>
+        </Grid>
 
         {/* Estado Publicación */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Estado Visibilidad</label>
-          <select
+        <Grid size={{ xs: 12, md: 6, lg: 4 }} >
+          <TextField
+            select
             {...form.register("publicacion")}
+            defaultValue={initialData?.publicacion || EstadoPublicacion.BORRADOR}
+            label="Estado Visibilidad"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none appearance-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           >
             {Object.values(EstadoPublicacion).map((o) => (
-              <option key={o} value={o}>{o}</option>
+              <MenuItem key={o} value={o}>{o}</MenuItem>
             ))}
-          </select>
-        </div>
+          </TextField>
+        </Grid>
 
         {/* Categoría */}
-        <div className="flex flex-col gap-2 lg:col-span-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Categoría</label>
-          <select
+        <Grid size={{ xs: 12, md: 6, lg: 8 }} >
+          <TextField
+            select
             {...form.register("categoriaId")}
+            defaultValue={initialData?.categoriaId || categorias[0]?.id || ""}
+            label="Categoría"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none appearance-none"
+            fullWidth
+            variant="filled"
+            slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+            sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
           >
             {categorias.map((cat) => (
-              <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+              <MenuItem key={cat.id} value={cat.id}>{cat.nombre}</MenuItem>
             ))}
-          </select>
-        </div>
-      </div>
-      <div className="flex flex-col gap-6 py-6 border-t border-foreground/[0.05]">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Galería de Imágenes</label>
+          </TextField>
+        </Grid>
+      </Grid>
+
+      <Box sx={{ pt: 4, borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'text.secondary' }}>Galería de Imágenes</Typography>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <Grid container spacing={2}>
           {imagenes.map((url) => (
-            <div key={url} className="relative aspect-[4/3] group overflow-hidden rounded-sm bg-surface-low border border-foreground/5">
-              <Image 
-                src={getCldUrl(url, "4:3")} 
-                alt="Imagen vehículo" 
-                fill 
-                sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 16vw"
-                className="object-cover object-center transition-transform group-hover:scale-110 duration-500"
-              />
-              <button
-                type="button"
-                onClick={() => removeImage(url)}
-                className="absolute top-2 right-2 w-6 h-6 bg-primary text-white flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-              >
-                <X size={14} />
-              </button>
-            </div>
+            <Grid size={{ xs: 6, md: 3, lg: 2 }} key={url}>
+              <Box sx={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', borderRadius: 1, bgcolor: '#0a0a0a', '&:hover .del-btn': { opacity: 1 } }}>
+                <Image 
+                  src={getCldUrl(url, "4:3")} 
+                  alt="Imagen vehículo" 
+                  fill 
+                  sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 16vw"
+                  style={{ objectFit: 'cover', objectPosition: 'center', transition: 'transform 0.5s' }}
+                />
+                <IconButton
+                  onClick={() => removeImage(url)}
+                  className="del-btn"
+                  sx={{
+                    position: 'absolute',
+                    top: 4,
+                    right: 4,
+                    width: 24,
+                    height: 24,
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    opacity: 0,
+                    transition: 'opacity 0.2s',
+                    '&:hover': { bgcolor: 'primary.dark' }
+                  }}
+                >
+                  <X size={14} />
+                </IconButton>
+              </Box>
+            </Grid>
           ))}
 
-          <CldUploadWidget 
-            onSuccess={onUpload} 
-            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "concesionario_unsigned"}
-            options={{
-              multiple: true,
-              maxFiles: 10,
-              resourceType: "image",
-              clientAllowedFormats: ["webp", "png", "jpg", "jpeg"],
-              cropping: true,
-              croppingAspectRatio: 4/3,
-              croppingShowDimensions: true,
-              croppingDefaultSelectionRatio: 4/3
-            }}
-          >
-            {({ open }) => (
-              <button
-                type="button"
-                onClick={() => open()}
-                className="aspect-square flex flex-col items-center justify-center gap-2 bg-surface-low border-2 border-dashed border-foreground/10 hover:border-primary/30 hover:bg-primary/5 transition-all group"
-              >
-                <ImagePlus size={24} className="text-foreground/20 group-hover:text-primary transition-colors" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40 group-hover:text-primary transition-colors">Añadir</span>
-              </button>
-            )}
-          </CldUploadWidget>
-        </div>
+          <Grid size={{ xs: 6, md: 3, lg: 2 }} >
+            <CldUploadWidget 
+              onSuccess={onUpload} 
+              uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "concesionario_unsigned"}
+              options={{
+                multiple: true,
+                maxFiles: 10,
+                resourceType: "image",
+                clientAllowedFormats: ["webp", "png", "jpg", "jpeg"],
+                cropping: true,
+                croppingAspectRatio: 4/3,
+                croppingShowDimensions: true,
+                croppingDefaultSelectionRatio: 4/3
+              }}
+            >
+              {({ open }) => (
+                <Box
+                  onClick={() => open()}
+                  sx={{
+                    aspectRatio: '1',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 1,
+                    bgcolor: '#0a0a0a',
+                    border: '2px dashed rgba(255,255,255,0.1)',
+                    borderRadius: 1,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    color: 'text.secondary',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      bgcolor: 'rgba(194,65,12,0.05)',
+                      color: 'primary.main'
+                    }
+                  }}
+                >
+                  <ImagePlus size={24} />
+                  <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Añadir</Typography>
+                </Box>
+              )}
+            </CldUploadWidget>
+          </Grid>
+        </Grid>
         
         {imagenes.length === 0 && (
-          <p className="text-[10px] font-medium italic text-foreground/40">Sube al menos una imagen para que el vehículo sea visible en el catálogo.</p>
+          <Typography sx={{ fontSize: '10px', fontWeight: 500, fontStyle: 'italic', color: 'text.secondary' }}>Sube al menos una imagen para que el vehículo sea visible en el catálogo.</Typography>
         )}
-      </div>
+      </Box>
 
       {/* Descripción */}
-      <div className="flex flex-col gap-2 pt-6 border-t border-foreground/[0.05]">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Descripción Editorial</label>
-        <textarea
+      <Box sx={{ pt: 4, borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <TextField
           {...form.register("descripcion")}
-          rows={5}
-          disabled={isPending}
-          className="bg-surface-low px-4 py-4 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none resize-none"
+          label="Descripción Editorial"
           placeholder="Describe el equipamiento, estado general, etc."
+          disabled={isPending}
+          multiline
+          rows={5}
+          fullWidth
+          variant="filled"
+          slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+          sx={{ '& .MuiFilledInput-root': { bgcolor: '#0a0a0a', borderRadius: 1 } }}
         />
-      </div>
+      </Box>
 
-      {error && <div className="bg-primary/5 p-4 text-primary text-[10px] font-black uppercase tracking-widest">{error}</div>}
-      {success && <div className="bg-green-500/5 p-4 text-green-600 text-[10px] font-black uppercase tracking-widest">{success}</div>}
+      {error && <Typography sx={{ bgcolor: 'rgba(194,65,12,0.1)', color: 'primary.main', p: 2, fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{error}</Typography>}
+      {success && <Typography sx={{ bgcolor: 'rgba(34,197,94,0.1)', color: '#16a34a', p: 2, fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{success}</Typography>}
 
-      <div className="pt-6">
-        <button
+      <Box sx={{ pt: 4 }}>
+        <Button
           type="submit"
           disabled={isPending}
-          className="bg-racing text-white py-5 px-12 rounded-sm shadow-xl hover:translate-y-[-2px] transition-all font-black text-xs uppercase tracking-[0.4em] disabled:opacity-50"
+          variant="contained"
+          sx={{
+            bgcolor: '#c2410c',
+            color: 'white',
+            py: 2.5,
+            px: 6,
+            fontSize: '12px',
+            fontWeight: 900,
+            textTransform: 'uppercase',
+            letterSpacing: '0.4em',
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)',
+            '&:hover': { bgcolor: '#9a3412', transform: 'translateY(-2px)' },
+            transition: 'all 0.3s'
+          }}
         >
           {isPending ? "PROCESANDO..." : isEditing ? "ACTUALIZAR VEHÍCULO" : "GUARDAR EN GALERÍA"}
-        </button>
-      </div>
-    </form>
+        </Button>
+      </Box>
+    </Box>
   );
-};
+};

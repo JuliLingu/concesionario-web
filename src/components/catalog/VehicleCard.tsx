@@ -7,6 +7,7 @@ import { Vehiculo, ImagenVehiculo } from "../../../generated/prisma";
 import { Calendar, Fuel, AlignJustify, ArrowRight, Settings2 } from "lucide-react";
 import { EditModal } from "./EditModal";
 import { getCldUrl } from "@/lib/cloudinary";
+import { Box, Typography, Button, IconButton } from "@mui/material";
 
 interface VehicleCardProps {
   vehiculo: Omit<Vehiculo, "precio"> & {
@@ -17,97 +18,142 @@ interface VehicleCardProps {
   categorias?: { id: string; nombre: string }[];
 }
 
-
 export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [] }: VehicleCardProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const imagenPrincipal = vehiculo.imagenes.find(img => img.esPrincipal)?.url || vehiculo.imagenes[0]?.url || "";
 
   return (
-    <div className="bg-surface-lowest transition-all hover:shadow-premium relative flex flex-col group">
-
+    <Box 
+      sx={{ 
+        bgcolor: '#0a0a0a', 
+        position: 'relative', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        height: '100%',
+        transition: 'all 0.3s',
+        '&:hover': {
+          boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+          '& .vehicle-img': {
+            transform: 'scale(1.05)'
+          }
+        }
+      }}
+    >
       {/* Top Image Section */}
-      <div className="relative aspect-[4/3] w-full bg-surface-low overflow-hidden">
+      <Box sx={{ position: 'relative', aspectRatio: '4/3', width: '100%', bgcolor: '#171717', overflow: 'hidden' }}>
         {imagenPrincipal ? (
           <Image
             src={getCldUrl(imagenPrincipal, "4:3")}
             alt={`${vehiculo.marca} ${vehiculo.modelo}`}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-            className="object-cover object-center transition-transform group-hover:scale-105 duration-700"
+            className="vehicle-img"
+            style={{ objectFit: 'cover', objectPosition: 'center', transition: 'transform 0.7s ease' }}
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-foreground/5 font-black text-4xl italic">
-            JBJ
-          </div>
+          <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Typography sx={{ color: 'rgba(255,255,255,0.05)', fontWeight: 900, fontSize: '2.25rem', fontStyle: 'italic' }}>
+              JBJ
+            </Typography>
+          </Box>
         )}
 
         {/* Edit Overlay Button */}
         {isAdmin && (
-          <button
+          <Button
             onClick={(e) => { e.preventDefault(); setIsEditModalOpen(true); }}
-            className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm text-white text-[9px] font-black uppercase tracking-widest px-3 py-1.5 hover:bg-primary transition-all"
+            variant="contained"
+            sx={{ 
+              position: 'absolute', 
+              top: 12, 
+              right: 12, 
+              zIndex: 10, 
+              bgcolor: 'rgba(0,0,0,0.6)', 
+              backdropFilter: 'blur(4px)',
+              color: 'white',
+              fontSize: '9px',
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              p: '6px 12px',
+              minWidth: 0,
+              gap: 1,
+              '&:hover': { bgcolor: 'primary.main' }
+            }}
           >
             <Settings2 size={11} />
             Editar
-          </button>
+          </Button>
         )}
-      </div>
+      </Box>
 
       {/* Content Section */}
-      <div className="flex flex-col p-6 flex-grow">
-
+      <Box sx={{ display: 'flex', flexDirection: 'column', p: 3, flexGrow: 1 }}>
         {/* Badges row */}
-        <div className="flex items-center justify-between mb-4">
-          {/* Primary left badge depending on logic, hardcoding for visual initially or map properly */}
-          <span className="text-[9px] font-black uppercase tracking-widest text-primary">
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+          <Typography sx={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'primary.main' }}>
             Nuevo Ingreso
-          </span>
-          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/60 px-2 py-1 bg-surface-low">
+          </Typography>
+          <Typography sx={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.6)', px: 1, py: 0.5, bgcolor: '#171717' }}>
             {vehiculo.estado}
-          </span>
-        </div>
+          </Typography>
+        </Box>
 
         {/* Title */}
-        <h3 className="text-2xl font-bold text-foreground tracking-tighter leading-none mb-1 font-space">
+        <Typography variant="h3" sx={{ fontSize: '1.5rem', fontWeight: 700, color: 'text.primary', letterSpacing: '-0.05em', lineHeight: 1, mb: 0.5 }}>
           {vehiculo.marca} {vehiculo.modelo}
-        </h3>
+        </Typography>
 
         {/* Subtitle / Engine */}
-        <p className="text-[12px] text-foreground/60 mb-6 font-medium">
+        <Typography sx={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', mb: 3, fontWeight: 500 }}>
           {vehiculo.version || vehiculo.motor || "Versión Base"}
-        </p>
+        </Typography>
 
         {/* Inline Specs */}
-        <div className="flex items-center gap-4 mb-8 text-[11px] font-bold text-foreground/60">
-          <div className="flex items-center gap-1.5">
-            <Calendar size={14} className="text-foreground/40" />
-            {vehiculo.anio}
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Fuel size={14} className="text-foreground/40" />
-            <span className="capitalize">{vehiculo.combustible?.toLowerCase()}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <AlignJustify size={14} className="text-foreground/40" />
-            <span className="capitalize">{vehiculo.transmision?.toLowerCase()}</span>
-          </div>
-        </div>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4, color: 'rgba(255,255,255,0.6)' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Calendar size={14} style={{ opacity: 0.4 }} />
+            <Typography sx={{ fontSize: '11px', fontWeight: 700 }}>{vehiculo.anio}</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Fuel size={14} style={{ opacity: 0.4 }} />
+            <Typography sx={{ fontSize: '11px', fontWeight: 700, textTransform: 'capitalize' }}>{vehiculo.combustible?.toLowerCase()}</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <AlignJustify size={14} style={{ opacity: 0.4 }} />
+            <Typography sx={{ fontSize: '11px', fontWeight: 700, textTransform: 'capitalize' }}>{vehiculo.transmision?.toLowerCase()}</Typography>
+          </Box>
+        </Box>
 
         {/* Price and CTA */}
-        <div className="mt-auto flex items-center justify-between">
-          <div>
-            <p className="text-2xl font-black text-primary tracking-tighter">
-              U$D {vehiculo.precio.toLocaleString("es-AR")}
-            </p>
-          </div>
-          <Link
+        <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, color: 'primary.main', letterSpacing: '-0.05em' }}>
+            U$D {vehiculo.precio.toLocaleString("es-AR")}
+          </Typography>
+          <Button
+            component={Link}
             href={`/catalogo/${vehiculo.id}`}
-            className="bg-racing text-white flex items-center gap-2 px-5 py-3 hover:opacity-90 active:scale-95 transition-all text-[11px] font-black uppercase tracking-widest shadow-md shadow-primary/20"
+            variant="contained"
+            sx={{
+              bgcolor: '#c2410c',
+              color: 'white',
+              px: 2.5,
+              py: 1.5,
+              fontSize: '11px',
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              boxShadow: '0 4px 6px -1px rgba(194,65,12,0.2), 0 2px 4px -1px rgba(194,65,12,0.1)',
+              display: 'flex',
+              gap: 1,
+              '&:hover': { bgcolor: '#9a3412', opacity: 0.9 },
+              '&:active': { transform: 'scale(0.95)' }
+            }}
           >
             Ver Detalles <ArrowRight size={14} />
-          </Link>
-        </div>
-      </div>
+          </Button>
+        </Box>
+      </Box>
 
       <EditModal
         isOpen={isEditModalOpen}
@@ -115,7 +161,6 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [] }: Vehi
         vehiculo={vehiculo}
         categorias={categorias}
       />
-    </div>
+    </Box>
   );
 };
-

@@ -1,66 +1,186 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { Box, Container, Typography, Button, Stack, Grid } from "@mui/material";
 
 export function Hero() {
   return (
-    <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden bg-background">
+    <Box 
+      component="section" 
+      sx={{ 
+        position: 'relative', 
+        minHeight: '90vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        pt: 10, 
+        overflow: 'hidden', 
+        bgcolor: 'background.default' 
+      }}
+    >
       {/* Background Text Decor */}
-      <div className="absolute top-1/2 left-0 -translate-y-1/2 select-none pointer-events-none opacity-[0.02] whitespace-nowrap">
-         <span className="text-[30rem] font-black tracking-tighter italic">KINETIC</span>
-      </div>
+      <Box 
+        sx={{ 
+          position: 'absolute', 
+          top: '50%', 
+          left: 0, 
+          transform: 'translateY(-50%)', 
+          userSelect: 'none', 
+          pointerEvents: 'none', 
+          opacity: 0.02, 
+          whiteSpace: 'nowrap' 
+        }}
+      >
+         <Typography sx={{ fontSize: '30rem', fontWeight: 900, letterSpacing: '-0.05em', fontStyle: 'italic', lineHeight: 1 }}>
+           KINETIC
+         </Typography>
+      </Box>
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <div className="lg:col-span-7 z-10">
-          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary mb-6 block fade-in">
-            Selection 2024
-          </span>
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold uppercase tracking-tight tight-editorial text-foreground mb-8">
-            Ingeniería <br /> 
-            <span className="text-primary italic">en Movimiento.</span>
-          </h1>
-          <p className="text-lg md:text-xl text-foreground/60 max-w-xl mb-12 font-medium leading-relaxed">
-            La curaduría automotriz más exclusiva de la región. Rendimiento sin precedentes, estética sin compromisos. 
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link 
-              href="/catalogo" 
-              className="bg-racing text-white px-10 py-5 text-[10px] font-black uppercase tracking-[0.3em] rounded-sm shadow-2xl hover:translate-y-[-4px] transition-all text-center"
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 10 }}>
+        <Grid container spacing={6} sx={{ alignItems: 'center' }}>
+          <Grid size={{ xs: 12, lg: 7 }} sx={{ zIndex: 10 }}>
+            <Typography 
+              variant="overline" 
+              sx={{ 
+                fontSize: '10px', 
+                fontWeight: 900, 
+                letterSpacing: '0.5em', 
+                color: 'primary.main', 
+                mb: 3, 
+                display: 'block' 
+              }}
             >
-              Explorar Galería
-            </Link>
-            <Link 
-              href="#ubicacion" 
-              className="bg-surface-low text-foreground px-10 py-5 text-[10px] font-black uppercase tracking-[0.3em] rounded-sm hover:bg-foreground hover:text-white transition-all text-center"
+              Selection 2024
+            </Typography>
+            <Typography 
+              variant="h1" 
+              sx={{ 
+                fontSize: { xs: '4rem', md: '6rem', lg: '8rem' }, 
+                fontWeight: 800, 
+                textTransform: 'uppercase', 
+                letterSpacing: '-0.02em', 
+                color: 'text.primary', 
+                mb: 4,
+                lineHeight: 0.9
+              }}
             >
-              Agendar Visita
-            </Link>
-          </div>
-        </div>
+              Ingeniería <br /> 
+              <Box component="span" sx={{ color: 'primary.main', fontStyle: 'italic' }}>en Movimiento.</Box>
+            </Typography>
+            <Typography 
+              variant="body1" 
+              sx={{ 
+                fontSize: { xs: '1.125rem', md: '1.25rem' }, 
+                color: 'text.secondary', 
+                maxWidth: '600px', 
+                mb: 6, 
+                fontWeight: 500, 
+                lineHeight: 1.6 
+              }}
+            >
+              La curaduría automotriz más exclusiva de la región. Rendimiento sin precedentes, estética sin compromisos. 
+            </Typography>
+            
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+              <Button 
+                component={Link} 
+                href="/catalogo" 
+                variant="contained" 
+                disableElevation
+                sx={{
+                  background: "linear-gradient(135deg, #c2410c 0%, #ea580c 100%)",
+                  color: "#ffffff",
+                  px: 5,
+                  py: 2.5,
+                  fontSize: '10px',
+                  fontWeight: 900,
+                  letterSpacing: '0.3em',
+                  boxShadow: '0 25px 50px -12px rgba(194,65,12,0.5)',
+                  '&:hover': {
+                    background: "linear-gradient(135deg, #9a3412 0%, #c2410c 100%)",
+                    transform: 'translateY(-4px)',
+                  },
+                  transition: 'all 0.3s'
+                }}
+              >
+                Explorar Galería
+              </Button>
+              <Button 
+                component={Link} 
+                href="#ubicacion" 
+                variant="outlined" 
+                sx={{
+                  borderColor: 'rgba(255,255,255,0.1)',
+                  color: 'text.primary',
+                  px: 5,
+                  py: 2.5,
+                  fontSize: '10px',
+                  fontWeight: 900,
+                  letterSpacing: '0.3em',
+                  bgcolor: 'rgba(255,255,255,0.02)',
+                  '&:hover': {
+                    bgcolor: 'text.primary',
+                    color: 'background.default',
+                    borderColor: 'text.primary'
+                  },
+                  transition: 'all 0.3s'
+                }}
+              >
+                Agendar Visita
+              </Button>
+            </Stack>
+          </Grid>
 
-        {/* Overlapping Image area */}
-        <div className="lg:col-span-5 relative mt-12 lg:mt-0">
-          <div className="relative aspect-[4/5] w-full bg-surface-low rounded-lg overflow-visible">
-            {/* Silhouette / Shadow under the vehicle */}
-            <div className="absolute -bottom-10 -right-10 w-full h-1/2 bg-primary/5 blur-3xl rounded-full" />
-            
-            {/* Empty space for the high-end vehicle PNG you'll provide */}
-            <div className="absolute inset-0 flex items-center justify-center p-8">
-               <div className="text-[10px] font-black uppercase tracking-widest text-foreground/10 rotate-90 origin-center">
-                  Masterpiece / 01
-               </div>
-            </div>
-            
-            {/* The "Bleed" element */}
-            <div className="absolute top-1/2 -left-20 -translate-y-1/2 w-40 h-px bg-primary/20" />
-          </div>
-          
-          <div className="absolute -bottom-6 -left-6 bg-surface-lowest p-8 shadow-premium z-20 hidden md:block">
-             <p className="text-3xl font-bold text-foreground">0-100</p>
-             <p className="text-[10px] font-black uppercase tracking-widest text-primary">2.8 Segundos</p>
-          </div>
-        </div>
-      </div>
-    </section>
+          {/* Overlapping Image area */}
+          <Grid size={{ xs: 12, lg: 5 }} sx={{ position: 'relative', mt: { xs: 6, lg: 0 } }}>
+            <Box 
+              sx={{ 
+                position: 'relative', 
+                aspectRatio: '4/5', 
+                width: '100%', 
+                bgcolor: 'background.paper', 
+                borderRadius: 2, 
+                overflow: 'visible' 
+              }}
+            >
+              {/* Silhouette / Shadow under the vehicle */}
+              <Box 
+                sx={{ 
+                  position: 'absolute', 
+                  bottom: -40, 
+                  right: -40, 
+                  width: '100%', 
+                  height: '50%', 
+                  bgcolor: 'rgba(194,65,12,0.05)', 
+                  filter: 'blur(64px)', 
+                  borderRadius: '50%' 
+                }} 
+              />
+              
+              {/* Empty space for the high-end vehicle PNG you'll provide */}
+              <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 4 }}>
+                 <Typography 
+                   sx={{ 
+                     fontSize: '10px', 
+                     fontWeight: 900, 
+                     textTransform: 'uppercase', 
+                     letterSpacing: '0.2em', 
+                     color: 'rgba(255,255,255,0.1)', 
+                     transform: 'rotate(90deg)', 
+                     transformOrigin: 'center' 
+                   }}
+                 >
+                    Masterpiece / 01
+                 </Typography>
+              </Box>
+              
+              {/* The "Bleed" element */}
+              <Box sx={{ position: 'absolute', top: '50%', left: -80, transform: 'translateY(-50%)', width: 160, height: '1px', bgcolor: 'rgba(194,65,12,0.2)' }} />
+            </Box>            
+
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
   );
 }

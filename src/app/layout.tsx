@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { auth } from "@/auth";
+import ThemeRegistry from "@/components/ThemeRegistry/ThemeRegistry";
 
 const spaceGrotesk = Space_Grotesk({ 
   subsets: ["latin"],
@@ -30,9 +31,11 @@ export default async function RootLayout({
   return (
     <html lang="es" className={`${spaceGrotesk.variable} ${manrope.variable}`} data-scroll-behavior="smooth">
       <body className={manrope.className}>
-        <Header session={session} />
-        <main>{children}</main>
-        <Footer />
+        <ThemeRegistry>
+          <Header session={session} />
+          <main>{children}</main>
+          <Footer />
+        </ThemeRegistry>
       </body>
     </html>
   );

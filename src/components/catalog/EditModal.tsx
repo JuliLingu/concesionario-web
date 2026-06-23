@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import { VehicleForm } from "../dashboard/VehicleForm";
-import { useEffect } from "react";
+import { Dialog, DialogContent, IconButton } from "@mui/material";
 
 interface EditModalProps {
   isOpen: boolean;
@@ -12,38 +12,52 @@ interface EditModalProps {
 }
 
 export const EditModal = ({ isOpen, onClose, vehiculo, categorias }: EditModalProps) => {
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div 
-        className="bg-surface-lowest w-full max-w-5xl rounded-sm shadow-2xl relative my-auto"
-        onClick={(e) => e.stopPropagation()}
+    <Dialog 
+      open={isOpen} 
+      onClose={onClose} 
+      maxWidth="md" 
+      fullWidth
+      PaperProps={{
+        sx: {
+          bgcolor: 'background.paper',
+          backgroundImage: 'none',
+          borderRadius: 1,
+          position: 'relative',
+          maxHeight: '90vh'
+        }
+      }}
+      slotProps={{
+        backdrop: {
+          sx: {
+            bgcolor: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(4px)'
+          }
+        }
+      }}
+    >
+      {/* Close Button */}
+      <IconButton 
+        onClick={onClose}
+        sx={{
+          position: 'absolute',
+          right: 8,
+          top: 8,
+          zIndex: 10,
+          bgcolor: 'rgba(255,255,255,0.05)',
+          color: 'text.secondary',
+          '&:hover': {
+            bgcolor: 'primary.main',
+            color: 'white'
+          }
+        }}
       >
-        {/* Close Button */}
-        <button 
-          onClick={onClose}
-          className="absolute right-4 top-4 z-10 w-10 h-10 bg-surface-low hover:bg-primary hover:text-white flex items-center justify-center transition-colors shadow-sm"
-        >
-          <X size={20} />
-        </button>
+        <X size={20} />
+      </IconButton>
 
-        <div className="max-h-[90vh] overflow-y-auto">
-           <VehicleForm initialData={vehiculo} categorias={categorias} onSuccess={onClose} />
-        </div>
-      </div>
-    </div>
+      <DialogContent sx={{ p: 0, '&::-webkit-scrollbar': { width: '8px' }, '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.2)' } }}>
+        <VehicleForm initialData={vehiculo} categorias={categorias} onSuccess={onClose} />
+      </DialogContent>
+    </Dialog>
   );
 };

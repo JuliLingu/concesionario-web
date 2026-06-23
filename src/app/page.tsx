@@ -6,13 +6,13 @@ import { LocationSection } from "@/components/home/LocationSection";
 
 export default async function HomePage() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <main style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Hero />
       <RecentVehicles />
       <CompanyInfo />
       <FinancingSection />
       <LocationSection />
-    </div>
+    </main>
   );
 }
 

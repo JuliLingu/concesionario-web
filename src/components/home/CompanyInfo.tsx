@@ -1,48 +1,102 @@
-import Image from "next/image";
+"use client";
+
+import { Box, Container, Grid, Typography, Stack } from "@mui/material";
 
 export function CompanyInfo() {
   return (
-    <section id="nosotros" className="py-32 bg-background overflow-hidden relative">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-        {/* Content Area */}
-        <div>
-          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary mb-8 block">
-            Our DNA / Legacy
-          </span>
-          <h2 className="text-6xl md:text-7xl font-bold text-foreground uppercase tracking-tight tight-editorial mb-12">
-            La Maestría <br /> 
-            detrás del <br /> 
-            volante.
-          </h2>
-          <p className="text-foreground/60 leading-relaxed mb-16 text-lg font-medium max-w-md">
-            En JBJ Automotores, operamos bajo el principio de que un vehículo es una extensión de la identidad. Nuestra trayectoria de dos décadas redefine la curaduría automotriz, seleccionando piezas que trascienden lo convencional.
-          </p>
+    <Box component="section" id="nosotros" sx={{ py: 16, bgcolor: 'background.default', overflow: 'hidden', position: 'relative' }}>
+      <Container maxWidth="lg">
+        <Grid container spacing={16} sx={{ alignItems: 'center' }}>
+          {/* Content Area */}
+          <Grid size={{ xs: 12, lg: 6 }} >
+            <Typography 
+              variant="overline" 
+              sx={{ 
+                fontSize: '10px', 
+                fontWeight: 900, 
+                letterSpacing: '0.5em', 
+                color: 'primary.main', 
+                mb: 4, 
+                display: 'block' 
+              }}
+            >
+              Our DNA / Legacy
+            </Typography>
+            <Typography 
+              variant="h2" 
+              sx={{ 
+                fontSize: { xs: '3.75rem', md: '4.5rem' }, 
+                fontWeight: 800, 
+                textTransform: 'uppercase', 
+                letterSpacing: '-0.02em', 
+                color: 'text.primary', 
+                lineHeight: 1, 
+                mb: 6 
+              }}
+            >
+              La Maestría <br /> 
+              detrás del <br /> 
+              volante.
+            </Typography>
+            <Typography 
+              variant="body1" 
+              sx={{ 
+                color: 'text.secondary', 
+                lineHeight: 1.6, 
+                mb: 8, 
+                fontSize: '1.125rem', 
+                fontWeight: 500, 
+                maxWidth: '28rem' 
+              }}
+            >
+              En JBJ Automotores, operamos bajo el principio de que un vehículo es una extensión de la identidad. Nuestra trayectoria de dos décadas redefine la curaduría automotriz, seleccionando piezas que trascienden lo convencional.
+            </Typography>
 
-          <div className="grid grid-cols-2 gap-16 pt-12 border-t border-foreground/[0.05]">
-            <div>
-              <p className="text-5xl font-bold font-space text-foreground mb-4">5K<span className="text-primary italic">+</span></p>
-              <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Relaciones Consolidadas</p>
-            </div>
-            <div>
-              <p className="text-5xl font-bold font-space text-foreground mb-4">24<span className="text-primary italic">/</span>7</p>
-              <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Soporte de Ingeniería</p>
-            </div>
-          </div>
-        </div>
+            <Grid container spacing={8} sx={{ pt: 6, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <Grid size={{ xs: 6 }} >
+                <Typography sx={{ fontSize: '3rem', fontWeight: 700, color: 'text.primary', mb: 2, lineHeight: 1 }}>
+                  5K<Box component="span" sx={{ color: 'primary.main', fontStyle: 'italic' }}>+</Box>
+                </Typography>
+                <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.4)' }}>
+                  Relaciones Consolidadas
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 6 }} >
+                <Typography sx={{ fontSize: '3rem', fontWeight: 700, color: 'text.primary', mb: 2, lineHeight: 1 }}>
+                  24<Box component="span" sx={{ color: 'primary.main', fontStyle: 'italic' }}>/</Box>7
+                </Typography>
+                <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.4)' }}>
+                  Soporte de Ingeniería
+                </Typography>
+              </Grid>
+            </Grid>
+          </Grid>
 
-        {/* Image Area with Editorial Overlap */}
-        <div className="relative">
-           <div className="aspect-square bg-surface-low rounded-lg shadow-premium relative z-10 overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center">
-                 <span className="text-[15rem] font-black text-foreground/[0.02] -rotate-12 italic">JBJ</span>
-              </div>
-           </div>
-           {/* Decorative overlapping element */}
-           <div className="absolute -top-12 -right-12 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-           <div className="absolute bottom-12 -left-12 w-48 h-48 border-[20px] border-surface-low z-0" />
-        </div>
-      </div>
-    </section>
+          {/* Image Area with Editorial Overlap */}
+          <Grid size={{ xs: 12, lg: 6 }} sx={{ position: 'relative' }}>
+             <Box 
+               sx={{ 
+                 aspectRatio: '1', 
+                 bgcolor: 'background.paper', 
+                 borderRadius: 2, 
+                 position: 'relative', 
+                 zIndex: 10, 
+                 overflow: 'hidden',
+                 boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'
+               }}
+             >
+                <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                   <Typography sx={{ fontSize: '15rem', fontWeight: 900, color: 'rgba(255,255,255,0.02)', transform: 'rotate(-12deg)', fontStyle: 'italic' }}>
+                     JBJ
+                   </Typography>
+                </Box>
+             </Box>
+             {/* Decorative overlapping element */}
+             <Box sx={{ position: 'absolute', top: -48, right: -48, width: 256, height: 256, bgcolor: 'rgba(194,65,12,0.05)', borderRadius: '50%', filter: 'blur(64px)' }} />
+             <Box sx={{ position: 'absolute', bottom: 48, left: -48, width: 192, height: 192, border: '20px solid #171717', zIndex: 0 }} />
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
   );
 }
-

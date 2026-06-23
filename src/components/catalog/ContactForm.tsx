@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import { ConsultaSchema } from "@/schemas/consulta";
 import { createConsulta } from "@/actions/consulta";
 import { Send, CheckCircle2 } from "lucide-react";
+import { Box, Button, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 
 interface ContactFormProps {
   vehiculoId?: string;
@@ -46,119 +47,130 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
   // If success, show confirmation state
   if (success) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 px-6 bg-surface-low text-center gap-4">
-        <div className="w-14 h-14 rounded-full bg-green-500/10 flex items-center justify-center">
-          <CheckCircle2 size={28} className="text-green-600" />
-        </div>
-        <h3 className="font-black text-foreground text-lg font-space uppercase tracking-tight">
+      <Stack alignItems="center" justifyContent="center" sx={{ py: 6, px: 3, bgcolor: 'background.paper', textAlign: 'center' }} spacing={2}>
+        <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: 'rgba(34,197,94,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <CheckCircle2 size={28} color="#16a34a" />
+        </Box>
+        <Typography variant="h3" sx={{ fontWeight: 900, fontSize: '1.125rem', textTransform: 'uppercase', letterSpacing: '-0.02em', mt: 1 }}>
           ¡Consulta enviada!
-        </h3>
-        <p className="text-sm text-foreground/60 font-medium max-w-sm leading-relaxed">
+        </Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500, maxWidth: 300, lineHeight: 1.6 }}>
           {success}
-        </p>
-        <button
+        </Typography>
+        <Button
           onClick={() => setSuccess(undefined)}
-          className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline mt-2"
+          variant="text"
+          sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', mt: 1 }}
         >
           Enviar otra consulta
-        </button>
-      </div>
+        </Button>
+      </Stack>
     );
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <Box component="form" onSubmit={form.handleSubmit(onSubmit)} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Nombre + Email */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">
-            Nombre *
-          </label>
-          <input
-            {...form.register("nombre")}
-            placeholder="Tu nombre"
-            disabled={isPending}
-            className="bg-surface-low px-4 py-3 outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm"
-          />
-          {form.formState.errors.nombre && (
-            <span className="text-primary text-[10px] font-black uppercase">
-              {form.formState.errors.nombre.message}
-            </span>
-          )}
-        </div>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+        <TextField
+          {...form.register("nombre")}
+          label="Nombre *"
+          placeholder="Tu nombre"
+          disabled={isPending}
+          error={!!form.formState.errors.nombre}
+          helperText={form.formState.errors.nombre?.message?.toString()}
+          fullWidth
+          variant="filled"
+          slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+          sx={{ '& .MuiFilledInput-root': { bgcolor: 'background.paper', borderRadius: 1 } }}
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">
-            Email *
-          </label>
-          <input
-            {...form.register("email")}
-            type="email"
-            placeholder="tu@email.com"
-            disabled={isPending}
-            className="bg-surface-low px-4 py-3 outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm"
-          />
-          {form.formState.errors.email && (
-            <span className="text-primary text-[10px] font-black uppercase">
-              {form.formState.errors.email.message}
-            </span>
-          )}
-        </div>
-      </div>
+        <TextField
+          {...form.register("email")}
+          type="email"
+          label="Email *"
+          placeholder="tu@email.com"
+          disabled={isPending}
+          error={!!form.formState.errors.email}
+          helperText={form.formState.errors.email?.message?.toString()}
+          fullWidth
+          variant="filled"
+          slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+          sx={{ '& .MuiFilledInput-root': { bgcolor: 'background.paper', borderRadius: 1 } }}
+        />
+      </Stack>
 
       {/* Teléfono */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">
-          Teléfono <span className="text-foreground/20 normal-case font-medium">(opcional)</span>
-        </label>
-        <input
-          {...form.register("telefono")}
-          placeholder="+54 223 421-4414"
-          disabled={isPending}
-          className="bg-surface-low px-4 py-3 outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm"
-        />
-      </div>
+      <TextField
+        {...form.register("telefono")}
+        label="Teléfono (opcional)"
+        placeholder="+54 223 421-4414"
+        disabled={isPending}
+        fullWidth
+        variant="filled"
+        slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+        sx={{ '& .MuiFilledInput-root': { bgcolor: 'background.paper', borderRadius: 1 } }}
+      />
 
       {/* Mensaje */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">
-          Mensaje <span className="text-foreground/20 normal-case font-medium">(opcional)</span>
-        </label>
-        <textarea
-          {...form.register("mensaje")}
-          rows={4}
-          disabled={isPending}
-          placeholder="¿Tenés alguna pregunta específica sobre el vehículo?"
-          className="bg-surface-low px-4 py-3 outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm resize-none"
-        />
-      </div>
-
-      {/* Hidden vehiculoId */}
-      <input type="hidden" {...form.register("vehiculoId")} />
+      <TextField
+        {...form.register("mensaje")}
+        label="Mensaje (opcional)"
+        placeholder="¿Tenés alguna pregunta específica sobre el vehículo?"
+        disabled={isPending}
+        multiline
+        rows={4}
+        fullWidth
+        variant="filled"
+        slotProps={{
+          input: {},
+          inputLabel: {}
+        }}
+        sx={{ '& .MuiFilledInput-root': { bgcolor: 'background.paper', borderRadius: 1 } }}
+      />
 
       {error && (
-        <div className="bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest p-3">
+        <Typography sx={{ bgcolor: 'rgba(194,65,12,0.1)', color: 'primary.main', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', p: 1.5 }}>
           {error}
-        </div>
+        </Typography>
       )}
 
-      <button
+      <Button
         type="submit"
         disabled={isPending}
-        className="w-full bg-foreground text-white py-4 text-[11px] font-black uppercase tracking-widest hover:bg-primary transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+        variant="contained"
+        fullWidth
+        sx={{
+          bgcolor: 'text.primary',
+          color: 'background.default',
+          py: 2,
+          fontSize: '11px',
+          fontWeight: 900,
+          letterSpacing: '0.1em',
+          '&:hover': { bgcolor: 'primary.main' }
+        }}
       >
         {isPending ? (
-          <>
-            <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            Enviando...
-          </>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <CircularProgress size={16} color="inherit" />
+            <Typography sx={{ fontSize: 'inherit', fontWeight: 'inherit', textTransform: 'uppercase' }}>Enviando...</Typography>
+          </Stack>
         ) : (
-          <>
-            <Send size={13} />
-            Enviar Consulta
-          </>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Send size={16} />
+            <Typography sx={{ fontSize: 'inherit', fontWeight: 'inherit', textTransform: 'uppercase' }}>Enviar Consulta</Typography>
+          </Stack>
         )}
-      </button>
-    </form>
+      </Button>
+    </Box>
   );
 };

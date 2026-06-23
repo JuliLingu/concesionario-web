@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { registerSchema } from "@/schemas/auth.schemas";
+import { RegisterSchema as registerSchema } from "@/schemas/auth";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {

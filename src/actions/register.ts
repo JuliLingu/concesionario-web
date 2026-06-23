@@ -5,7 +5,8 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { RegisterSchema } from "@/schemas/auth";
 
-export const register = async (values: z.infer<typeof RegisterSchema>) => {
+export const register = async (formData: FormData) => {
+  const values = Object.fromEntries(formData.entries());
   const validatedFields = RegisterSchema.safeParse(values);
 
   if (!validatedFields.success) {
