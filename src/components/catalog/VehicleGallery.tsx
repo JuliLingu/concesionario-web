@@ -55,6 +55,7 @@ export const VehicleGallery = ({ images, altText }: VehicleGalleryProps) => {
           alt={`${altText} - Imagen ${currentIndex + 1}`}
           fill
           priority
+          loading="eager"
           sizes="(max-width: 1024px) 100vw, 65vw"
           style={{ objectFit: 'cover', objectPosition: 'center' }}
         />

@@ -16,9 +16,11 @@ interface VehicleCardProps {
   };
   isAdmin?: boolean;
   categorias?: { id: string; nombre: string }[];
+  priority?: boolean;
+  cotizacionDolar?: number | null;
 }
 
-export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [] }: VehicleCardProps) => {
+export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priority = false, cotizacionDolar }: VehicleCardProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const imagenPrincipal = vehiculo.imagenes.find(img => img.esPrincipal)?.url || vehiculo.imagenes[0]?.url || "";
 
@@ -46,6 +48,8 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [] }: Vehi
             src={getCldUrl(imagenPrincipal, "4:3")}
             alt={`${vehiculo.marca} ${vehiculo.modelo}`}
             fill
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className="vehicle-img"
             style={{ objectFit: 'cover', objectPosition: 'center', transition: 'transform 0.7s ease' }}
@@ -128,7 +132,9 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [] }: Vehi
         {/* Price and CTA */}
         <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, color: 'primary.main', letterSpacing: '-0.05em' }}>
-            U$D {vehiculo.precio.toLocaleString("es-AR")}
+            {cotizacionDolar 
+              ? `ARS $ ${(vehiculo.precio * cotizacionDolar).toLocaleString("es-AR")}` 
+              : `U$D ${vehiculo.precio.toLocaleString("es-AR")}`}
           </Typography>
           <Button
             component={Link}

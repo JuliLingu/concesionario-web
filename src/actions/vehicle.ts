@@ -57,7 +57,10 @@ export const getVehicles = async () => {
         createdAt: "desc",
       },
     });
-    return vehicles;
+    return vehicles.map(v => ({
+      ...v,
+      precio: Number(v.precio)
+    }));
   } catch {
     return [];
   }
@@ -128,7 +131,13 @@ export const getVehicleById = async (id: string) => {
         },
       },
     });
-    return vehicle;
+    
+    if (!vehicle) return null;
+    
+    return {
+      ...vehicle,
+      precio: Number(vehicle.precio)
+    };
   } catch {
     return null;
   }

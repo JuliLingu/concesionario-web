@@ -24,12 +24,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 7.6.0
- * Query Engine version: 75cbdc1eb7150937890ad5465d861175c6624711
+ * Prisma Client JS version: 7.8.0
+ * Query Engine version: 3c6e192761c0362d496ed980de936e2f3cebcd3a
  */
 Prisma.prismaVersion = {
-  client: "7.6.0",
-  engine: "75cbdc1eb7150937890ad5465d861175c6624711"
+  client: "7.8.0",
+  engine: "3c6e192761c0362d496ed980de936e2f3cebcd3a"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -212,6 +212,18 @@ exports.Prisma.ConsultaScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ConfiguracionScalarFieldEnum = {
+  id: 'id',
+  nombreConcesionaria: 'nombreConcesionaria',
+  telefono: 'telefono',
+  email: 'email',
+  direccion: 'direccion',
+  facebookUrl: 'facebookUrl',
+  instagramUrl: 'instagramUrl',
+  cotizacionDolar: 'cotizacionDolar',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -288,6 +300,16 @@ exports.Prisma.ConsultaOrderByRelevanceFieldEnum = {
   telefono: 'telefono',
   mensaje: 'mensaje'
 };
+
+exports.Prisma.ConfiguracionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  nombreConcesionaria: 'nombreConcesionaria',
+  telefono: 'telefono',
+  email: 'email',
+  direccion: 'direccion',
+  facebookUrl: 'facebookUrl',
+  instagramUrl: 'instagramUrl'
+};
 exports.Role = exports.$Enums.Role = {
   USER: 'USER',
   ADMIN: 'ADMIN'
@@ -334,7 +356,8 @@ exports.Prisma.ModelName = {
   Categoria: 'Categoria',
   Vehiculo: 'Vehiculo',
   ImagenVehiculo: 'ImagenVehiculo',
-  Consulta: 'Consulta'
+  Consulta: 'Consulta',
+  Configuracion: 'Configuracion'
 };
 
 /**

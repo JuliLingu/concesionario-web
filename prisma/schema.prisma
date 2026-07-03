@@ -211,3 +211,22 @@ model Consulta {
   @@index([estado])
   @@map("consultas")
 }
+
+// ─────────────────────────────────────────
+// CONFIGURACIÓN DEL SISTEMA
+// ─────────────────────────────────────────
+
+model Configuracion {
+  id                  String   @id @default("1")
+  nombreConcesionaria String   @default("JBJ Automotores")
+  telefono            String?
+  email               String?
+  direccion           String?
+  facebookUrl         String?
+  instagramUrl        String?
+  cotizacionDolar     Decimal? @db.Decimal(10, 2)
+  
+  updatedAt           DateTime @updatedAt
+
+  @@map("configuraciones")
+}

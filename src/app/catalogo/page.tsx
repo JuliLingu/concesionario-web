@@ -8,6 +8,7 @@ import {
   getCachedAnioRange, 
   getCachedCategorias 
 } from "@/services/cache.service";
+import { getConfiguracion } from "@/actions/configuracion";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -98,10 +99,11 @@ export default async function CatalogoPage({
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
-  const [marcasDisponibles, combustiblesDisponibles, { anioMin, anioMax }] = await Promise.all([
+  const [marcasDisponibles, combustiblesDisponibles, { anioMin, anioMax }, configuracion] = await Promise.all([
     getCachedMarcas(),
     getCachedCombustibles(),
     getCachedAnioRange(),
+    getConfiguracion(),
   ]);
 
   let categorias: { id: string; nombre: string }[] = [];
@@ -109,11 +111,10 @@ export default async function CatalogoPage({
     categorias = await getCachedCategorias();
   }
 
-
-
   return (
     <CatalogoClient 
       vehiculos={vehiculos}
+      cotizacionDolar={configuracion?.cotizacionDolar}
       marcasDisponibles={marcasDisponibles}
       combustiblesDisponibles={combustiblesDisponibles}
       anioMin={anioMin}

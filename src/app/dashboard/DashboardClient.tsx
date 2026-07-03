@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Car, CheckCircle2, FileText, MessageSquare, Plus, LayoutList, ArrowRight, ExternalLink } from "lucide-react";
+import { Car, CheckCircle2, FileText, MessageSquare, Plus, LayoutList, ArrowRight, ExternalLink, Tags } from "lucide-react";
 import { ConsultaStatusButton } from "@/components/dashboard/ConsultaStatusButton";
 import { Box, Container, Grid, Typography, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Link as MuiLink } from "@mui/material";
 
@@ -54,21 +54,27 @@ export const DashboardClient = ({
 
         {/* ── Quick Actions ── */}
         <Grid container spacing={2} sx={{ mb: 6 }}>
-          <Grid size={{ xs: 12, md: 4 }} >
+          <Grid size={{ xs: 12, md: 4, lg: 2.4 }} >
             <QuickAction href="/dashboard/vehicles/new" icon={<Plus size={18} />} label="Agregar Vehículo" description="Dar de alta una nueva unidad" primary />
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }} >
+          <Grid size={{ xs: 12, md: 4, lg: 2.4 }} >
             <QuickAction href="/dashboard/vehicles" icon={<LayoutList size={18} />} label="Ver Inventario" description="Gestionar y editar el stock" />
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }} >
+          <Grid size={{ xs: 12, md: 4, lg: 2.4 }} >
+            <QuickAction href="/dashboard/categorias" icon={<Tags size={18} />} label="Categorías" description="Administrar tipos de vehículos" />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6, lg: 2.4 }} >
             <QuickAction href="/dashboard/consultas" icon={<MessageSquare size={18} />} label="Ver Consultas" description={consultasPendientes > 0 ? `${consultasPendientes} sin atender` : "Historial completo"} badge={consultasPendientes > 0 ? consultasPendientes : undefined} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6, lg: 2.4 }} >
+            <QuickAction href="/dashboard/settings" icon={<ExternalLink size={18} />} label="Configuración" description="Ajustes generales del sitio" />
           </Grid>
         </Grid>
 
         {/* ── Últimas Consultas Pendientes ── */}
         {ultimasConsultas.length > 0 && (
           <Box>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
+            <Stack direction="row" sx={{ mb: 3, alignItems: "center", justifyContent:"space-between" }}>
               <Typography variant="h2" sx={{ fontSize: '1.125rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
                 Consultas Pendientes
               </Typography>
@@ -137,10 +143,10 @@ export const DashboardClient = ({
 const MetricCard = ({ label, value, icon, href, accent }: any) => {
   const iconColor = accent === "primary" ? "primary.main" : accent === "green" ? "#16a34a" : "text.secondary";
   const textColor = accent === "primary" ? "primary.main" : accent === "green" ? "#16a34a" : "text.primary";
-  
+
   return (
     <Box component={Link} href={href} sx={{ display: 'block', textDecoration: 'none', bgcolor: 'background.paper', p: 3, borderRadius: 1, transition: 'all 0.2s', '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' } }}>
-      <Stack direction="row" alignItems="flex-start" justifyContent="space-between" sx={{ mb: 2, color: iconColor }}>
+      <Stack direction="row" sx={{ mb: 2, color: iconColor,alignItems:"flex-start", justifyContent:"space-between"  }}>
         {icon}
         <ArrowRight size={14} style={{ opacity: 0.5 }} />
       </Stack>

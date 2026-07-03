@@ -15,17 +15,17 @@ interface ContactFormProps {
 }
 
 export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) => {
-  const [error, setError]     = useState<string | undefined>();
+  const [error, setError] = useState<string | undefined>();
   const [success, setSuccess] = useState<string | undefined>();
-  const [isPending, start]    = useTransition();
+  const [isPending, start] = useTransition();
 
   const form = useForm<z.infer<typeof ConsultaSchema>>({
     resolver: zodResolver(ConsultaSchema),
     defaultValues: {
-      nombre:     "",
-      email:      "",
-      telefono:   "",
-      mensaje:    vehiculoNombre ? `Hola, me interesa el ${vehiculoNombre}. ` : "",
+      nombre: "",
+      email: "",
+      telefono: "",
+      mensaje: vehiculoNombre ? `Hola, me interesa el ${vehiculoNombre}. ` : "",
       vehiculoId: vehiculoId || "",
     },
   });
@@ -36,7 +36,7 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
 
     start(async () => {
       const result = await createConsulta(values);
-      if (result.error)   setError(result.error);
+      if (result.error) setError(result.error);
       if (result.success) {
         setSuccess(result.success);
         form.reset();
@@ -47,7 +47,7 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
   // If success, show confirmation state
   if (success) {
     return (
-      <Stack alignItems="center" justifyContent="center" sx={{ py: 6, px: 3, bgcolor: 'background.paper', textAlign: 'center' }} spacing={2}>
+      <Stack sx={{ py: 6, px: 3, bgcolor: 'background.paper', textAlign: 'center', alignItems: "center", justifyContent: "center" }} spacing={2}>
         <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: 'rgba(34,197,94,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <CheckCircle2 size={28} color="#16a34a" />
         </Box>
@@ -82,9 +82,9 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
           fullWidth
           variant="filled"
           slotProps={{
-          input: {},
-          inputLabel: {}
-        }}
+            input: {},
+            inputLabel: {}
+          }}
           sx={{ '& .MuiFilledInput-root': { bgcolor: 'background.paper', borderRadius: 1 } }}
         />
 
@@ -99,9 +99,9 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
           fullWidth
           variant="filled"
           slotProps={{
-          input: {},
-          inputLabel: {}
-        }}
+            input: {},
+            inputLabel: {}
+          }}
           sx={{ '& .MuiFilledInput-root': { bgcolor: 'background.paper', borderRadius: 1 } }}
         />
       </Stack>
@@ -160,12 +160,12 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
         }}
       >
         {isPending ? (
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
             <CircularProgress size={16} color="inherit" />
             <Typography sx={{ fontSize: 'inherit', fontWeight: 'inherit', textTransform: 'uppercase' }}>Enviando...</Typography>
           </Stack>
         ) : (
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
             <Send size={16} />
             <Typography sx={{ fontSize: 'inherit', fontWeight: 'inherit', textTransform: 'uppercase' }}>Enviar Consulta</Typography>
           </Stack>

@@ -25,7 +25,8 @@ export const CatalogoClient = ({
   transmisionesArray,
   combustiblesArray,
   anioDesde,
-  anioHasta
+  anioHasta,
+  cotizacionDolar
 }: any) => {
 
   const buildUrl = (newParams: Record<string, string | null>) => {
@@ -117,9 +118,9 @@ export const CatalogoClient = ({
           <Grid size={{ xs: 12, lg: 9 }} >
             {vehiculos.length > 0 ? (
               <Grid container spacing={3}>
-                {vehiculos.map((v: any) => (
+                {vehiculos.map((v: any, index: number) => (
                   <Grid size={{ xs: 12, sm: 6, xl: 4 }} key={v.id}>
-                    <VehicleCard vehiculo={v} isAdmin={isAdmin} categorias={categorias} />
+                    <VehicleCard vehiculo={v} isAdmin={isAdmin} categorias={categorias} priority={index < 2} cotizacionDolar={cotizacionDolar} />
                   </Grid>
                 ))}
               </Grid>

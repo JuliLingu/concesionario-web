@@ -11,7 +11,7 @@ export const VehiclesClient = ({ vehicles, publicados, borradores }: any) => {
       <Container maxWidth="xl">
         
         {/* Header */}
-        <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-start', md: 'flex-end' }} justifyContent="space-between" spacing={3} sx={{ mb: 6 }}>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{ mb: 6, alignItems: { xs: 'flex-start', md: 'flex-end' }, justifyContent: "space-between" }}>
           <Box>
             <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'primary.main', mb: 1 }}>
               Panel de Control
@@ -94,7 +94,7 @@ export const VehiclesClient = ({ vehicles, publicados, borradores }: any) => {
                     </Typography>
                   </TableCell>
                   <TableCell align="right" sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={2}>
+                    <Stack direction="row" spacing={2} sx={{alignItems:"center", justifyContent:"flex-end"}}>
                       <MuiLink component={Link} href={`/dashboard/vehicles/${v.id}`} sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' }, display: 'flex' }} title="Editar">
                         <Pencil size={16} />
                       </MuiLink>

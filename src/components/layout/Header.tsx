@@ -7,9 +7,15 @@ import { AppBar, Toolbar, Box, Button, Typography } from "@mui/material";
 
 interface HeaderProps {
   session: any;
+  configuracion?: any;
 }
 
-export function Header({ session }: HeaderProps) {
+export function Header({ session, configuracion }: HeaderProps) {
+  // Extraer primera palabra del nombre si existe
+  const parts = configuracion?.nombreConcesionaria ? configuracion.nombreConcesionaria.split(" ") : ["JBJ", "Automotores"];
+  const firstWord = parts[0];
+  const restWords = parts.slice(1).join(" ");
+
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -36,11 +42,13 @@ export function Header({ session }: HeaderProps) {
           <Box component={Link} href="/" sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none' }}>
             <Car style={{ color: "#c2410c", width: 24, height: 24 }} />
             <Typography variant="body2" sx={{ fontWeight: 800, color: '#1a1c1e', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
-              JBJ 
+              {firstWord}
             </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 800, color: '#c2410c', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
-              Automotores
-            </Typography>
+            {restWords && (
+              <Typography variant="body2" sx={{ fontWeight: 800, color: '#c2410c', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+                {restWords}
+              </Typography>
+            )}
           </Box>
 
           <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>

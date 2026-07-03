@@ -5,7 +5,7 @@ import { VehicleCard } from "../catalog/VehicleCard";
 import { ArrowRight } from "lucide-react";
 import { Box, Container, Typography, Stack, Grid } from "@mui/material";
 
-export function RecentVehiclesUI({ vehicles }: { vehicles: any[] }) {
+export function RecentVehiclesUI({ vehicles, cotizacionDolar }: { vehicles: any[], cotizacionDolar?: number | null }) {
   return (
     <Box component="section" sx={{ bgcolor: 'background.paper', py: 16 }}>
       <Container maxWidth="lg">
@@ -80,9 +80,9 @@ export function RecentVehiclesUI({ vehicles }: { vehicles: any[] }) {
         </Stack>
 
         <Grid container spacing={0}>
-          {vehicles.map((vehicle) => (
+          {vehicles.map((vehicle, index) => (
             <Grid size={{ xs: 12, md: 4 }} key={vehicle.id}>
-              <VehicleCard vehiculo={vehicle} />
+              <VehicleCard vehiculo={vehicle} priority={index === 0} cotizacionDolar={cotizacionDolar} />
             </Grid>
           ))}
         </Grid>

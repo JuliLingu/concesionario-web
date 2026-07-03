@@ -483,11 +483,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
                 multiple: true,
                 maxFiles: 10,
                 resourceType: "image",
-                clientAllowedFormats: ["webp", "png", "jpg", "jpeg"],
-                cropping: true,
-                croppingAspectRatio: 4/3,
-                croppingShowDimensions: true,
-                croppingDefaultSelectionRatio: 4/3
+                clientAllowedFormats: ["webp", "png", "jpg", "jpeg"]
               }}
             >
               {({ open }) => (

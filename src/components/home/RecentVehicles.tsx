@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { RecentVehiclesUI } from "./RecentVehiclesUI";
 
-export async function RecentVehicles() {
+export async function RecentVehicles({ cotizacionDolar }: { cotizacionDolar?: number | null }) {
   const rawVehicles = await prisma.vehiculo.findMany({
     take: 3,
     orderBy: {
@@ -18,5 +18,5 @@ export async function RecentVehicles() {
     precio: Number(v.precio),
   }));
 
-  return <RecentVehiclesUI vehicles={recentVehicles} />;
+  return <RecentVehiclesUI vehicles={recentVehicles} cotizacionDolar={cotizacionDolar} />;
 }

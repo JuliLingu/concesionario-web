@@ -6,7 +6,7 @@ import { VehicleGallery } from "@/components/catalog/VehicleGallery";
 import { ContactForm } from "@/components/catalog/ContactForm";
 import { Box, Button, Container, Grid, Stack, Typography } from "@mui/material";
 
-export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl }: any) => {
+export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, cotizacionDolar }: any) => {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.paper', color: 'text.primary', pt: 4, pb: 8 }}>
       <Container maxWidth="xl">
@@ -23,7 +23,7 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl }: an
 
         <Grid container spacing={6}>
           <Grid size={{ xs: 12, lg: 7, xl: 8 }} >
-            <VehicleGallery images={vehicle.imagenes} altText={vehiculoNombre} />
+            <VehicleGallery images={vehicle.imagenes} altText={vehiculoNombre}/>
           </Grid>
 
           <Grid size={{ xs: 12, lg: 5, xl: 4 }} >
@@ -46,8 +46,10 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl }: an
                 </Typography>
               </Box>
 
-              <Typography sx={{ fontSize: { xs: '2.25rem', lg: '2.5rem' }, fontWeight: 900, letterSpacing: '-0.02em' }}>
-                U$D {Number(vehicle.precio).toLocaleString("es-AR")}
+              <Typography sx={{ fontSize: '2.5rem', fontWeight: 900, color: 'primary.main', letterSpacing: '-0.05em' }}>
+                {cotizacionDolar 
+                  ? `ARS $ ${(Number(vehicle.precio) * cotizacionDolar).toLocaleString("es-AR")}` 
+                  : `U$D ${Number(vehicle.precio).toLocaleString("es-AR")}`}
               </Typography>
 
               <Button
@@ -154,8 +156,8 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl }: an
 };
 
 const SpecItem = ({ icon, label, value, capitalize = false, border = true }: any) => (
-  <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ pb: border ? 1.5 : 0, borderBottom: border ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
-    <Stack direction="row" alignItems="center" spacing={1} sx={{ color: 'text.secondary' }}>
+  <Stack direction="row" sx={{ pb: border ? 1.5 : 0, borderBottom: border ? '1px solid rgba(255,255,255,0.05)' : 'none', alignItems: "center", justifyContent: "space-between" }}>
+    <Stack direction="row" spacing={1} sx={{ color: 'text.secondary', alignItems: "center" }}>
       {icon}
       <Typography sx={{ fontSize: '0.875rem', fontWeight: 700 }}>{label}</Typography>
     </Stack>
@@ -164,8 +166,8 @@ const SpecItem = ({ icon, label, value, capitalize = false, border = true }: any
 );
 
 const SpecRow = ({ label, value }: { label: string; value: string | number }) => (
-  <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 1.5, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+  <Stack direction="row" sx={{ py: 1.5, borderBottom: '1px solid rgba(255,255,255,0.05)', alignItems: "center", justifyContent: "space-between" }}>
     <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, color: 'text.secondary' }}>{label}</Typography>
-    <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, noWrap: true, pl: 2 }}>{value}</Typography>
+    <Typography sx={{ fontSize: '0.875rem', fontWeight: 700,whiteSpace: "nowrap", pl: 2 }}>{value}</Typography>
   </Stack>
 );

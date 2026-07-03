@@ -2,7 +2,13 @@
 
 import { Box, Container, Grid, Typography, Stack } from "@mui/material";
 
-export function LocationSection() {
+interface LocationSectionProps {
+  configuracion?: any;
+}
+
+export function LocationSection({ configuracion }: LocationSectionProps) {
+  const address = configuracion?.direccion || "Av. Principal 123, Buenos Aires";
+
   return (
     <Box component="section" id="ubicacion" sx={{ py: 12, bgcolor: '#171717' }}>
       <Container maxWidth="lg">
@@ -43,16 +49,16 @@ export function LocationSection() {
                 <Box sx={{ width: '1px', height: 48, bgcolor: 'rgba(194,65,12,0.3)' }} />
                 <Box>
                   <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.4)', mb: 1 }}>Location</Typography>
-                  <Typography sx={{ color: 'text.primary', fontWeight: 700, fontSize: '1.125rem' }}>Av. Principal 123, Buenos Aires</Typography>
+                  <Typography sx={{ color: 'text.primary', fontWeight: 700, fontSize: '1.125rem' }}>{address}</Typography>
                 </Box>
               </Box>
 
               <Box sx={{ display: 'flex', gap: 3 }}>
                 <Box sx={{ width: '1px', height: 48, bgcolor: 'rgba(194,65,12,0.3)' }} />
                 <Box>
-                  <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.4)', mb: 1 }}>Open Hours</Typography>
-                  <Typography sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Lun — Vie: 09:00 — 19:00</Typography>
-                  <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', mt: 0.5 }}>Sábados: 10:00 — 14:00</Typography>
+                  <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.4)', mb: 1 }}>Contact</Typography>
+                  <Typography sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{configuracion?.telefono || "Lun — Vie: 09:00 — 19:00"}</Typography>
+                  <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', mt: 0.5 }}>{configuracion?.email || "Sábados: 10:00 — 14:00"}</Typography>
                 </Box>
               </Box>
             </Stack>

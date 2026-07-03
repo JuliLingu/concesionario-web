@@ -24,7 +24,7 @@ export const ConsultasClient = ({ consultas, pendientes, TABS, estadoValido }: a
           <Typography variant="h1" sx={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-0.02em', mb: 0.5 }}>
             Consultas
           </Typography>
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <Stack direction="row"  spacing={1} sx={{alignItems:"center"}} >
             <Typography sx={{ color: 'text.secondary', fontWeight: 500 }}>
               {consultas.length} consulta{consultas.length !== 1 ? "s" : ""}
             </Typography>

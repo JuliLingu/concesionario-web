@@ -2,7 +2,15 @@
 import { Car } from "lucide-react";
 import { Box, Container, Typography, Stack, Link as MuiLink } from "@mui/material";
 
-export function Footer() {
+interface FooterProps {
+  configuracion?: any;
+}
+
+export function Footer({ configuracion }: FooterProps) {
+  const parts = configuracion?.nombreConcesionaria ? configuracion.nombreConcesionaria.split(" ") : ["JBJ", "Automotores"];
+  const firstWord = parts[0];
+  const restWords = parts.slice(1).join(" ");
+
   return (
     <Box component="footer" sx={{ py: 4, bgcolor: '#1a1c1e' }}>
       <Container maxWidth="lg">
@@ -17,13 +25,14 @@ export function Footer() {
               <Car style={{ color: "#c2410c", width: 20, height: 20 }} />
             </Box>
             <Typography variant="body1" sx={{ fontWeight: 800, color: 'white', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
-              JBJ <span style={{ color: "#c2410c" }}>Automotores</span>
+              {firstWord} {restWords && <span style={{ color: "#c2410c" }}>{restWords}</span>}
             </Typography>
           </Stack>
 
           {/* TEXTO CENTRAL */}
           <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.35)', fontWeight: 300, textAlign: 'center' }}>
             Vehículos de calidad. Concesionario en Argentina. {new Date().getFullYear()}
+            {configuracion?.direccion && ` - ${configuracion.direccion}`}
           </Typography>
 
           {/* ENLACES SECUNDARIOS */}

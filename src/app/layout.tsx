@@ -21,20 +21,23 @@ export const metadata: Metadata = {
   description: "Una experiencia automotriz editorial y premium.",
 };
 
+import { getConfiguracion } from "@/actions/configuracion";
+
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const session = await auth();
+  const configuracion = await getConfiguracion();
 
   return (
     <html lang="es" className={`${spaceGrotesk.variable} ${manrope.variable}`} data-scroll-behavior="smooth">
       <body className={manrope.className}>
         <ThemeRegistry>
-          <Header session={session} />
+          <Header session={session} configuracion={configuracion} />
           <main>{children}</main>
-          <Footer />
+          <Footer configuracion={configuracion} />
         </ThemeRegistry>
       </body>
     </html>
