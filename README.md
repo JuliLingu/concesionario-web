@@ -34,3 +34,38 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Credenciales
+
+# Conexión a Base de Datos (URL Completa para Prisma)
+DATABASE_URL=""
+
+# Variables para el Adaptador Nativo (Requerido en Prisma 7)
+DATABASE_HOST=""
+DATABASE_PORT=
+DATABASE_NAME=""
+DATABASE_USER=""
+DATABASE_PASSWORD=""
+
+TIMEZONE = "America/Argentina/Buenos_Aires";
+
+CA="./isrgrootx1.pem"
+
+
+# Configuración de Auth.js
+# Genera un secreto seguro en terminal, puede ser por ejemplo con: openssl rand -base64 32
+AUTH_SECRET="un_secreto_muy_largo_y_seguro"
+
+# Credenciales de Google OAuth (Ver paso 4)
+AUTH_GOOGLE_ID=""
+AUTH_GOOGLE_SECRET=""
+
+# Importante para desarrollo local
+AUTH_TRUST_HOST=true
+
+# Configuración de Cloudinary
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=""
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=""
+CLOUDINARY_API_KEY=""
+CLOUDINARY_API_SECRET=""
+
