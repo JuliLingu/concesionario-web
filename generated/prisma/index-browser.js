@@ -176,7 +176,6 @@ exports.Prisma.VehiculoScalarFieldEnum = {
   version: 'version',
   estado: 'estado',
   precio: 'precio',
-  moneda: 'moneda',
   kilometraje: 'kilometraje',
   color: 'color',
   motor: 'motor',
@@ -220,7 +219,35 @@ exports.Prisma.ConfiguracionScalarFieldEnum = {
   direccion: 'direccion',
   facebookUrl: 'facebookUrl',
   instagramUrl: 'instagramUrl',
-  cotizacionDolar: 'cotizacionDolar',
+  horariosAtencion: 'horariosAtencion',
+  updatedAt: 'updatedAt',
+  cotizacionDolar: 'cotizacionDolar'
+};
+
+exports.Prisma.PlanFinanciacionScalarFieldEnum = {
+  id: 'id',
+  nombre: 'nombre',
+  cuotas: 'cuotas',
+  tasaAnual: 'tasaAnual',
+  activo: 'activo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SolicitudFinanciacionScalarFieldEnum = {
+  id: 'id',
+  vehiculoId: 'vehiculoId',
+  nombre: 'nombre',
+  apellido: 'apellido',
+  dni: 'dni',
+  email: 'email',
+  telefono: 'telefono',
+  ingresos: 'ingresos',
+  anticipo: 'anticipo',
+  cuotas: 'cuotas',
+  estado: 'estado',
+  mensaje: 'mensaje',
+  createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
@@ -279,7 +306,6 @@ exports.Prisma.VehiculoOrderByRelevanceFieldEnum = {
   marca: 'marca',
   modelo: 'modelo',
   version: 'version',
-  moneda: 'moneda',
   color: 'color',
   motor: 'motor',
   descripcion: 'descripcion'
@@ -308,7 +334,24 @@ exports.Prisma.ConfiguracionOrderByRelevanceFieldEnum = {
   email: 'email',
   direccion: 'direccion',
   facebookUrl: 'facebookUrl',
-  instagramUrl: 'instagramUrl'
+  instagramUrl: 'instagramUrl',
+  horariosAtencion: 'horariosAtencion'
+};
+
+exports.Prisma.PlanFinanciacionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  nombre: 'nombre'
+};
+
+exports.Prisma.SolicitudFinanciacionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  vehiculoId: 'vehiculoId',
+  nombre: 'nombre',
+  apellido: 'apellido',
+  dni: 'dni',
+  email: 'email',
+  telefono: 'telefono',
+  mensaje: 'mensaje'
 };
 exports.Role = exports.$Enums.Role = {
   USER: 'USER',
@@ -357,7 +400,9 @@ exports.Prisma.ModelName = {
   Vehiculo: 'Vehiculo',
   ImagenVehiculo: 'ImagenVehiculo',
   Consulta: 'Consulta',
-  Configuracion: 'Configuracion'
+  Configuracion: 'Configuracion',
+  PlanFinanciacion: 'PlanFinanciacion',
+  SolicitudFinanciacion: 'SolicitudFinanciacion'
 };
 
 /**

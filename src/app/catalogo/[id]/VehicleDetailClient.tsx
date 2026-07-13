@@ -4,9 +4,10 @@ import Link from "next/link";
 import { ArrowLeft, Calendar, Fuel, AlignJustify, Disc, MessageCircle } from "lucide-react";
 import { VehicleGallery } from "@/components/catalog/VehicleGallery";
 import { ContactForm } from "@/components/catalog/ContactForm";
+import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
 import { Box, Button, Container, Grid, Stack, Typography } from "@mui/material";
 
-export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, cotizacionDolar }: any) => {
+export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, cotizacionDolar, planes }: any) => {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.paper', color: 'text.primary', pt: 4, pb: 8 }}>
       <Container maxWidth="xl">
@@ -116,6 +117,30 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
                   El vendedor no ha añadido una descripción para este vehículo.
                 </Typography>
               )}
+            </Grid>
+          </Grid>
+        </Box>
+
+        <Box sx={{ mt: { xs: 8, lg: 12 }, pt: { xs: 6, lg: 8 }, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <Grid container spacing={6} sx={{ alignItems: 'flex-start' }}>
+            <Grid size={{ xs: 12, lg: 5 }} >
+              <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'primary.main', mb: 2 }}>
+                Financiación Exclusiva
+              </Typography>
+              <Typography variant="h2" sx={{ fontSize: '1.875rem', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', mb: 2 }}>
+                Llevátelo hoy, <br/> pagalo a tu ritmo
+              </Typography>
+              <Typography sx={{ color: 'text.secondary', fontWeight: 500, lineHeight: 1.6, mb: 3 }}>
+                Calculá tu cuota mensual ajustando el anticipo y los plazos. Nuestras tasas son fijas y en pesos.
+              </Typography>
+            </Grid>
+            <Grid size={{ xs: 12, lg: 7 }} >
+              <FinancingSimulator 
+                vehiculoId={vehicle.id} 
+                precioOriginal={Number(vehicle.precio)} 
+                cotizacionDolar={cotizacionDolar} 
+                planes={planes || []} 
+              />
             </Grid>
           </Grid>
         </Box>

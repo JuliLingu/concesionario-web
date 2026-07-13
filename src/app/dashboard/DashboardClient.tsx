@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Car, CheckCircle2, FileText, MessageSquare, Plus, LayoutList, ArrowRight, ExternalLink, Tags } from "lucide-react";
+import { Car, CheckCircle2, FileText, MessageSquare, Plus, LayoutList, ArrowRight, ExternalLink, Tags, Wallet, CreditCard } from "lucide-react";
 import { ConsultaStatusButton } from "@/components/dashboard/ConsultaStatusButton";
 import { Box, Container, Grid, Typography, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Link as MuiLink } from "@mui/material";
 
@@ -54,19 +54,25 @@ export const DashboardClient = ({
 
         {/* ── Quick Actions ── */}
         <Grid container spacing={2} sx={{ mb: 6 }}>
-          <Grid size={{ xs: 12, md: 4, lg: 2.4 }} >
+          <Grid size={{ xs: 12, md: 4, lg: 3 }} >
             <QuickAction href="/dashboard/vehicles/new" icon={<Plus size={18} />} label="Agregar Vehículo" description="Dar de alta una nueva unidad" primary />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 2.4 }} >
+          <Grid size={{ xs: 12, md: 4, lg: 3 }} >
             <QuickAction href="/dashboard/vehicles" icon={<LayoutList size={18} />} label="Ver Inventario" description="Gestionar y editar el stock" />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 2.4 }} >
+          <Grid size={{ xs: 12, md: 4, lg: 3 }} >
             <QuickAction href="/dashboard/categorias" icon={<Tags size={18} />} label="Categorías" description="Administrar tipos de vehículos" />
           </Grid>
-          <Grid size={{ xs: 12, md: 6, lg: 2.4 }} >
+          <Grid size={{ xs: 12, md: 6, lg: 3 }} >
             <QuickAction href="/dashboard/consultas" icon={<MessageSquare size={18} />} label="Ver Consultas" description={consultasPendientes > 0 ? `${consultasPendientes} sin atender` : "Historial completo"} badge={consultasPendientes > 0 ? consultasPendientes : undefined} />
           </Grid>
-          <Grid size={{ xs: 12, md: 6, lg: 2.4 }} >
+          <Grid size={{ xs: 12, md: 6, lg: 3 }} >
+            <QuickAction href="/dashboard/solicitudes" icon={<Wallet size={18} />} label="Solicitudes Crédito" description="Ver pedidos de financiación" />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6, lg: 3 }} >
+            <QuickAction href="/dashboard/planes" icon={<CreditCard size={18} />} label="Planes Financiación" description="Configurar tasas y cuotas" />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6, lg: 3 }} >
             <QuickAction href="/dashboard/settings" icon={<ExternalLink size={18} />} label="Configuración" description="Ajustes generales del sitio" />
           </Grid>
         </Grid>

@@ -5,7 +5,7 @@ import {
   Box, Container, Typography, TextField, Button,
   Paper, Stack, Alert, Grid, InputAdornment
 } from "@mui/material";
-import { Settings, Save, Phone, Mail, MapPin, Building2, DollarSign } from "lucide-react";
+import { Settings, Save, Phone, Mail, MapPin, Building2, DollarSign, Clock } from "lucide-react";
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import { updateConfiguracion } from "@/actions/configuracion";
@@ -31,6 +31,7 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
       direccion: formData.get("direccion"),
       facebookUrl: formData.get("facebookUrl"),
       instagramUrl: formData.get("instagramUrl"),
+      horariosAtencion: formData.get("horariosAtencion"),
       cotizacionDolar: formData.get("cotizacionDolar") || null,
     };
 
@@ -127,6 +128,19 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
                     slotProps={{
                       input: {
                         startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><MapPin size={18} /></InputAdornment>,
+                      }
+                    }}
+                  />
+
+                  <TextField
+                    fullWidth
+                    label="Horarios de Atención"
+                    name="horariosAtencion"
+                    defaultValue={configuracion.horariosAtencion}
+                    placeholder="Ej: Lun — Vie: 09:00 — 19:00"
+                    slotProps={{
+                      input: {
+                        startAdornment: <InputAdornment position="start"><Clock size={18} /></InputAdornment>,
                       }
                     }}
                   />
