@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { loginSchema } from "@/schemas/auth.schemas";
+import { LoginSchema } from "@/schemas/auth";
 
 export function LoginForm() {
   const router = useRouter();
@@ -21,7 +21,7 @@ export function LoginForm() {
       password: formData.get("password") as string,
     };
 
-    const parsed = loginSchema.safeParse(data);
+    const parsed = LoginSchema.safeParse(data);
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
       setLoading(false);

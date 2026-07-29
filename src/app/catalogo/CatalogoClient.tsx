@@ -5,7 +5,6 @@ import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { SortController } from "@/components/catalog/SortController";
 import { LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { Box, Button, Container, Grid, IconButton, Stack, Typography } from "@mui/material";
 
 export const CatalogoClient = ({
   vehiculos,
@@ -60,149 +59,142 @@ export const CatalogoClient = ({
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pt: 16, pb: 8, display: 'flex', flexDirection: 'column' }}>
+    <div className="min-h-screen bg-[hsl(var(--background))] pt-16 pb-8 flex flex-col">
 
       {/* Header */}
-      <Container maxWidth="xl" sx={{ mb: 5 }}>
-        <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'primary.main', mb: 2 }}>
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mb-5 w-full">
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(var(--primary))] mb-2">
           Galería de Stock
-        </Typography>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{alignItems:{ xs: 'flex-start', md: 'flex-end' }, justifyContent:"space-between"}}>
-          <Box>
-            <Typography variant="h1" sx={{ fontSize: '3rem', fontWeight: 700, letterSpacing: '-0.02em', mb: 1 }}>
+        </p>
+        <div className="flex flex-col md:flex-row gap-3 items-start md:items-end justify-between">
+          <div>
+            <h1 className="text-4xl md:text-[3rem] font-bold tracking-tight mb-1">
               Nuestro Stock
-            </Typography>
-            <Typography sx={{ color: 'text.secondary', fontWeight: 500, fontStyle: 'italic' }}>
+            </h1>
+            <p className="text-[hsl(var(--muted-foreground))] font-medium italic">
               {totalCount === 0
                 ? "No hay vehículos que coincidan con tu búsqueda."
                 : `Mostrando ${(currentPage - 1) * ITEMS_PER_PAGE + 1}–${Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} de ${totalCount} vehículos disponibles.`}
-            </Typography>
-          </Box>
+            </p>
+          </div>
 
-          <Stack direction="row" spacing={2} sx={{ bgcolor: 'background.paper', p: 1, border: '1px solid rgba(255,255,255,0.05)', borderRadius: 1, alignItems: 'center' }}>
-            <Box
-              component="select"
+          <div className="flex items-center gap-2 bg-[hsl(var(--card))] p-1 border border-black/5 rounded">
+            <select
               id="sort-select"
-              sx={{ bgcolor: 'transparent', color: 'text.primary', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', border: 'none', borderRight: '1px solid rgba(255,255,255,0.1)', pr: 2, mr: 1, outline: 'none', cursor: 'pointer', '& option': { bgcolor: '#0a0a0a' } }}
+              className="bg-transparent text-foreground text-[11px] font-black uppercase tracking-[0.1em] border-none border-r border-black/10 pr-2 mr-1 outline-none cursor-pointer focus:ring-0"
+              value={sort}
+              onChange={() => {}}
             >
               {SORT_OPTIONS.map((o: any) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
-            </Box>
-            <IconButton size="small" sx={{ color: 'primary.main', bgcolor: 'rgba(194,65,12,0.1)', borderRadius: 1 }}>
+            </select>
+            <button className="text-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10 p-1.5 rounded">
               <LayoutGrid size={18} />
-            </IconButton>
-            <IconButton size="small" sx={{ color: 'text.secondary', borderRadius: 1, '&:hover': { color: 'text.primary' } }}>
+            </button>
+            <button className="text-[hsl(var(--muted-foreground))] hover:text-foreground p-1.5 rounded transition">
               <List size={18} />
-            </IconButton>
-          </Stack>
-        </Stack>
-      </Container>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <SortController currentSort={sort} />
 
       {/* Main Grid */}
-      <Container maxWidth="xl" sx={{ flexGrow: 1 }}>
-        <Grid container spacing={5}>
+      <div className="max-w-7xl mx-auto px-4 md:px-8 flex-grow w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           {/* Filters */}
-          <Grid size={{ xs: 12, lg: 3 }} >
+          <div className="lg:col-span-3">
             <CatalogFilters
               marcasDisponibles={marcasDisponibles}
               combustiblesDisponibles={combustiblesDisponibles}
               anioMin={anioMin}
               anioMax={anioMax}
             />
-          </Grid>
+          </div>
 
           {/* Vehicles */}
-          <Grid size={{ xs: 12, lg: 9 }} >
+          <div className="lg:col-span-9">
             {vehiculos.length > 0 ? (
-              <Grid container spacing={3}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {vehiculos.map((v: any, index: number) => (
-                  <Grid size={{ xs: 12, sm: 6, xl: 4 }} key={v.id}>
+                  <div key={v.id}>
                     <VehicleCard vehiculo={v} isAdmin={isAdmin} categorias={categorias} priority={index < 2} cotizacionDolar={cotizacionDolar} />
-                  </Grid>
+                  </div>
                 ))}
-              </Grid>
+              </div>
             ) : (
-              <Box sx={{ py: 10, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>No se encontraron vehículos.</Typography>
-                <Typography sx={{ fontSize: '0.875rem', color: 'text.secondary', mb: 3, maxWidth: 400 }}>Los filtros aplicados no coinciden con ninguna unidad en stock.</Typography>
-                <Button component={Link} href="/catalogo" variant="contained" sx={{ bgcolor: 'text.primary', color: 'background.default', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', px: 4, py: 1.5, '&:hover': { bgcolor: 'primary.main', color: 'white' } }}>
+              <div className="py-10 text-center flex flex-col items-center justify-center bg-black/5 border border-dashed border-black/10 rounded">
+                <h6 className="text-xl font-bold mb-1">No se encontraron vehículos.</h6>
+                <p className="text-sm text-[hsl(var(--muted-foreground))] mb-3 max-w-md">Los filtros aplicados no coinciden con ninguna unidad en stock.</p>
+                <Link href="/catalogo" className="bg-foreground text-background text-[10px] font-black uppercase tracking-[0.1em] px-4 py-1.5 rounded hover:bg-[hsl(var(--primary))] hover:text-white transition">
                   Limpiar Búsqueda
-                </Button>
-              </Box>
+                </Link>
+              </div>
             )}
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                <Stack direction="row" spacing={1}>
-                  <IconButton
-                    component={Link}
+              <div className="mt-8 flex flex-col items-center gap-2">
+                <div className="flex items-center gap-1">
+                  <Link
                     href={currentPage > 1 ? buildUrl({ page: String(currentPage - 1) }) : "#"}
-                    disabled={currentPage === 1}
-                    sx={{ width: 40, height: 40, color: 'text.secondary', '&:hover': { bgcolor: 'background.paper', color: 'text.primary' } }}
+                    className={`w-10 h-10 flex items-center justify-center rounded transition-all ${currentPage === 1 ? 'text-black/30 pointer-events-none' : 'text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--surface-low))] hover:text-foreground'}`}
                   >
                     <ChevronLeft size={18} />
-                  </IconButton>
+                  </Link>
 
                   {generatePageNumbers(currentPage, totalPages).map((p, i) =>
                     p === "..." ? (
-                      <Box key={`ellipsis-${i}`} sx={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontWeight: 700 }}>…</Box>
+                      <div key={`ellipsis-${i}`} className="w-10 h-10 flex items-center justify-center text-[hsl(var(--muted-foreground))] font-bold">…</div>
                     ) : (
-                      <Box
+                      <Link
                         key={p}
-                        component={Link}
                         href={buildUrl({ page: String(p) })}
-                        sx={{
-                          width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.875rem', borderRadius: 1, textDecoration: 'none', transition: 'all 0.2s',
-                          ...(p === currentPage ? { bgcolor: 'primary.main', color: 'white', boxShadow: 2 } : { color: 'text.primary', '&:hover': { bgcolor: 'background.paper' } })
-                        }}
+                        className={`w-10 h-10 flex items-center justify-center font-bold text-sm rounded transition-all ${p === currentPage ? 'bg-[hsl(var(--primary))] text-white shadow-md' : 'text-foreground hover:bg-[hsl(var(--surface-low))]'}`}
                       >
                         {p}
-                      </Box>
+                      </Link>
                     )
                   )}
 
-                  <IconButton
-                    component={Link}
+                  <Link
                     href={currentPage < totalPages ? buildUrl({ page: String(currentPage + 1) }) : "#"}
-                    disabled={currentPage === totalPages}
-                    sx={{ width: 40, height: 40, color: 'text.secondary', '&:hover': { bgcolor: 'background.paper', color: 'text.primary' } }}
+                    className={`w-10 h-10 flex items-center justify-center rounded transition-all ${currentPage === totalPages ? 'text-black/30 pointer-events-none' : 'text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--surface-low))] hover:text-foreground'}`}
                   >
                     <ChevronRight size={18} />
-                  </IconButton>
-                </Stack>
-                <Typography sx={{ fontSize: '11px', fontWeight: 500, color: 'text.secondary' }}>Página {currentPage} de {totalPages}</Typography>
-              </Box>
+                  </Link>
+                </div>
+                <p className="text-[11px] font-medium text-[hsl(var(--muted-foreground))]">Página {currentPage} de {totalPages}</p>
+              </div>
             )}
-          </Grid>
-        </Grid>
-      </Container>
+          </div>
+        </div>
+      </div>
 
       {/* Banner */}
-      <Box sx={{ mt: 12, bgcolor: '#0a0a0b', py: 10, px: 3, position: 'relative', overflow: 'hidden', '&:hover .glow': { transform: 'scale(1.05)' } }}>
-        <Box className="glow" sx={{ position: 'absolute', top: '50%', right: 0, transform: 'translateY(-50%) translateX(33%)', width: 800, height: 800, opacity: 0.2, background: 'radial-gradient(circle at center, rgba(194,65,12,0.2) 0%, transparent 70%)', pointerEvents: 'none', transition: 'transform 1s' }} />
-        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 10 }}>
-          <Box sx={{ maxWidth: 600 }}>
-            <Typography variant="h2" sx={{ fontSize: { xs: '2.25rem', md: '3rem' }, fontWeight: 700, letterSpacing: '-0.02em', color: 'white', mb: 2 }}>
+      <div className="mt-12 bg-[#0a0a0b] py-10 px-3 relative overflow-hidden group">
+        <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/3 w-[800px] h-[800px] opacity-20 pointer-events-none transition-transform duration-1000 group-hover:scale-105" style={{ background: 'radial-gradient(circle at center, rgba(194,65,12,0.2) 0%, transparent 70%)' }} />
+        <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
+          <div className="max-w-xl">
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-2">
               ¿No encontrás lo que buscás?
-            </Typography>
-            <Typography sx={{ fontSize: '1.125rem', color: 'rgba(255,255,255,0.5)', fontWeight: 500, mb: 4, lineHeight: 1.6 }}>
+            </h2>
+            <p className="text-lg text-white/50 font-medium mb-4 leading-relaxed">
               Nuestro equipo de importación personalizada se encarga de traer el vehículo de tus sueños directo a tu puerta.
-            </Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <Button component={Link} href="#importacion" variant="contained" sx={{ bgcolor: 'primary.main', color: 'white', px: 4, py: 2, fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', '&:hover': { bgcolor: 'white', color: 'primary.main' } }}>
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Link href="#importacion" className="bg-[hsl(var(--primary))] text-white px-4 py-2 text-[11px] font-black uppercase tracking-[0.2em] rounded hover:bg-white hover:text-[hsl(var(--primary))] transition text-center">
                 Nosotros lo traemos por vos 🚀
-              </Button>
-              <Button component={Link} href="#asesor" variant="outlined" sx={{ borderColor: 'rgba(255,255,255,0.2)', color: 'white', px: 4, py: 2, fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', '&:hover': { bgcolor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.3)' } }}>
+              </Link>
+              <Link href="#asesor" className="border border-white/20 text-white px-4 py-2 text-[11px] font-black uppercase tracking-[0.2em] rounded hover:bg-white/10 hover:border-white/30 transition text-center">
                 Hablar con un asesor
-              </Button>
-            </Stack>
-          </Box>
-        </Container>
-      </Box>
-    </Box>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

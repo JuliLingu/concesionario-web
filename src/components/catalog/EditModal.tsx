@@ -2,7 +2,6 @@
 
 import { X } from "lucide-react";
 import { VehicleForm } from "../dashboard/VehicleForm";
-import { Dialog, DialogContent, IconButton } from "@mui/material";
 
 interface EditModalProps {
   isOpen: boolean;
@@ -12,52 +11,27 @@ interface EditModalProps {
 }
 
 export const EditModal = ({ isOpen, onClose, vehiculo, categorias }: EditModalProps) => {
-  return (
-    <Dialog 
-      open={isOpen} 
-      onClose={onClose} 
-      maxWidth="md" 
-      fullWidth
-      PaperProps={{
-        sx: {
-          bgcolor: 'background.paper',
-          backgroundImage: 'none',
-          borderRadius: 1,
-          position: 'relative',
-          maxHeight: '90vh'
-        }
-      }}
-      slotProps={{
-        backdrop: {
-          sx: {
-            bgcolor: 'rgba(0,0,0,0.6)',
-            backdropFilter: 'blur(4px)'
-          }
-        }
-      }}
-    >
-      {/* Close Button */}
-      <IconButton 
-        onClick={onClose}
-        sx={{
-          position: 'absolute',
-          right: 8,
-          top: 8,
-          zIndex: 10,
-          bgcolor: 'rgba(255,255,255,0.05)',
-          color: 'text.secondary',
-          '&:hover': {
-            bgcolor: 'primary.main',
-            color: 'white'
-          }
-        }}
-      >
-        <X size={20} />
-      </IconButton>
+  if (!isOpen) return null;
 
-      <DialogContent sx={{ p: 0, '&::-webkit-scrollbar': { width: '8px' }, '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.2)' } }}>
-        <VehicleForm initialData={vehiculo} categorias={categorias} onSuccess={onClose} />
-      </DialogContent>
-    </Dialog>
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center">
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
+        onClick={onClose} 
+      />
+      <div className="relative bg-white rounded-lg shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] flex flex-col">
+        {/* Close Button */}
+        <button 
+          onClick={onClose}
+          className="absolute right-4 top-4 z-10 p-2 bg-black/5 text-[hsl(var(--muted-foreground))] hover:bg-[#b5000b] hover:text-white rounded-full transition-colors"
+        >
+          <X size={20} />
+        </button>
+
+        <div className="flex-1 overflow-y-auto p-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-black/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-black/20">
+          <VehicleForm initialData={vehiculo} categorias={categorias} onSuccess={onClose} />
+        </div>
+      </div>
+    </div>
   );
 };

@@ -3,7 +3,6 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
-import { Box, Typography, Stack, Checkbox, FormControlLabel, Select, MenuItem, IconButton, Button } from "@mui/material";
 
 interface CatalogFiltersProps {
   marcasDisponibles: string[];
@@ -77,45 +76,38 @@ export const CatalogFilters = ({
   for (let y = anioMax; y >= anioMin; y--) years.push(y);
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        bgcolor: 'background.paper',
-        p: 3,
-        border: '1px solid rgba(255,255,255,0.05)',
-        transition: 'opacity 0.2s',
-        opacity: isPending ? 0.6 : 1,
-        pointerEvents: isPending ? 'none' : 'auto'
-      }}
+    <div
+      className={`w-full bg-white p-6 border border-black/5 transition-opacity duration-200 shadow-[0_20px_40px_rgba(26,28,30,0.06)] rounded ${
+        isPending ? "opacity-60 pointer-events-none" : "opacity-100 pointer-events-auto"
+      }`}
     >
       {/* Header */}
-      <Stack direction="row" sx={{ mb: 4, alignItems: "center", justifyContent: "space-between" }}>
-        <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
-          <SlidersHorizontal size={14} color="#c2410c" />
-          <Typography sx={{ fontWeight: 900, textTransform: 'uppercase', fontSize: '0.875rem', letterSpacing: '0.1em' }}>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal size={14} className="text-[#b5000b]" />
+          <span className="font-black uppercase text-sm tracking-[0.1em] text-[hsl(var(--foreground))]">
             Filtros
-          </Typography>
+          </span>
           {hasFilters && (
-            <Box sx={{ width: 20, height: 20, borderRadius: '50%', bgcolor: 'primary.main', color: 'white', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="w-5 h-5 rounded-full bg-[#b5000b] text-white text-[9px] font-black flex items-center justify-center">
               {currentMarcas.length +
                 currentTransmisiones.length +
                 currentCombustibles.length +
                 (currentAnioDesde ? 1 : 0) +
                 (currentAnioHasta ? 1 : 0)}
-            </Box>
+            </div>
           )}
-        </Stack>
+        </div>
         {hasFilters && (
-          <Button
+          <button
             onClick={() => navigate("")}
-            variant="text"
-            startIcon={<X size={11} />}
-            sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'primary.main', minWidth: 0, p: 0.5, '&:hover': { color: 'text.primary', bgcolor: 'transparent' } }}
+            className="flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.1em] text-[#b5000b] hover:text-[hsl(var(--foreground))] transition-colors p-1"
           >
+            <X size={11} />
             Limpiar todo
-          </Button>
+          </button>
         )}
-      </Stack>
+      </div>
 
       {/* ── Marca ── */}
       <FilterSection title="Marca">
@@ -157,46 +149,40 @@ export const CatalogFilters = ({
 
       {/* ── Año ── */}
       <FilterSection title="Año" noBorder>
-        <Stack direction="row" spacing={1.5}>
-          <Box sx={{ flex: 1 }}>
-            <Typography sx={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary', mb: 0.5 }}>
+        <div className="flex gap-4">
+          <div className="flex-1 flex flex-col gap-1.5">
+            <label className="text-[9px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))]">
               Desde
-            </Typography>
-            <Select
+            </label>
+            <select
               value={currentAnioDesde}
               onChange={(e) => navigate(buildParams({ anioDesde: e.target.value || null }))}
-              displayEmpty
-              fullWidth
-              size="small"
-              sx={{ bgcolor: '#0a0a0a', fontSize: '12px', fontWeight: 500, '& .MuiOutlinedInput-notchedOutline': { border: 'none' } }}
+              className="bg-[hsl(var(--input))] text-xs font-medium px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 text-[hsl(var(--foreground))] w-full appearance-none cursor-pointer"
             >
-              <MenuItem value="" sx={{ fontSize: '12px' }}>Todos</MenuItem>
+              <option value="">Todos</option>
               {years.map((y) => (
-                <MenuItem key={y} value={y.toString()} sx={{ fontSize: '12px' }}>{y}</MenuItem>
+                <option key={y} value={y.toString()}>{y}</option>
               ))}
-            </Select>
-          </Box>
-          <Box sx={{ flex: 1 }}>
-            <Typography sx={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary', mb: 0.5 }}>
+            </select>
+          </div>
+          <div className="flex-1 flex flex-col gap-1.5">
+            <label className="text-[9px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))]">
               Hasta
-            </Typography>
-            <Select
+            </label>
+            <select
               value={currentAnioHasta}
               onChange={(e) => navigate(buildParams({ anioHasta: e.target.value || null }))}
-              displayEmpty
-              fullWidth
-              size="small"
-              sx={{ bgcolor: '#0a0a0a', fontSize: '12px', fontWeight: 500, '& .MuiOutlinedInput-notchedOutline': { border: 'none' } }}
+              className="bg-[hsl(var(--input))] text-xs font-medium px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 text-[hsl(var(--foreground))] w-full appearance-none cursor-pointer"
             >
-              <MenuItem value="" sx={{ fontSize: '12px' }}>Todos</MenuItem>
+              <option value="">Todos</option>
               {years.map((y) => (
-                <MenuItem key={y} value={y.toString()} sx={{ fontSize: '12px' }}>{y}</MenuItem>
+                <option key={y} value={y.toString()}>{y}</option>
               ))}
-            </Select>
-          </Box>
-        </Stack>
+            </select>
+          </div>
+        </div>
       </FilterSection>
-    </Box>
+    </div>
   );
 };
 
@@ -211,12 +197,12 @@ const FilterSection = ({
   children: React.ReactNode;
   noBorder?: boolean;
 }) => (
-  <Box sx={{ mb: 3, pb: noBorder ? 0 : 3, borderBottom: noBorder ? 'none' : '1px solid rgba(255,255,255,0.05)' }}>
-    <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.25em', color: 'text.secondary', mb: 1.5 }}>
+  <div className={`mb-6 pb-${noBorder ? '0' : '6'} ${noBorder ? '' : 'border-b border-black/5'}`}>
+    <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-[hsl(var(--muted-foreground))] mb-4">
       {title}
-    </Typography>
-    <Stack spacing={1}>{children}</Stack>
-  </Box>
+    </h3>
+    <div className="flex flex-col gap-2.5">{children}</div>
+  </div>
 );
 
 const CheckItem = ({
@@ -228,19 +214,15 @@ const CheckItem = ({
   checked: boolean;
   onChange: () => void;
 }) => (
-  <FormControlLabel
-    control={
-      <Checkbox
-        checked={checked}
-        onChange={onChange}
-        size="small"
-        sx={{
-          color: 'rgba(255,255,255,0.2)',
-          '&.Mui-checked': { color: 'primary.main' }
-        }}
-      />
-    }
-    label={<Typography sx={{ fontSize: '13px', fontWeight: checked ? 700 : 500, color: checked ? 'text.primary' : 'text.secondary' }}>{label}</Typography>}
-    sx={{ m: 0, '&:hover .MuiTypography-root': { color: 'text.primary' } }}
-  />
+  <label className="flex items-center gap-3 cursor-pointer group m-0">
+    <input
+      type="checkbox"
+      checked={checked}
+      onChange={onChange}
+      className="w-4 h-4 rounded-sm border-gray-300 accent-[#b5000b] cursor-pointer"
+    />
+    <span className={`text-[13px] transition-colors group-hover:text-[hsl(var(--foreground))] ${checked ? 'font-bold text-[hsl(var(--foreground))]' : 'font-medium text-[hsl(var(--muted-foreground))]'}`}>
+      {label}
+    </span>
+  </label>
 );

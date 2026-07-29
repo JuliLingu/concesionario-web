@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Car, CheckCircle2, FileText, MessageSquare, Plus, LayoutList, ArrowRight, ExternalLink, Tags, Wallet, CreditCard } from "lucide-react";
 import { ConsultaStatusButton } from "@/components/dashboard/ConsultaStatusButton";
-import { Box, Container, Grid, Typography, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Link as MuiLink } from "@mui/material";
 
 export const DashboardClient = ({
   userName,
@@ -20,165 +19,159 @@ export const DashboardClient = ({
     }).format(new Date(date));
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pt: 16, pb: 8 }}>
-      <Container maxWidth="xl">
+    <div className="min-h-screen bg-[hsl(var(--background))] pt-16 pb-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
 
         {/* ── Header ── */}
-        <Box sx={{ mb: 6 }}>
-          <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'primary.main', mb: 1 }}>
+        <div className="mb-6">
+          <div className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--primary))] mb-1">
             Panel de Control
-          </Typography>
-          <Typography variant="h1" sx={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-0.02em', mb: 0.5 }}>
+          </div>
+          <h1 className="text-[2.5rem] font-bold tracking-tight mb-0.5 text-[hsl(var(--foreground))]">
             Bienvenido, {userName}
-          </Typography>
-          <Typography sx={{ color: 'text.secondary', fontWeight: 500 }}>
+          </h1>
+          <p className="text-[hsl(var(--muted-foreground))] font-medium">
             Resumen de actividad de JBJ Automotores
-          </Typography>
-        </Box>
+          </p>
+        </div>
 
         {/* ── Metric Cards ── */}
-        <Grid container spacing={2} sx={{ mb: 6 }}>
-          <Grid size={{ xs: 12, sm: 6, lg: 3 }} >
-            <MetricCard label="Total Vehículos" value={totalVehiculos} icon={<Car size={20} />} href="/dashboard/vehicles" />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, lg: 3 }} >
-            <MetricCard label="Publicados" value={publicados} icon={<CheckCircle2 size={20} />} href="/dashboard/vehicles" accent="green" />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, lg: 3 }} >
-            <MetricCard label="Borradores" value={borradores} icon={<FileText size={20} />} href="/dashboard/vehicles" />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, lg: 3 }} >
-            <MetricCard label="Consultas Pendientes" value={consultasPendientes} icon={<MessageSquare size={20} />} href="/dashboard/consultas" accent={consultasPendientes > 0 ? "primary" : undefined} />
-          </Grid>
-        </Grid>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <MetricCard label="Total Vehículos" value={totalVehiculos} icon={<Car size={20} />} href="/dashboard/vehicles" />
+          <MetricCard label="Publicados" value={publicados} icon={<CheckCircle2 size={20} />} href="/dashboard/vehicles" accent="green" />
+          <MetricCard label="Borradores" value={borradores} icon={<FileText size={20} />} href="/dashboard/vehicles" />
+          <MetricCard label="Consultas Pendientes" value={consultasPendientes} icon={<MessageSquare size={20} />} href="/dashboard/consultas" accent={consultasPendientes > 0 ? "primary" : undefined} />
+        </div>
 
         {/* ── Quick Actions ── */}
-        <Grid container spacing={2} sx={{ mb: 6 }}>
-          <Grid size={{ xs: 12, md: 4, lg: 3 }} >
+        <div className="grid grid-cols-1 md:grid-cols-12 lg:grid-cols-4 gap-4 mb-6">
+          <div className="md:col-span-4 lg:col-span-1">
             <QuickAction href="/dashboard/vehicles/new" icon={<Plus size={18} />} label="Agregar Vehículo" description="Dar de alta una nueva unidad" primary />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 3 }} >
+          </div>
+          <div className="md:col-span-4 lg:col-span-1">
             <QuickAction href="/dashboard/vehicles" icon={<LayoutList size={18} />} label="Ver Inventario" description="Gestionar y editar el stock" />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 3 }} >
+          </div>
+          <div className="md:col-span-4 lg:col-span-1">
             <QuickAction href="/dashboard/categorias" icon={<Tags size={18} />} label="Categorías" description="Administrar tipos de vehículos" />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6, lg: 3 }} >
+          </div>
+          <div className="md:col-span-6 lg:col-span-1">
             <QuickAction href="/dashboard/consultas" icon={<MessageSquare size={18} />} label="Ver Consultas" description={consultasPendientes > 0 ? `${consultasPendientes} sin atender` : "Historial completo"} badge={consultasPendientes > 0 ? consultasPendientes : undefined} />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6, lg: 3 }} >
+          </div>
+          <div className="md:col-span-6 lg:col-span-1">
             <QuickAction href="/dashboard/solicitudes" icon={<Wallet size={18} />} label="Solicitudes Crédito" description="Ver pedidos de financiación" />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6, lg: 3 }} >
+          </div>
+          <div className="md:col-span-6 lg:col-span-1">
             <QuickAction href="/dashboard/planes" icon={<CreditCard size={18} />} label="Planes Financiación" description="Configurar tasas y cuotas" />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6, lg: 3 }} >
+          </div>
+          <div className="md:col-span-6 lg:col-span-1">
             <QuickAction href="/dashboard/settings" icon={<ExternalLink size={18} />} label="Configuración" description="Ajustes generales del sitio" />
-          </Grid>
-        </Grid>
+          </div>
+        </div>
 
         {/* ── Últimas Consultas Pendientes ── */}
         {ultimasConsultas.length > 0 && (
-          <Box>
-            <Stack direction="row" sx={{ mb: 3, alignItems: "center", justifyContent:"space-between" }}>
-              <Typography variant="h2" sx={{ fontSize: '1.125rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-bold uppercase tracking-tight text-[hsl(var(--foreground))]">
                 Consultas Pendientes
-              </Typography>
-              <MuiLink component={Link} href="/dashboard/consultas" sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'primary.main', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 0.5, '&:hover': { textDecoration: 'underline' } }}>
+              </h2>
+              <Link href="/dashboard/consultas" className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--primary))] flex items-center gap-1 hover:underline">
                 Ver todas <ArrowRight size={11} />
-              </MuiLink>
-            </Stack>
+              </Link>
+            </div>
 
-            <TableContainer component={Paper} sx={{ bgcolor: 'background.paper', borderRadius: 1, boxShadow: 'none', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <Table>
-                <TableHead sx={{ bgcolor: '#0a0a0a' }}>
-                  <TableRow>
-                    <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Cliente</TableCell>
-                    <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)', display: { xs: 'none', md: 'table-cell' } }}>Vehículo</TableCell>
-                    <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)', display: { xs: 'none', lg: 'table-cell' } }}>Fecha</TableCell>
-                    <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Acción</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {ultimasConsultas.map((c: any) => (
-                    <TableRow key={c.id} sx={{ '&:last-child td': { border: 0 }, '&:hover': { bgcolor: 'rgba(255,255,255,0.02)' } }}>
-                      <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        <Typography sx={{ fontWeight: 900, fontSize: '0.875rem' }}>{c.nombre}</Typography>
-                        <MuiLink href={`mailto:${c.email}`} sx={{ fontSize: '0.75rem', color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>{c.email}</MuiLink>
-                      </TableCell>
-                      <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)', display: { xs: 'none', md: 'table-cell' } }}>
-                        {c.vehiculo ? (
-                          <MuiLink component={Link} href={`/catalogo/${c.vehiculo.id}`} target="_blank" sx={{ fontSize: '0.875rem', fontWeight: 700, color: 'text.primary', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 0.5, '&:hover': { color: 'primary.main' } }}>
-                            {c.vehiculo.marca} {c.vehiculo.modelo}
-                            <ExternalLink size={11} style={{ opacity: 0.4 }} />
-                          </MuiLink>
-                        ) : (
-                          <Typography sx={{ fontSize: '0.875rem', color: 'text.secondary', fontStyle: 'italic' }}>General</Typography>
-                        )}
-                      </TableCell>
-                      <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)', display: { xs: 'none', lg: 'table-cell' } }}>
-                        <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 500 }}>{formatDate(c.createdAt)}</Typography>
-                      </TableCell>
-                      <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        <ConsultaStatusButton consultaId={c.id} estadoActual={c.estado} />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
+            <div className="bg-white rounded shadow-[0_20px_40px_rgba(26,28,30,0.06)] overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-[#f3f3f6]">
+                    <tr className="border-b border-[#e5e7eb]">
+                      <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Cliente</th>
+                      <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))] hidden md:table-cell">Vehículo</th>
+                      <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))] hidden lg:table-cell">Fecha</th>
+                      <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ultimasConsultas.map((c: any) => (
+                      <tr key={c.id} className="border-b border-[#e5e7eb]/50 hover:bg-[hsl(var(--surface-low))] transition">
+                        <td className="py-3 px-4">
+                          <div className="font-bold text-sm text-[hsl(var(--foreground))]">{c.nombre}</div>
+                          <Link href={`mailto:${c.email}`} className="text-xs text-[hsl(var(--primary))] hover:underline">{c.email}</Link>
+                        </td>
+                        <td className="py-3 px-4 hidden md:table-cell">
+                          {c.vehiculo ? (
+                            <Link href={`/catalogo/${c.vehiculo.id}`} target="_blank" className="text-sm font-bold text-[hsl(var(--foreground))] flex items-center gap-1 hover:text-[hsl(var(--primary))]">
+                              {c.vehiculo.marca} {c.vehiculo.modelo}
+                              <ExternalLink size={11} className="opacity-40" />
+                            </Link>
+                          ) : (
+                            <span className="text-sm text-[hsl(var(--muted-foreground))] italic">General</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 hidden lg:table-cell">
+                          <span className="text-xs text-[hsl(var(--muted-foreground))] font-medium">{formatDate(c.createdAt)}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <ConsultaStatusButton consultaId={c.id} estadoActual={c.estado} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         )}
 
         {ultimasConsultas.length === 0 && (
-          <Box sx={{ py: 8, textAlign: 'center', bgcolor: 'background.paper', borderRadius: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-            <CheckCircle2 size={32} color="rgba(34,197,94,0.4)" />
-            <Typography sx={{ color: 'text.secondary', fontWeight: 500, fontSize: '0.875rem' }}>
+          <div className="py-8 text-center bg-white rounded shadow-[0_20px_40px_rgba(26,28,30,0.06)] flex flex-col items-center gap-2">
+            <CheckCircle2 size={32} className="text-green-500 opacity-40" />
+            <span className="text-[hsl(var(--muted-foreground))] font-medium text-sm">
               No hay consultas pendientes. ¡Todo al día!
-            </Typography>
-          </Box>
+            </span>
+          </div>
         )}
 
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 };
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 const MetricCard = ({ label, value, icon, href, accent }: any) => {
-  const iconColor = accent === "primary" ? "primary.main" : accent === "green" ? "#16a34a" : "text.secondary";
-  const textColor = accent === "primary" ? "primary.main" : accent === "green" ? "#16a34a" : "text.primary";
+  const iconColor = accent === "primary" ? "text-[hsl(var(--primary))]" : accent === "green" ? "text-green-600" : "text-[hsl(var(--muted-foreground))]";
+  const textColor = accent === "primary" ? "text-[hsl(var(--primary))]" : accent === "green" ? "text-green-600" : "text-[hsl(var(--foreground))]";
 
   return (
-    <Box component={Link} href={href} sx={{ display: 'block', textDecoration: 'none', bgcolor: 'background.paper', p: 3, borderRadius: 1, transition: 'all 0.2s', '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' } }}>
-      <Stack direction="row" sx={{ mb: 2, color: iconColor,alignItems:"flex-start", justifyContent:"space-between"  }}>
+    <Link href={href} className="block bg-white p-6 rounded shadow-[0_20px_40px_rgba(26,28,30,0.06)] transition hover:-translate-y-1 hover:shadow-2xl">
+      <div className={`flex items-start justify-between mb-4 ${iconColor}`}>
         {icon}
-        <ArrowRight size={14} style={{ opacity: 0.5 }} />
-      </Stack>
-      <Typography sx={{ fontSize: '2.25rem', fontWeight: 900, letterSpacing: '-0.02em', color: textColor, lineHeight: 1, mb: 1 }}>
+        <ArrowRight size={14} className="opacity-50" />
+      </div>
+      <div className={`text-4xl font-black tracking-tight leading-none mb-2 ${textColor}`}>
         {value}
-      </Typography>
-      <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary' }}>
+      </div>
+      <div className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">
         {label}
-      </Typography>
-    </Box>
+      </div>
+    </Link>
   );
 };
 
 const QuickAction = ({ href, icon, label, description, primary, badge }: any) => (
-  <Box component={Link} href={href} sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 2, p: 2.5, textDecoration: 'none', borderRadius: 1, transition: 'all 0.2s', bgcolor: primary ? '#c2410c' : 'background.paper', '&:hover': { bgcolor: primary ? '#9a3412' : 'rgba(255,255,255,0.05)' } }}>
-    <Box sx={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderRadius: 1, bgcolor: primary ? 'rgba(255,255,255,0.1)' : '#0a0a0a', color: primary ? 'white' : 'text.secondary' }}>
+  <Link href={href} className={`relative flex items-center gap-4 p-5 rounded transition ${primary ? 'bg-[#b5000b] hover:bg-[#9a3412]' : 'bg-white hover:bg-[hsl(var(--surface-low))] shadow-[0_20px_40px_rgba(26,28,30,0.06)]'}`}>
+    <div className={`w-10 h-10 flex items-center justify-center shrink-0 rounded ${primary ? 'bg-white/10 text-white' : 'bg-[hsl(var(--foreground))] text-[hsl(var(--muted-foreground))]'}`}>
       {icon}
-    </Box>
-    <Box>
-      <Typography sx={{ fontSize: '0.875rem', fontWeight: 900, color: primary ? 'white' : 'text.primary' }}>{label}</Typography>
-      <Typography sx={{ fontSize: '0.75rem', fontWeight: 500, color: primary ? 'rgba(255,255,255,0.6)' : 'text.secondary' }}>{description}</Typography>
-    </Box>
+    </div>
+    <div>
+      <div className={`text-sm font-black ${primary ? 'text-white' : 'text-[hsl(var(--foreground))]'}`}>{label}</div>
+      <div className={`text-xs font-medium ${primary ? 'text-white/60' : 'text-[hsl(var(--muted-foreground))]'}`}>{description}</div>
+    </div>
     {badge && (
-      <Box sx={{ position: 'absolute', top: 12, right: 12, width: 20, height: 20, bgcolor: 'primary.main', color: 'white', fontSize: '9px', fontWeight: 900, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="absolute top-3 right-3 w-5 h-5 bg-[hsl(var(--primary))] text-white text-[9px] font-black rounded-full flex items-center justify-center">
         {badge}
-      </Box>
+      </div>
     )}
-  </Box>
+  </Link>
 );

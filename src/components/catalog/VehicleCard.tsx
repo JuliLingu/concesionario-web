@@ -7,7 +7,6 @@ import { Vehiculo, ImagenVehiculo } from "../../../generated/prisma";
 import { Calendar, Fuel, AlignJustify, ArrowRight, Settings2 } from "lucide-react";
 import { EditModal } from "./EditModal";
 import { getCldUrl } from "@/lib/cloudinary";
-import { Box, Typography, Button, IconButton } from "@mui/material";
 
 interface VehicleCardProps {
   vehiculo: Omit<Vehiculo, "precio"> & {
@@ -25,24 +24,9 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
   const imagenPrincipal = vehiculo.imagenes.find(img => img.esPrincipal)?.url || vehiculo.imagenes[0]?.url || "";
 
   return (
-    <Box 
-      sx={{ 
-        bgcolor: '#0a0a0a', 
-        position: 'relative', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        height: '100%',
-        transition: 'all 0.3s',
-        '&:hover': {
-          boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
-          '& .vehicle-img': {
-            transform: 'scale(1.05)'
-          }
-        }
-      }}
-    >
+    <div className="group relative flex flex-col h-full bg-white shadow-[0_4px_20px_rgba(26,28,30,0.06)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(26,28,30,0.12)]">
       {/* Top Image Section */}
-      <Box sx={{ position: 'relative', aspectRatio: '4/3', width: '100%', bgcolor: '#171717', overflow: 'hidden' }}>
+      <div className="relative aspect-[4/3] w-full bg-[hsl(var(--surface-low))] overflow-hidden">
         {imagenPrincipal ? (
           <Image
             src={getCldUrl(imagenPrincipal, "4:3")}
@@ -51,115 +35,79 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
             priority={priority}
             loading={priority ? "eager" : "lazy"}
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-            className="vehicle-img"
-            style={{ objectFit: 'cover', objectPosition: 'center', transition: 'transform 0.7s ease' }}
+            className="object-cover object-center transition-transform duration-700 ease-in-out group-hover:scale-105"
           />
         ) : (
-          <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Typography sx={{ color: 'rgba(255,255,255,0.05)', fontWeight: 900, fontSize: '2.25rem', fontStyle: 'italic' }}>
-              JBJ
-            </Typography>
-          </Box>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-black/5 font-black text-4xl italic">JBJ</span>
+          </div>
         )}
 
         {/* Edit Overlay Button */}
         {isAdmin && (
-          <Button
+          <button
             onClick={(e) => { e.preventDefault(); setIsEditModalOpen(true); }}
-            variant="contained"
-            sx={{ 
-              position: 'absolute', 
-              top: 12, 
-              right: 12, 
-              zIndex: 10, 
-              bgcolor: 'rgba(0,0,0,0.6)', 
-              backdropFilter: 'blur(4px)',
-              color: 'white',
-              fontSize: '9px',
-              fontWeight: 900,
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              p: '6px 12px',
-              minWidth: 0,
-              gap: 1,
-              '&:hover': { bgcolor: 'primary.main' }
-            }}
+            className="absolute top-3 right-3 z-10 bg-black/60 backdrop-blur-sm text-white text-[9px] font-black uppercase tracking-[0.1em] px-3 py-1.5 flex items-center gap-1 hover:bg-[#b5000b] transition-colors"
           >
             <Settings2 size={11} />
             Editar
-          </Button>
+          </button>
         )}
-      </Box>
+      </div>
 
       {/* Content Section */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', p: 3, flexGrow: 1 }}>
+      <div className="flex flex-col p-5 flex-grow">
         {/* Badges row */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Typography sx={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'primary.main' }}>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#b5000b]">
             Nuevo Ingreso
-          </Typography>
-          <Typography sx={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.6)', px: 1, py: 0.5, bgcolor: '#171717' }}>
+          </span>
+          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] px-2 py-0.5 bg-[hsl(var(--surface-low))]">
             {vehiculo.estado}
-          </Typography>
-        </Box>
+          </span>
+        </div>
 
         {/* Title */}
-        <Typography variant="h3" sx={{ fontSize: '1.5rem', fontWeight: 700, color: 'text.primary', letterSpacing: '-0.05em', lineHeight: 1, mb: 0.5 }}>
+        <h3 className="text-2xl font-bold text-[hsl(var(--foreground))] tracking-[-0.05em] leading-none mb-1.5">
           {vehiculo.marca} {vehiculo.modelo}
-        </Typography>
+        </h3>
 
         {/* Subtitle / Engine */}
-        <Typography sx={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', mb: 3, fontWeight: 500 }}>
+        <p className="text-xs text-[hsl(var(--muted-foreground))] font-medium mb-5">
           {vehiculo.version || vehiculo.motor || "Versión Base"}
-        </Typography>
+        </p>
 
         {/* Inline Specs */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4, color: 'rgba(255,255,255,0.6)' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Calendar size={14} style={{ opacity: 0.4 }} />
-            <Typography sx={{ fontSize: '11px', fontWeight: 700 }}>{vehiculo.anio}</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Fuel size={14} style={{ opacity: 0.4 }} />
-            <Typography sx={{ fontSize: '11px', fontWeight: 700, textTransform: 'capitalize' }}>{vehiculo.combustible?.toLowerCase()}</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <AlignJustify size={14} style={{ opacity: 0.4 }} />
-            <Typography sx={{ fontSize: '11px', fontWeight: 700, textTransform: 'capitalize' }}>{vehiculo.transmision?.toLowerCase()}</Typography>
-          </Box>
-        </Box>
+        <div className="flex items-center gap-4 mb-6 text-[hsl(var(--muted-foreground))]">
+          <div className="flex items-center gap-1">
+            <Calendar size={14} className="opacity-40" />
+            <span className="text-[11px] font-bold">{vehiculo.anio}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Fuel size={14} className="opacity-40" />
+            <span className="text-[11px] font-bold capitalize">{vehiculo.combustible?.toLowerCase()}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <AlignJustify size={14} className="opacity-40" />
+            <span className="text-[11px] font-bold capitalize">{vehiculo.transmision?.toLowerCase()}</span>
+          </div>
+        </div>
 
         {/* Price and CTA */}
-        <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, color: 'primary.main', letterSpacing: '-0.05em' }}>
-            {cotizacionDolar 
-              ? `ARS $ ${(vehiculo.precio * cotizacionDolar).toLocaleString("es-AR")}` 
+        <div className="mt-auto flex items-center justify-between">
+          <span className="text-2xl font-black text-[#b5000b] tracking-[-0.05em]">
+            {cotizacionDolar
+              ? `ARS $ ${(vehiculo.precio * cotizacionDolar).toLocaleString("es-AR")}`
               : `U$D ${vehiculo.precio.toLocaleString("es-AR")}`}
-          </Typography>
-          <Button
-            component={Link}
+          </span>
+          <Link
             href={`/catalogo/${vehiculo.id}`}
-            variant="contained"
-            sx={{
-              bgcolor: '#c2410c',
-              color: 'white',
-              px: 2.5,
-              py: 1.5,
-              fontSize: '11px',
-              fontWeight: 900,
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              boxShadow: '0 4px 6px -1px rgba(194,65,12,0.2), 0 2px 4px -1px rgba(194,65,12,0.1)',
-              display: 'flex',
-              gap: 1,
-              '&:hover': { bgcolor: '#9a3412', opacity: 0.9 },
-              '&:active': { transform: 'scale(0.95)' }
-            }}
+            className="bg-[#b5000b] text-white px-4 py-2.5 text-[11px] font-black uppercase tracking-[0.1em] flex items-center gap-1.5 hover:bg-red-800 active:scale-95 transition-all shadow-[0_4px_6px_-1px_rgba(181,0,11,0.2)]"
           >
             Ver Detalles <ArrowRight size={14} />
-          </Button>
-        </Box>
-      </Box>
+          </Link>
+        </div>
+      </div>
 
       <EditModal
         isOpen={isEditModalOpen}
@@ -167,6 +115,6 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
         vehiculo={vehiculo}
         categorias={categorias}
       />
-    </Box>
+    </div>
   );
 };

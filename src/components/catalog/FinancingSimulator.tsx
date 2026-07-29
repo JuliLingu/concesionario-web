@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Box, Button, Collapse, Slider, Stack, Typography } from "@mui/material";
 import { Calculator } from "lucide-react";
 import { FinancingForm } from "./FinancingForm";
 
@@ -47,131 +46,94 @@ export const FinancingSimulator = ({ vehiculoId, precioOriginal, cotizacionDolar
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(val);
 
   return (
-    <Box sx={{
-      bgcolor: 'rgba(255, 255, 255, 0.02)',
-      backdropFilter: 'blur(20px)',
-      border: '1px solid rgba(255, 255, 255, 0.05)',
-      borderRadius: 2,
-      overflow: 'hidden'
-    }}>
-      <Box sx={{ p: 4 }}>
-        <Stack direction="row" spacing={2} sx={{ mb: 4, alignItems: "center" }}>
-          <Box sx={{ width: 40, height: 40, borderRadius: 1, bgcolor: 'rgba(194,65,12,0.1)', color: 'primary.main', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div className="bg-[hsl(var(--surface-low))] border border-black/5 rounded-lg overflow-hidden">
+      <div className="p-6 md:p-8">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-10 h-10 rounded bg-[#b5000b]/10 text-[#b5000b] flex items-center justify-center shrink-0">
             <Calculator size={20} />
-          </Box>
-          <Typography variant="h2" sx={{ fontSize: '1.5rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+          </div>
+          <h2 className="text-2xl font-black uppercase tracking-[-0.02em] text-[hsl(var(--foreground))]">
             Simulador de Cuotas
-          </Typography>
-        </Stack>
+          </h2>
+        </div>
 
-        <Stack spacing={4}>
-          <Box>
-            <Stack direction="row" sx={{ justifyContent: "space-between", mb: 1 }}>
-              <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        <div className="flex flex-col gap-8">
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-sm font-bold text-[hsl(var(--muted-foreground))] uppercase tracking-[0.1em]">
                 Tu Anticipo ({anticipoPercent}%)
-              </Typography>
-              <Typography sx={{ fontSize: '0.875rem', fontWeight: 900, color: 'text.primary' }}>
+              </span>
+              <span className="text-sm font-black text-[hsl(var(--foreground))]">
                 {formatCurrency(anticipoArs)}
-              </Typography>
-            </Stack>
-            <Slider
-              value={anticipoPercent}
-              onChange={(_, newVal) => setAnticipoPercent(newVal as number)}
+              </span>
+            </div>
+            <input
+              type="range"
               min={10}
               max={90}
               step={5}
-              sx={{
-                color: 'primary.main',
-                height: 8,
-                '& .MuiSlider-thumb': {
-                  width: 24,
-                  height: 24,
-                  backgroundColor: '#fff',
-                  border: '2px solid currentColor',
-                  '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
-                    boxShadow: 'inherit',
-                  },
-                },
-              }}
+              value={anticipoPercent}
+              onChange={(e) => setAnticipoPercent(Number(e.target.value))}
+              className="w-full h-2 bg-black/10 rounded-lg appearance-none cursor-pointer accent-[#b5000b]"
             />
-          </Box>
+          </div>
 
-          <Box>
-            <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.1em', mb: 2 }}>
+          <div>
+            <div className="text-sm font-bold text-[hsl(var(--muted-foreground))] uppercase tracking-[0.1em] mb-4">
               Plan de Financiación
-            </Typography>
-            <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
+            </div>
+            <div className="flex flex-wrap gap-2">
               {planes.map(plan => (
-                <Button
+                <button
                   key={plan.id}
                   onClick={() => setSelectedPlanId(plan.id)}
-                  variant={selectedPlanId === plan.id ? "contained" : "outlined"}
-                  sx={{
-                    borderRadius: 5,
-                    px: 3,
-                    py: 1,
-                    fontSize: '10px',
-                    fontWeight: 900,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    ...(selectedPlanId === plan.id 
-                      ? { bgcolor: 'text.primary', color: 'background.default', boxShadow: 'none', border: '1px solid transparent', '&:hover': { bgcolor: 'text.secondary', boxShadow: 'none' } }
-                      : { color: 'text.secondary', border: '1px solid rgba(255,255,255,0.1)', '&:hover': { color: 'text.primary', border: '1px solid rgba(255,255,255,0.3)', bgcolor: 'transparent' } }
-                    )
-                  }}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.1em] rounded-full transition-colors ${
+                    selectedPlanId === plan.id
+                      ? "bg-[hsl(var(--foreground))] text-white"
+                      : "border border-black/10 text-[hsl(var(--muted-foreground))] hover:border-black/30 hover:text-[hsl(var(--foreground))]"
+                  }`}
                 >
                   {plan.cuotas} Cuotas
-                </Button>
+                </button>
               ))}
-            </Stack>
-          </Box>
+            </div>
+          </div>
 
-          <Box sx={{ bgcolor: '#0a0a0a', p: 3, borderRadius: 2, border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
-            <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'primary.main', mb: 1 }}>
+          <div className="bg-white p-6 rounded-lg border border-black/5 text-center shadow-[0_4px_20px_rgba(26,28,30,0.04)]">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#b5000b] mb-2">
               Cuota Fija Mensual
-            </Typography>
-            <Typography sx={{ fontSize: '3rem', fontWeight: 900, letterSpacing: '-0.05em', color: 'text.primary', lineHeight: 1 }}>
+            </div>
+            <div className="text-5xl font-black tracking-[-0.05em] text-[hsl(var(--foreground))] leading-none">
               {formatCurrency(cuotaMensual)}
-            </Typography>
-            <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 500, mt: 1 }}>
+            </div>
+            <div className="text-xs text-[hsl(var(--muted-foreground))] font-medium mt-3">
               TNA: {selectedPlan?.tasaAnual}% (Interés Simple)
-            </Typography>
-          </Box>
+            </div>
+          </div>
 
           {!showForm && (
-            <Button
+            <button
               onClick={() => setShowForm(true)}
-              variant="contained"
-              fullWidth
-              sx={{
-                bgcolor: 'primary.main',
-                color: 'white',
-                py: 2,
-                fontSize: '0.875rem',
-                fontWeight: 900,
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                '&:hover': { bgcolor: 'primary.dark' }
-              }}
+              className="w-full bg-[#b5000b] hover:bg-red-800 text-white py-4 text-sm font-black uppercase tracking-[0.1em] transition-colors rounded"
             >
               Solicitar este crédito
-            </Button>
+            </button>
           )}
-        </Stack>
-      </Box>
+        </div>
+      </div>
 
-      <Collapse in={showForm}>
-        <Box sx={{ p: 4, bgcolor: 'rgba(0,0,0,0.2)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.1em', mb: 3 }}>
+      {showForm && (
+        <div className="p-6 md:p-8 bg-white border-t border-black/5">
+          <div className="text-sm font-bold text-[hsl(var(--foreground))] uppercase tracking-[0.1em] mb-6">
             Completá tus datos
-          </Typography>
+          </div>
           <FinancingForm 
             vehiculoId={vehiculoId} 
             anticipo={anticipoArs} 
             cuotas={selectedPlan?.cuotas || 12} 
           />
-        </Box>
-      </Collapse>
-    </Box>
+        </div>
+      )}
+    </div>
   );
 };

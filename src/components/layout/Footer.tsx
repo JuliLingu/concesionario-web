@@ -1,73 +1,56 @@
 "use client";
 import { Car } from "lucide-react";
-import { Box, Container, Typography, Stack, Link as MuiLink } from "@mui/material";
+import Link from "next/link";
 
 interface FooterProps {
   configuracion?: any;
 }
 
 export function Footer({ configuracion }: FooterProps) {
-  const parts = configuracion?.nombreConcesionaria ? configuracion.nombreConcesionaria.split(" ") : ["JBJ", "Automotores"];
+  const parts = configuracion?.nombreConcesionaria
+    ? configuracion.nombreConcesionaria.split(" ")
+    : ["JBJ", "Automotores"];
   const firstWord = parts[0];
   const restWords = parts.slice(1).join(" ");
 
   return (
-    <Box component="footer" sx={{ py: 4, bgcolor: '#1a1c1e' }}>
-      <Container maxWidth="lg">
-        <Stack 
-          direction={{ xs: 'column', md: 'row' }} 
-          spacing={3}
-          sx={{ alignItems: 'center', justifyContent: 'space-between' }}
-        >
-          {/* LOGO Y NOMBRE */}
-          <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
-            <Box sx={{ p: 0.75, borderRadius: 2, bgcolor: 'rgba(194,65,12,0.1)' }}>
-              <Car style={{ color: "#c2410c", width: 20, height: 20 }} />
-            </Box>
-            <Typography variant="body1" sx={{ fontWeight: 800, color: 'white', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
-              {firstWord} {restWords && <span style={{ color: "#c2410c" }}>{restWords}</span>}
-            </Typography>
-          </Stack>
+    <footer className="py-8 bg-[#1a1c1e]">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="p-1.5 rounded-lg bg-[#c2410c]/10">
+              <Car className="text-[#c2410c] w-5 h-5" />
+            </div>
+            <span className="font-extrabold text-white uppercase tracking-tighter">
+              {firstWord}{" "}
+              {restWords && <span className="text-[#c2410c]">{restWords}</span>}
+            </span>
+          </div>
 
-          {/* TEXTO CENTRAL */}
-          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.35)', fontWeight: 300, textAlign: 'center' }}>
+          {/* Copyright */}
+          <p className="text-white/35 font-light text-sm text-center">
             Vehículos de calidad. Concesionario en Argentina. {new Date().getFullYear()}
             {configuracion?.direccion && ` - ${configuracion.direccion}`}
-          </Typography>
+          </p>
 
-          {/* ENLACES SECUNDARIOS */}
-          <Stack direction="row" spacing={4}>
-            <MuiLink 
-              href="#" 
-              underline="none"
-              sx={{ 
-                fontSize: '0.75rem', 
-                textTransform: 'uppercase', 
-                letterSpacing: '0.1em', 
-                color: 'rgba(255,255,255,0.35)',
-                transition: 'color 0.2s',
-                '&:hover': { color: '#c2410c' }
-              }}
+          {/* Links */}
+          <div className="flex items-center gap-8">
+            <Link
+              href="#"
+              className="text-xs uppercase tracking-widest text-white/35 hover:text-[#c2410c] transition-colors"
             >
               Términos
-            </MuiLink>
-            <MuiLink 
-              href="#" 
-              underline="none"
-              sx={{ 
-                fontSize: '0.75rem', 
-                textTransform: 'uppercase', 
-                letterSpacing: '0.1em', 
-                color: 'rgba(255,255,255,0.35)',
-                transition: 'color 0.2s',
-                '&:hover': { color: '#c2410c' }
-              }}
+            </Link>
+            <Link
+              href="#"
+              className="text-xs uppercase tracking-widest text-white/35 hover:text-[#c2410c] transition-colors"
             >
               Privacidad
-            </MuiLink>
-          </Stack>
-        </Stack>
-      </Container>
-    </Box>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }

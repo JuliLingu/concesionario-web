@@ -5,7 +5,6 @@ import { useState } from "react";
 import { ImagenVehiculo } from "../../../generated/prisma";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getCldUrl } from "@/lib/cloudinary";
-import { Box, IconButton, Typography, Stack } from "@mui/material";
 
 interface VehicleGalleryProps {
   images: ImagenVehiculo[];
@@ -17,24 +16,9 @@ export const VehicleGallery = ({ images, altText }: VehicleGalleryProps) => {
 
   if (!images || images.length === 0) {
     return (
-      <Box 
-        sx={{ 
-          width: '100%', 
-          aspectRatio: '4/3', 
-          bgcolor: 'background.paper', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          fontFamily: 'var(--font-space)', 
-          fontSize: '2.25rem', 
-          color: 'rgba(255,255,255,0.05)', 
-          fontWeight: 900, 
-          borderRadius: 1, 
-          border: '1px solid rgba(255,255,255,0.05)' 
-        }}
-      >
+      <div className="w-full aspect-[4/3] bg-[hsl(var(--surface-low))] flex items-center justify-center font-black text-4xl text-black/5 rounded-lg border border-black/5">
         JBJ
-      </Box>
+      </div>
     );
   }
 
@@ -47,9 +31,9 @@ export const VehicleGallery = ({ images, altText }: VehicleGalleryProps) => {
   };
 
   return (
-    <Stack spacing={2}>
+    <div className="flex flex-col gap-4">
       {/* Main Image */}
-      <Box sx={{ position: 'relative', width: '100%', aspectRatio: '4/3', bgcolor: '#0a0a0a', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 2, overflow: 'hidden', '&:hover .nav-btn': { opacity: 1 } }}>
+      <div className="group relative w-full aspect-[4/3] bg-[hsl(var(--surface-low))] border border-black/5 rounded-lg overflow-hidden">
         <Image
           src={getCldUrl(images[currentIndex].url, "4:3")}
           alt={`${altText} - Imagen ${currentIndex + 1}`}
@@ -57,93 +41,61 @@ export const VehicleGallery = ({ images, altText }: VehicleGalleryProps) => {
           priority
           loading="eager"
           sizes="(max-width: 1024px) 100vw, 65vw"
-          style={{ objectFit: 'cover', objectPosition: 'center' }}
+          className="object-cover object-center"
         />
-        
+
         {/* Navigation Arrows */}
         {images.length > 1 && (
           <>
-            <IconButton 
-              className="nav-btn"
+            <button
               onClick={handlePrev}
-              sx={{ 
-                position: 'absolute', 
-                left: 8, 
-                top: '50%', 
-                transform: 'translateY(-50%)', 
-                bgcolor: 'rgba(255,255,255,0.9)', 
-                color: '#000', 
-                opacity: 0, 
-                transition: 'all 0.3s',
-                '&:hover': { bgcolor: '#fff', transform: 'translateY(-50%) scale(1.1)' }
-              }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 text-black p-2 rounded-full opacity-0 transition-all duration-300 group-hover:opacity-100 hover:bg-white hover:scale-110"
+              aria-label="Imagen anterior"
             >
               <ChevronLeft size={24} />
-            </IconButton>
-            <IconButton 
-              className="nav-btn"
+            </button>
+            <button
               onClick={handleNext}
-              sx={{ 
-                position: 'absolute', 
-                right: 8, 
-                top: '50%', 
-                transform: 'translateY(-50%)', 
-                bgcolor: 'rgba(255,255,255,0.9)', 
-                color: '#000', 
-                opacity: 0, 
-                transition: 'all 0.3s',
-                '&:hover': { bgcolor: '#fff', transform: 'translateY(-50%) scale(1.1)' }
-              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 text-black p-2 rounded-full opacity-0 transition-all duration-300 group-hover:opacity-100 hover:bg-white hover:scale-110"
+              aria-label="Imagen siguiente"
             >
               <ChevronRight size={24} />
-            </IconButton>
+            </button>
           </>
         )}
 
         {/* Image counter */}
         {images.length > 1 && (
-          <Box sx={{ position: 'absolute', bottom: 12, right: 12, bgcolor: 'rgba(0,0,0,0.5)', color: 'white', fontSize: '10px', fontWeight: 900, px: 1, py: 0.5, borderRadius: 1, letterSpacing: '0.1em' }}>
+          <div className="absolute bottom-3 right-3 bg-black/50 text-white text-[10px] font-black px-2 py-0.5 rounded tracking-[0.1em]">
             {currentIndex + 1} / {images.length}
-          </Box>
+          </div>
         )}
-      </Box>
+      </div>
 
       {/* Thumbnails */}
       {images.length > 1 && (
-        <Stack direction="row" spacing={1.5} sx={{ overflowX: 'auto', pb: 1, pt: 0.5, '&::-webkit-scrollbar': { display: 'none' } }}>
+        <div className="flex flex-row gap-3 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden">
           {images.map((img, index) => (
-            <Box
+            <button
               key={img.id}
-              component="button"
               onClick={() => setCurrentIndex(index)}
-              sx={{ 
-                position: 'relative', 
-                flexShrink: 0, 
-                width: { xs: 80, md: 96 }, 
-                aspectRatio: '4/3', 
-                borderRadius: 1, 
-                overflow: 'hidden', 
-                transition: 'all 0.3s',
-                border: 'none',
-                p: 0,
-                cursor: 'pointer',
-                ...(currentIndex === index 
-                  ? { boxShadow: '0 0 0 2px #c2410c', opacity: 1 } 
-                  : { boxShadow: '0 0 0 1px rgba(255,255,255,0.1)', opacity: 0.5, '&:hover': { opacity: 1 } }
-                )
-              }}
+              className={`relative shrink-0 w-20 md:w-24 aspect-[4/3] rounded overflow-hidden transition-all duration-300 p-0 cursor-pointer ${
+                currentIndex === index
+                  ? "ring-2 ring-[#b5000b] opacity-100"
+                  : "ring-1 ring-black/10 opacity-50 hover:opacity-100"
+              }`}
             >
               <Image
                 src={getCldUrl(img.url, "4:3")}
                 alt={`${altText} miniatura ${index + 1}`}
                 fill
                 sizes="96px"
-                style={{ objectFit: 'cover', objectPosition: 'center' }}
+                className="object-cover object-center"
               />
-            </Box>
+            </button>
           ))}
-        </Stack>
+        </div>
       )}
-    </Stack>
+    </div>
   );
 };

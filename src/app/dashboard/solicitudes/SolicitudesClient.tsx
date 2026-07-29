@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { MessageSquare, ExternalLink } from "lucide-react";
 import { SolicitudStatusButton } from "@/components/dashboard/SolicitudStatusButton";
-import { Box, Button, Container, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Link as MuiLink } from "@mui/material";
 
 export const SolicitudesClient = ({ solicitudes, pendientes, TABS, estadoValido }: any) => {
 
@@ -16,131 +15,125 @@ export const SolicitudesClient = ({ solicitudes, pendientes, TABS, estadoValido 
     new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(val);
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pt: 16, pb: 8 }}>
-      <Container maxWidth="xl">
+    <div className="min-h-screen bg-[hsl(var(--background))] pt-16 pb-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
         
         {/* Header */}
-        <Box sx={{ mb: 6 }}>
-          <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'primary.main', mb: 1 }}>
+        <div className="mb-6">
+          <div className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--primary))] mb-1">
             Panel de Control
-          </Typography>
-          <Typography variant="h1" sx={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-0.02em', mb: 0.5 }}>
+          </div>
+          <h1 className="text-[2.5rem] font-bold tracking-tight mb-0.5 text-[hsl(var(--foreground))]">
             Solicitudes de Crédito
-          </Typography>
-          <Stack direction="row"  spacing={1} sx={{alignItems:"center"}} >
-            <Typography sx={{ color: 'text.secondary', fontWeight: 500 }}>
+          </h1>
+          <div className="flex items-center gap-2">
+            <span className="text-[hsl(var(--muted-foreground))] font-medium">
               {solicitudes.length} solicitud{solicitudes.length !== 1 ? "es" : ""}
-            </Typography>
+            </span>
             {pendientes.length > 0 && (
-              <Box sx={{ bgcolor: 'primary.main', color: 'white', fontSize: '9px', fontWeight: 900, px: 1, py: 0.5, borderRadius: 5 }}>
+              <span className="bg-[hsl(var(--primary))] text-white text-[9px] font-black px-2 py-1 rounded-full">
                 {pendientes.length} pendiente{pendientes.length !== 1 ? "s" : ""}
-              </Box>
+              </span>
             )}
-          </Stack>
-        </Box>
+          </div>
+        </div>
 
         {/* Tabs */}
-        <Stack direction="row" spacing={1} sx={{ mb: 4, bgcolor: 'background.paper', p: 0.5, borderRadius: 1, display: 'inline-flex', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="inline-flex gap-1 mb-4 bg-white p-1 rounded border border-[#e5e7eb] shadow-sm">
           {TABS.map((tab: any) => {
             const isActive = tab.value === "TODAS" ? !estadoValido : estadoValido === tab.value;
             const href = tab.value === "TODAS" ? "/dashboard/solicitudes" : `/dashboard/solicitudes?estado=${tab.value}`;
             return (
-              <Button
+              <Link
                 key={tab.value}
-                component={Link}
                 href={href}
-                variant={isActive ? "contained" : "text"}
-                sx={{
-                  fontSize: '10px',
-                  fontWeight: 900,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  px: 2,
-                  py: 1,
-                  minWidth: 0,
-                  boxShadow: 'none',
-                  ...(isActive ? { bgcolor: 'text.primary', color: 'background.default', '&:hover': { bgcolor: 'text.secondary', boxShadow: 'none' } } : { color: 'text.secondary', '&:hover': { color: 'text.primary', bgcolor: 'transparent' } })
-                }}
+                className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded transition ${
+                  isActive 
+                    ? "bg-[hsl(var(--foreground))] text-white" 
+                    : "text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] hover:bg-[#f3f3f6]"
+                }`}
               >
                 {tab.label}
-              </Button>
+              </Link>
             );
           })}
-        </Stack>
+        </div>
 
         {/* Table */}
         {solicitudes.length === 0 ? (
-          <Box sx={{ py: 10, textAlign: 'center', bgcolor: 'background.paper', borderRadius: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-            <MessageSquare size={32} color="rgba(255,255,255,0.2)" />
-            <Typography sx={{ color: 'text.secondary', fontWeight: 500, fontSize: '0.875rem' }}>
+          <div className="py-10 text-center bg-white rounded shadow-[0_20px_40px_rgba(26,28,30,0.06)] flex flex-col items-center gap-2">
+            <MessageSquare size={32} className="text-[hsl(var(--muted-foreground))] opacity-40" />
+            <span className="text-[hsl(var(--muted-foreground))] font-medium text-sm">
               No hay solicitudes en esta categoría.
-            </Typography>
-          </Box>
+            </span>
+          </div>
         ) : (
-          <TableContainer component={Paper} sx={{ bgcolor: 'background.paper', borderRadius: 1, boxShadow: 'none', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <Table>
-              <TableHead sx={{ bgcolor: '#0a0a0a' }}>
-                <TableRow>
-                  <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Cliente / DNI</TableCell>
-                  <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)', display: { xs: 'none', lg: 'table-cell' } }}>Vehículo</TableCell>
-                  <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Financiación</TableCell>
-                  <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)', display: { xs: 'none', md: 'table-cell' } }}>Fecha</TableCell>
-                  <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Estado</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {solicitudes.map((c: any) => (
-                  <TableRow key={c.id} sx={{ '&:last-child td': { border: 0 }, '&:hover': { bgcolor: 'rgba(255,255,255,0.02)' }, verticalAlign: 'top' }}>
-                    <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                      <Typography sx={{ fontWeight: 900, fontSize: '0.875rem', color: 'text.primary' }}>{c.nombre} {c.apellido}</Typography>
-                      <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', mt: 0.5 }}>DNI: {c.dni}</Typography>
-                      <MuiLink href={`mailto:${c.email}`} sx={{ fontSize: '0.75rem', fontWeight: 500, color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' }, display: 'block', mt: 0.5 }}>{c.email}</MuiLink>
-                      {c.telefono && (
-                        <MuiLink href={`tel:${c.telefono}`} sx={{ fontSize: '0.75rem', fontWeight: 500, color: 'text.secondary', textDecoration: 'none', display: 'block', mt: 0.5 }}>{c.telefono}</MuiLink>
-                      )}
-                    </TableCell>
-                    <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)', display: { xs: 'none', lg: 'table-cell' } }}>
-                      {c.vehiculo ? (
-                        <MuiLink component={Link} href={`/catalogo/${c.vehiculo.id}`} target="_blank" sx={{ fontSize: '0.875rem', fontWeight: 700, color: 'text.primary', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 0.5, '&:hover': { color: 'primary.main' } }}>
-                          {c.vehiculo.marca} {c.vehiculo.modelo} {c.vehiculo.anio}
-                          <ExternalLink size={11} style={{ opacity: 0.4 }} />
-                        </MuiLink>
-                      ) : (
-                        <Typography sx={{ fontSize: '0.875rem', color: 'text.secondary', fontStyle: 'italic' }}>General</Typography>
-                      )}
-                    </TableCell>
-                    <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                      <Typography sx={{ fontSize: '0.875rem', color: 'text.primary', fontWeight: 700 }}>
-                        {c.cuotas} Cuotas
-                      </Typography>
-                      <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', mt: 0.5 }}>
-                        Anticipo: {formatCurrency(c.anticipo)}
-                      </Typography>
-                      <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', mt: 0.5 }}>
-                        Ingresos: {c.ingresos ? formatCurrency(c.ingresos) : "No especificado"}
-                      </Typography>
-                      {c.mensaje && (
-                        <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', mt: 1, fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                          "{c.mensaje}"
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)', display: { xs: 'none', md: 'table-cell' } }}>
-                      <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 500, whiteSpace: 'nowrap' }}>
-                        {formatDate(c.createdAt)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                      <SolicitudStatusButton solicitudId={c.id} estadoActual={c.estado} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <div className="bg-white rounded shadow-[0_20px_40px_rgba(26,28,30,0.06)] overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-[#f3f3f6]">
+                  <tr className="border-b border-[#e5e7eb]">
+                    <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Cliente / DNI</th>
+                    <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))] hidden lg:table-cell">Vehículo</th>
+                    <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Financiación</th>
+                    <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))] hidden md:table-cell">Fecha</th>
+                    <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {solicitudes.map((c: any) => (
+                    <tr key={c.id} className="border-b border-[#e5e7eb]/50 hover:bg-[hsl(var(--surface-low))] transition align-top">
+                      <td className="py-3 px-4">
+                        <div className="font-bold text-sm text-[hsl(var(--foreground))]">{c.nombre} {c.apellido}</div>
+                        <div className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">DNI: {c.dni}</div>
+                        <Link href={`mailto:${c.email}`} className="text-xs font-medium text-[hsl(var(--primary))] hover:underline block mt-0.5">{c.email}</Link>
+                        {c.telefono && (
+                          <Link href={`tel:${c.telefono}`} className="text-xs font-medium text-[hsl(var(--muted-foreground))] hover:underline block mt-0.5">{c.telefono}</Link>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 hidden lg:table-cell">
+                        {c.vehiculo ? (
+                          <Link href={`/catalogo/${c.vehiculo.id}`} target="_blank" className="text-sm font-bold text-[hsl(var(--foreground))] flex items-center gap-1 hover:text-[hsl(var(--primary))]">
+                            {c.vehiculo.marca} {c.vehiculo.modelo} {c.vehiculo.anio}
+                            <ExternalLink size={11} className="opacity-40" />
+                          </Link>
+                        ) : (
+                          <span className="text-sm text-[hsl(var(--muted-foreground))] italic">General</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="text-sm font-bold text-[hsl(var(--foreground))]">
+                          {c.cuotas} Cuotas
+                        </div>
+                        <div className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">
+                          Anticipo: {formatCurrency(c.anticipo)}
+                        </div>
+                        <div className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">
+                          Ingresos: {c.ingresos ? formatCurrency(c.ingresos) : "No especificado"}
+                        </div>
+                        {c.mensaje && (
+                          <div className="text-xs text-[hsl(var(--muted-foreground))] mt-1 italic line-clamp-2">
+                            "{c.mensaje}"
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 hidden md:table-cell">
+                        <span className="text-xs text-[hsl(var(--muted-foreground))] font-medium whitespace-nowrap">
+                          {formatDate(c.createdAt)}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <SolicitudStatusButton solicitudId={c.id} estadoActual={c.estado} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
 
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 };

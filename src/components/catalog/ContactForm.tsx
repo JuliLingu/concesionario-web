@@ -7,7 +7,6 @@ import { useState, useTransition } from "react";
 import { ConsultaSchema } from "@/schemas/consulta";
 import { createConsulta } from "@/actions/consulta";
 import { Send, CheckCircle2 } from "lucide-react";
-import { Box, Button, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 
 interface ContactFormProps {
   vehiculoId?: string;
@@ -44,133 +43,99 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
     });
   };
 
-  // If success, show confirmation state
   if (success) {
     return (
-      <Stack sx={{ py: 6, px: 3, bgcolor: 'background.paper', textAlign: 'center', alignItems: "center", justifyContent: "center" }} spacing={2}>
-        <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: 'rgba(34,197,94,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <CheckCircle2 size={28} color="#16a34a" />
-        </Box>
-        <Typography variant="h3" sx={{ fontWeight: 900, fontSize: '1.125rem', textTransform: 'uppercase', letterSpacing: '-0.02em', mt: 1 }}>
+      <div className="py-12 px-6 bg-white text-center flex flex-col items-center justify-center gap-4 rounded border border-black/5">
+        <div className="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center">
+          <CheckCircle2 size={28} className="text-green-600" />
+        </div>
+        <h3 className="font-black text-lg uppercase tracking-[-0.02em] text-[hsl(var(--foreground))] mt-2">
           ¡Consulta enviada!
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500, maxWidth: 300, lineHeight: 1.6 }}>
+        </h3>
+        <p className="text-[hsl(var(--muted-foreground))] font-medium max-w-[300px] leading-relaxed">
           {success}
-        </Typography>
-        <Button
+        </p>
+        <button
           onClick={() => setSuccess(undefined)}
-          variant="text"
-          sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', mt: 1 }}
+          className="text-[10px] font-black uppercase tracking-[0.1em] text-[#b5000b] hover:text-[hsl(var(--foreground))] transition-colors mt-2"
         >
           Enviar otra consulta
-        </Button>
-      </Stack>
+        </button>
+      </div>
     );
   }
 
   return (
-    <Box component="form" onSubmit={form.handleSubmit(onSubmit)} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {/* Nombre + Email */}
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-        <TextField
-          {...form.register("nombre")}
-          label="Nombre *"
-          placeholder="Tu nombre"
+    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1 flex flex-col gap-1">
+          <input
+            {...form.register("nombre")}
+            placeholder="Nombre *"
+            disabled={isPending}
+            className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full disabled:opacity-50 ${form.formState.errors.nombre ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+          />
+          {form.formState.errors.nombre && (
+            <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.nombre.message}</span>
+          )}
+        </div>
+
+        <div className="flex-1 flex flex-col gap-1">
+          <input
+            {...form.register("email")}
+            type="email"
+            placeholder="Email *"
+            disabled={isPending}
+            className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full disabled:opacity-50 ${form.formState.errors.email ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+          />
+          {form.formState.errors.email && (
+            <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.email.message}</span>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <input
+          {...form.register("telefono")}
+          placeholder="Teléfono (opcional)"
           disabled={isPending}
-          error={!!form.formState.errors.nombre}
-          helperText={form.formState.errors.nombre?.message?.toString()}
-          fullWidth
-          variant="filled"
-          slotProps={{
-            input: {},
-            inputLabel: {}
-          }}
-          sx={{ '& .MuiFilledInput-root': { bgcolor: 'background.paper', borderRadius: 1 } }}
+          className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full disabled:opacity-50`}
         />
+      </div>
 
-        <TextField
-          {...form.register("email")}
-          type="email"
-          label="Email *"
-          placeholder="tu@email.com"
+      <div className="flex flex-col gap-1">
+        <textarea
+          {...form.register("mensaje")}
+          placeholder="Mensaje (opcional)"
           disabled={isPending}
-          error={!!form.formState.errors.email}
-          helperText={form.formState.errors.email?.message?.toString()}
-          fullWidth
-          variant="filled"
-          slotProps={{
-            input: {},
-            inputLabel: {}
-          }}
-          sx={{ '& .MuiFilledInput-root': { bgcolor: 'background.paper', borderRadius: 1 } }}
+          rows={4}
+          className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full resize-none disabled:opacity-50`}
         />
-      </Stack>
-
-      {/* Teléfono */}
-      <TextField
-        {...form.register("telefono")}
-        label="Teléfono (opcional)"
-        placeholder="+54 223 421-4414"
-        disabled={isPending}
-        fullWidth
-        variant="filled"
-        slotProps={{
-          input: {},
-          inputLabel: {}
-        }}
-        sx={{ '& .MuiFilledInput-root': { bgcolor: 'background.paper', borderRadius: 1 } }}
-      />
-
-      {/* Mensaje */}
-      <TextField
-        {...form.register("mensaje")}
-        label="Mensaje (opcional)"
-        placeholder="¿Tenés alguna pregunta específica sobre el vehículo?"
-        disabled={isPending}
-        multiline
-        rows={4}
-        fullWidth
-        variant="filled"
-        slotProps={{
-          input: {},
-          inputLabel: {}
-        }}
-        sx={{ '& .MuiFilledInput-root': { bgcolor: 'background.paper', borderRadius: 1 } }}
-      />
+      </div>
 
       {error && (
-        <Typography sx={{ bgcolor: 'rgba(194,65,12,0.1)', color: 'primary.main', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', p: 1.5 }}>
+        <div className="bg-red-50 text-[#b5000b] text-[10px] font-black uppercase tracking-[0.1em] p-3 rounded border-l-4 border-[#b5000b]">
           {error}
-        </Typography>
+        </div>
       )}
 
-      <Button
+      <button
         type="submit"
         disabled={isPending}
-        variant="contained"
-        fullWidth
-        sx={{
-          bgcolor: 'text.primary',
-          color: 'background.default',
-          py: 2,
-          fontSize: '11px',
-          fontWeight: 900,
-          letterSpacing: '0.1em',
-          '&:hover': { bgcolor: 'primary.main' }
-        }}
+        className="w-full bg-[hsl(var(--foreground))] text-white py-4 text-[11px] font-black uppercase tracking-[0.1em] rounded hover:bg-[#b5000b] transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
       >
         {isPending ? (
-          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
-            <CircularProgress size={16} color="inherit" />
-            <Typography sx={{ fontSize: 'inherit', fontWeight: 'inherit', textTransform: 'uppercase' }}>Enviando...</Typography>
-          </Stack>
+          <>
+            <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span>Enviando...</span>
+          </>
         ) : (
-          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
+          <>
             <Send size={16} />
-            <Typography sx={{ fontSize: 'inherit', fontWeight: 'inherit', textTransform: 'uppercase' }}>Enviar Consulta</Typography>
-          </Stack>
+            <span>Enviar Consulta</span>
+          </>
         )}
-      </Button>
-    </Box>
+      </button>
+    </form>
   );
 };

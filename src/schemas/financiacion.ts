@@ -2,9 +2,9 @@ import * as z from "zod";
 
 export const PlanFinanciacionSchema = z.object({
   nombre: z.string().min(1, "El nombre es requerido"),
-  cuotas: z.coerce.number().min(1, "Debe tener al menos 1 cuota"),
-  tasaAnual: z.coerce.number().min(0, "La tasa debe ser mayor o igual a 0"),
-  activo: z.boolean().default(true),
+  cuotas: z.number().min(1, "Debe tener al menos 1 cuota"),
+  tasaAnual: z.number().min(0, "La tasa debe ser mayor o igual a 0"),
+  activo: z.boolean(),
 });
 
 export const SolicitudFinanciacionSchema = z.object({

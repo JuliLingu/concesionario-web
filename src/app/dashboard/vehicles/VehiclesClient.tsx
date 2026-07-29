@@ -3,111 +3,102 @@
 import Link from "next/link";
 import { Plus, Pencil } from "lucide-react";
 import { DeleteVehicleButton } from "@/components/dashboard/DeleteVehicleButton";
-import { Box, Button, Container, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Link as MuiLink } from "@mui/material";
 
 export const VehiclesClient = ({ vehicles, publicados, borradores }: any) => {
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pt: 16, pb: 8 }}>
-      <Container maxWidth="xl">
+    <div className="min-h-screen bg-[hsl(var(--background))] pt-16 pb-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
         
         {/* Header */}
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{ mb: 6, alignItems: { xs: 'flex-start', md: 'flex-end' }, justifyContent: "space-between" }}>
-          <Box>
-            <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'primary.main', mb: 1 }}>
+        <div className="flex flex-col md:flex-row gap-6 mb-6 md:items-end justify-between">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--primary))] mb-1">
               Panel de Control
-            </Typography>
-            <Typography variant="h1" sx={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-0.02em', mb: 0.5 }}>
+            </div>
+            <h1 className="text-[2.5rem] font-bold tracking-tight mb-0.5 text-[hsl(var(--foreground))]">
               Inventario
-            </Typography>
-            <Typography sx={{ color: 'text.secondary', fontWeight: 500 }}>
+            </h1>
+            <p className="text-[hsl(var(--muted-foreground))] font-medium">
               {vehicles.length} unidades totales · {publicados} publicadas · {borradores} en borrador
-            </Typography>
-          </Box>
-          <Button
-            component={Link}
+            </p>
+          </div>
+          <Link
             href="/dashboard/vehicles/new"
-            variant="contained"
-            startIcon={<Plus size={15} />}
-            sx={{
-              bgcolor: '#c2410c',
-              color: 'white',
-              px: 3,
-              py: 1.5,
-              fontSize: '11px',
-              fontWeight: 900,
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              boxShadow: '0 20px 25px -5px rgba(194,65,12,0.25)',
-              '&:hover': { bgcolor: '#9a3412', transform: 'scale(0.98)' }
-            }}
+            className="inline-flex items-center gap-2 bg-[#b5000b] text-white px-6 py-3 text-[11px] font-black uppercase tracking-widest hover:bg-[#9a3412] transition rounded shadow-[0_20px_25px_-5px_rgba(181,0,11,0.25)] hover:scale-95"
           >
+            <Plus size={15} />
             Agregar Vehículo
-          </Button>
-        </Stack>
+          </Link>
+        </div>
 
         {/* Table */}
-        <TableContainer component={Paper} sx={{ bgcolor: 'background.paper', borderRadius: 1, boxShadow: 'none', border: '1px solid rgba(255,255,255,0.05)' }}>
-          <Table>
-            <TableHead sx={{ bgcolor: '#0a0a0a' }}>
-              <TableRow>
-                <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Vehículo</TableCell>
-                <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)', display: { xs: 'none', md: 'table-cell' } }}>Categoría</TableCell>
-                <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Precio</TableCell>
-                <TableCell sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Visibilidad</TableCell>
-                <TableCell align="right" sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Acciones</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {vehicles.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 8, color: 'text.secondary', fontSize: '0.875rem', fontWeight: 500, fontStyle: 'italic', borderBottom: 0 }}>
-                    No hay vehículos cargados aún.
-                  </TableCell>
-                </TableRow>
-              )}
-              {vehicles.map((v: any) => (
-                <TableRow key={v.id} sx={{ '&:last-child td': { border: 0 }, '&:hover': { bgcolor: 'rgba(255,255,255,0.02)' } }}>
-                  <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <Typography sx={{ fontWeight: 900, fontSize: '0.875rem', color: 'text.primary' }}>
-                      {v.marca} {v.modelo}
-                    </Typography>
-                    <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 500, mt: 0.5 }}>
-                      {v.anio} · {Number(v.kilometraje).toLocaleString("es-AR")} KM
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)', display: { xs: 'none', md: 'table-cell' } }}>
-                    <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary', bgcolor: '#0a0a0a', px: 1, py: 0.5, borderRadius: 1, display: 'inline-block' }}>
-                      {v.categoria.nombre}
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <Typography sx={{ fontSize: '0.875rem', fontWeight: 900, color: 'text.primary' }}>
-                      {v.moneda} ${Number(v.precio).toLocaleString("es-AR")}
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <Typography sx={{
-                      fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', display: 'inline-block', px: 1, py: 0.5, borderRadius: 1,
-                      ...(v.publicacion === "PUBLICADO" ? { bgcolor: 'rgba(34,197,94,0.1)', color: '#16a34a' } : v.publicacion === "VENDIDO" ? { bgcolor: 'rgba(255,255,255,0.1)', color: 'text.secondary' } : { bgcolor: 'rgba(194,65,12,0.1)', color: 'primary.main' })
-                    }}>
-                      {v.publicacion}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right" sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <Stack direction="row" spacing={2} sx={{alignItems:"center", justifyContent:"flex-end"}}>
-                      <MuiLink component={Link} href={`/dashboard/vehicles/${v.id}`} sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' }, display: 'flex' }} title="Editar">
-                        <Pencil size={16} />
-                      </MuiLink>
-                      <DeleteVehicleButton vehicleId={v.id} vehicleName={`${v.marca} ${v.modelo} ${v.anio}`} />
-                    </Stack>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <div className="bg-white rounded shadow-[0_20px_40px_rgba(26,28,30,0.06)] overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-[#f3f3f6]">
+                <tr className="border-b border-[#e5e7eb]">
+                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Vehículo</th>
+                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))] hidden md:table-cell">Categoría</th>
+                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Precio</th>
+                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Visibilidad</th>
+                  <th className="text-right py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {vehicles.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="text-center py-8 text-[hsl(var(--muted-foreground))] text-sm font-medium italic">
+                      No hay vehículos cargados aún.
+                    </td>
+                  </tr>
+                )}
+                {vehicles.map((v: any) => (
+                  <tr key={v.id} className="border-b border-[#e5e7eb]/50 hover:bg-[hsl(var(--surface-low))] transition">
+                    <td className="py-3 px-4">
+                      <div className="font-bold text-sm text-[hsl(var(--foreground))]">
+                        {v.marca} {v.modelo}
+                      </div>
+                      <div className="text-xs text-[hsl(var(--muted-foreground))] font-medium mt-0.5">
+                        {v.anio} · {Number(v.kilometraje).toLocaleString("es-AR")} KM
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 hidden md:table-cell">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))] bg-[#f3f3f6] px-2 py-1 rounded inline-block">
+                        {v.categoria.nombre}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="font-bold text-sm text-[hsl(var(--foreground))]">
+                        {v.moneda} ${Number(v.precio).toLocaleString("es-AR")}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className={`text-[10px] font-black uppercase tracking-widest inline-block px-2 py-1 rounded ${
+                        v.publicacion === "PUBLICADO" 
+                          ? "bg-green-100 text-green-700" 
+                          : v.publicacion === "VENDIDO" 
+                            ? "bg-gray-100 text-gray-500" 
+                            : "bg-red-50 text-[hsl(var(--primary))]"
+                      }`}>
+                        {v.publicacion}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <div className="flex items-center justify-end gap-3">
+                        <Link href={`/dashboard/vehicles/${v.id}`} className="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--primary))] transition" title="Editar">
+                          <Pencil size={16} />
+                        </Link>
+                        <DeleteVehicleButton vehicleId={v.id} vehicleName={`${v.marca} ${v.modelo} ${v.anio}`} />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 };

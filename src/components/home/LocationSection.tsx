@@ -1,7 +1,5 @@
 "use client";
 
-import { Box, Container, Grid, Typography, Stack } from "@mui/material";
-
 interface LocationSectionProps {
   configuracion?: any;
 }
@@ -10,91 +8,64 @@ export function LocationSection({ configuracion }: LocationSectionProps) {
   const address = configuracion?.direccion || "Av. Principal 123, Buenos Aires";
 
   return (
-    <Box component="section" id="ubicacion" sx={{ py: 12, bgcolor: '#171717' }}>
-      <Container maxWidth="lg">
-        <Grid container sx={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', borderRadius: 2, overflow: 'hidden' }}>
+    <section id="ubicacion" className="py-24 bg-[hsl(var(--surface-low))]">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="flex flex-col lg:flex-row shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] rounded-lg overflow-hidden bg-white">
+
           {/* Info Column */}
-          <Grid size={{ xs: 12, lg: 6 }} sx={{ bgcolor: '#0a0a0a', p: { xs: 6, md: 12 }, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <Typography 
-              variant="overline" 
-              sx={{ 
-                fontSize: '10px', 
-                fontWeight: 900, 
-                textTransform: 'uppercase', 
-                letterSpacing: '0.5em', 
-                color: 'primary.main', 
-                mb: 3, 
-                display: 'block' 
-              }}
-            >
-              Visit Us
-            </Typography>
-            <Typography 
-              variant="h2" 
-              sx={{ 
-                fontSize: { xs: '3rem', md: '3.75rem' }, 
-                fontWeight: 800, 
-                color: 'text.primary', 
-                textTransform: 'uppercase', 
-                letterSpacing: '-0.02em', 
-                mb: 8,
-                lineHeight: 1
-              }}
-            >
+          <div className="w-full lg:w-1/2 p-12 md:p-20 flex flex-col justify-center">
+            <h2 className="text-[3rem] md:text-[3.75rem] font-extrabold text-[hsl(var(--foreground))] uppercase tracking-[-0.02em] mb-16 leading-none">
               Nuestra Casa <br /> Central.
-            </Typography>
+            </h2>
 
-            <Stack spacing={6}>
-              <Box sx={{ display: 'flex', gap: 3 }}>
-                <Box sx={{ width: '1px', height: 48, bgcolor: 'rgba(194,65,12,0.3)' }} />
-                <Box>
-                  <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.4)', mb: 1 }}>Location</Typography>
-                  <Typography sx={{ color: 'text.primary', fontWeight: 700, fontSize: '1.125rem' }}>{address}</Typography>
-                </Box>
-              </Box>
+            <div className="flex flex-col gap-10">
+              <div className="flex gap-5">
+                <div className="w-px h-12 bg-[#b5000b]/30 shrink-0" />
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] mb-1">Ubicación</div>
+                  <div className="text-[hsl(var(--foreground))] font-bold text-lg">{address}</div>
+                </div>
+              </div>
 
-              <Box sx={{ display: 'flex', gap: 3 }}>
-                <Box sx={{ width: '1px', height: 48, bgcolor: 'rgba(194,65,12,0.3)' }} />
-                <Box>
-                  <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.4)', mb: 1 }}>Contact</Typography>
-                  <Typography sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{configuracion?.telefono || "+54 9 11 1234-5678"}</Typography>
-                  <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', mt: 0.5 }}>{configuracion?.email || "contacto@concesionaria.com"}</Typography>
-                </Box>
-              </Box>
+              <div className="flex gap-5">
+                <div className="w-px h-12 bg-[#b5000b]/30 shrink-0" />
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] mb-1">Contacto</div>
+                  <div className="text-[hsl(var(--foreground))] font-bold text-sm uppercase tracking-[0.1em]">
+                    {configuracion?.telefono || "+54 9 11 1234-5678"}
+                  </div>
+                  <div className="text-[hsl(var(--muted-foreground))] font-bold text-xs uppercase tracking-[0.1em] mt-1">
+                    {configuracion?.email || "contacto@concesionaria.com"}
+                  </div>
+                </div>
+              </div>
 
-              <Box sx={{ display: 'flex', gap: 3 }}>
-                <Box sx={{ width: '1px', height: 48, bgcolor: 'rgba(194,65,12,0.3)' }} />
-                <Box>
-                  <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.4)', mb: 1 }}>Horarios</Typography>
-                  <Typography sx={{ color: 'text.primary', fontWeight: 700, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.1em', whiteSpace: 'pre-line' }}>{configuracion?.horariosAtencion || "Lun — Vie: 09:00 — 19:00\nSábados: 10:00 — 14:00"}</Typography>
-                </Box>
-              </Box>
-            </Stack>
-          </Grid>
+              <div className="flex gap-5">
+                <div className="w-px h-12 bg-[#b5000b]/30 shrink-0" />
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] mb-1">Horarios</div>
+                  <div className="text-[hsl(var(--foreground))] font-bold text-sm uppercase tracking-[0.1em] whitespace-pre-line">
+                    {configuracion?.horariosAtencion || "Lun — Vie: 09:00 — 19:00\nSábados: 10:00 — 14:00"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Map Column */}
-          <Grid 
-            size={{ xs: 12, lg: 6 }} 
-            sx={{ 
-              height: { xs: 400, lg: 'auto' }, 
-              bgcolor: '#171717', 
-              position: 'relative', 
-              filter: 'grayscale(100%)', 
-              transition: 'filter 1s ease', 
-              '&:hover': { filter: 'grayscale(0%)' } 
-            }}
-          >
-             <iframe 
-              src={`https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`} 
-              width="100%" 
-              height="100%" 
-              style={{ border: 0 }} 
-              allowFullScreen 
+          <div className="group w-full lg:w-1/2 h-[400px] lg:h-auto bg-[hsl(var(--surface-low))] relative">
+            <iframe
+              src={`https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`}
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
               loading="lazy"
+              className="grayscale transition-all duration-1000 ease-in-out group-hover:grayscale-0"
             />
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

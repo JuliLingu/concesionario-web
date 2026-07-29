@@ -1,25 +1,24 @@
 "use client";
 
 import { VehicleForm } from "@/components/dashboard/VehicleForm";
-import { Box, Container, Typography } from "@mui/material";
 
 export const NewVehicleClient = ({ categorias }: any) => {
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pt: 16, pb: 8 }}>
-      <Container maxWidth="md">
-        <Box sx={{ mb: 5 }}>
-          <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'primary.main', mb: 1 }}>
+    <div className="min-h-screen bg-[hsl(var(--background))] pt-24 pb-12">
+      <div className="max-w-3xl mx-auto px-4 md:px-8">
+        <div className="mb-10">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(var(--primary))] mb-1">
             Panel de Control
-          </Typography>
-          <Typography variant="h1" sx={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-0.02em', mb: 0.5 }}>
+          </p>
+          <h1 className="text-4xl font-black uppercase tracking-tight text-[hsl(var(--foreground))] mb-1">
             Nuevo Vehículo
-          </Typography>
-          <Typography sx={{ color: 'text.secondary', fontWeight: 500 }}>
+          </h1>
+          <p className="text-sm text-[hsl(var(--muted-foreground))] font-medium">
             Completá la información técnica para dar de alta el auto en el catálogo.
-          </Typography>
-        </Box>
+          </p>
+        </div>
         <VehicleForm categorias={categorias} />
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 };

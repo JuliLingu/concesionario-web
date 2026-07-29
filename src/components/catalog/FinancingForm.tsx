@@ -7,7 +7,6 @@ import { useState, useTransition } from "react";
 import { SolicitudFinanciacionSchema } from "@/schemas/financiacion";
 import { createSolicitud } from "@/actions/financiacion";
 import { Send, CheckCircle2 } from "lucide-react";
-import { Box, Button, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 
 interface FinancingFormProps {
   vehiculoId: string;
@@ -20,7 +19,7 @@ export const FinancingForm = ({ vehiculoId, anticipo, cuotas }: FinancingFormPro
   const [success, setSuccess] = useState<string | undefined>();
   const [isPending, start] = useTransition();
 
-  const form = useForm<z.infer<typeof SolicitudFinanciacionSchema>>({
+  const form = useForm<z.input<typeof SolicitudFinanciacionSchema>, any, z.infer<typeof SolicitudFinanciacionSchema>>({
     resolver: zodResolver(SolicitudFinanciacionSchema),
     defaultValues: {
       vehiculoId,
@@ -56,136 +55,131 @@ export const FinancingForm = ({ vehiculoId, anticipo, cuotas }: FinancingFormPro
 
   if (success) {
     return (
-      <Stack sx={{ py: 6, px: 3, bgcolor: 'background.paper', textAlign: 'center', alignItems: "center", justifyContent: "center" }} spacing={2}>
-        <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: 'rgba(34,197,94,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <CheckCircle2 size={28} color="#16a34a" />
-        </Box>
-        <Typography variant="h3" sx={{ fontWeight: 900, fontSize: '1.125rem', textTransform: 'uppercase', letterSpacing: '-0.02em', mt: 1 }}>
+      <div className="py-12 px-6 bg-white text-center flex flex-col items-center justify-center gap-4 rounded border border-black/5">
+        <div className="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center">
+          <CheckCircle2 size={28} className="text-green-600" />
+        </div>
+        <h3 className="font-black text-lg uppercase tracking-[-0.02em] text-[hsl(var(--foreground))] mt-2">
           ¡Solicitud enviada!
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500, maxWidth: 300, lineHeight: 1.6 }}>
+        </h3>
+        <p className="text-[hsl(var(--muted-foreground))] font-medium max-w-[300px] leading-relaxed">
           {success}
-        </Typography>
-      </Stack>
+        </p>
+      </div>
     );
   }
 
   return (
-    <Box component="form" onSubmit={form.handleSubmit(onSubmit)} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-        <TextField
-          {...form.register("nombre")}
-          label="Nombre *"
-          disabled={isPending}
-          error={!!form.formState.errors.nombre}
-          helperText={form.formState.errors.nombre?.message?.toString()}
-          fullWidth
-          variant="filled"
-          sx={{ '& .MuiFilledInput-root': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1 } }}
-        />
-        <TextField
-          {...form.register("apellido")}
-          label="Apellido *"
-          disabled={isPending}
-          error={!!form.formState.errors.apellido}
-          helperText={form.formState.errors.apellido?.message?.toString()}
-          fullWidth
-          variant="filled"
-          sx={{ '& .MuiFilledInput-root': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1 } }}
-        />
-      </Stack>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1 flex flex-col gap-1">
+          <input
+            {...form.register("nombre")}
+            placeholder="Nombre *"
+            disabled={isPending}
+            className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full disabled:opacity-50 ${form.formState.errors.nombre ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+          />
+          {form.formState.errors.nombre && (
+            <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.nombre.message}</span>
+          )}
+        </div>
+        <div className="flex-1 flex flex-col gap-1">
+          <input
+            {...form.register("apellido")}
+            placeholder="Apellido *"
+            disabled={isPending}
+            className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full disabled:opacity-50 ${form.formState.errors.apellido ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+          />
+          {form.formState.errors.apellido && (
+            <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.apellido.message}</span>
+          )}
+        </div>
+      </div>
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-        <TextField
-          {...form.register("dni")}
-          label="DNI *"
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1 flex flex-col gap-1">
+          <input
+            {...form.register("dni")}
+            placeholder="DNI *"
+            disabled={isPending}
+            className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full disabled:opacity-50 ${form.formState.errors.dni ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+          />
+          {form.formState.errors.dni && (
+            <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.dni.message}</span>
+          )}
+        </div>
+        <div className="flex-1 flex flex-col gap-1">
+          <input
+            {...form.register("telefono")}
+            placeholder="Teléfono *"
+            disabled={isPending}
+            className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full disabled:opacity-50 ${form.formState.errors.telefono ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+          />
+          {form.formState.errors.telefono && (
+            <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.telefono.message}</span>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <input
+          {...form.register("email")}
+          type="email"
+          placeholder="Email *"
           disabled={isPending}
-          error={!!form.formState.errors.dni}
-          helperText={form.formState.errors.dni?.message?.toString()}
-          fullWidth
-          variant="filled"
-          sx={{ '& .MuiFilledInput-root': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1 } }}
+          className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full disabled:opacity-50 ${form.formState.errors.email ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
         />
-        <TextField
-          {...form.register("telefono")}
-          label="Teléfono *"
+        {form.formState.errors.email && (
+          <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.email.message}</span>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <input
+          {...form.register("ingresos")}
+          type="number"
+          placeholder="Ingresos demostrables (opcional)"
           disabled={isPending}
-          error={!!form.formState.errors.telefono}
-          helperText={form.formState.errors.telefono?.message?.toString()}
-          fullWidth
-          variant="filled"
-          sx={{ '& .MuiFilledInput-root': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1 } }}
+          className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full disabled:opacity-50 ${form.formState.errors.ingresos ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
         />
-      </Stack>
+        {form.formState.errors.ingresos && (
+          <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.ingresos.message}</span>
+        )}
+      </div>
 
-      <TextField
-        {...form.register("email")}
-        type="email"
-        label="Email *"
-        disabled={isPending}
-        error={!!form.formState.errors.email}
-        helperText={form.formState.errors.email?.message?.toString()}
-        fullWidth
-        variant="filled"
-        sx={{ '& .MuiFilledInput-root': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1 } }}
-      />
-
-      <TextField
-        {...form.register("ingresos")}
-        type="number"
-        label="Ingresos demostrables (opcional)"
-        disabled={isPending}
-        error={!!form.formState.errors.ingresos}
-        helperText={form.formState.errors.ingresos?.message?.toString()}
-        fullWidth
-        variant="filled"
-        sx={{ '& .MuiFilledInput-root': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1 } }}
-      />
-
-      <TextField
-        {...form.register("mensaje")}
-        label="Comentarios adicionales"
-        disabled={isPending}
-        multiline
-        rows={3}
-        fullWidth
-        variant="filled"
-        sx={{ '& .MuiFilledInput-root': { bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 1 } }}
-      />
+      <div className="flex flex-col gap-1">
+        <textarea
+          {...form.register("mensaje")}
+          placeholder="Comentarios adicionales"
+          disabled={isPending}
+          rows={3}
+          className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full resize-none disabled:opacity-50`}
+        />
+      </div>
 
       {error && (
-        <Typography sx={{ bgcolor: 'rgba(194,65,12,0.1)', color: 'primary.main', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', p: 1.5 }}>
+        <div className="bg-red-50 text-[#b5000b] text-[10px] font-black uppercase tracking-[0.1em] p-3 rounded border-l-4 border-[#b5000b]">
           {error}
-        </Typography>
+        </div>
       )}
 
-      <Button
+      <button
         type="submit"
         disabled={isPending}
-        variant="contained"
-        fullWidth
-        sx={{
-          bgcolor: 'primary.main',
-          color: 'white',
-          py: 2,
-          fontSize: '11px',
-          fontWeight: 900,
-          letterSpacing: '0.1em',
-          '&:hover': { bgcolor: 'primary.dark' }
-        }}
+        className="w-full bg-[#b5000b] text-white py-4 text-[11px] font-black uppercase tracking-[0.1em] rounded hover:bg-red-800 transition-colors disabled:opacity-70 flex items-center justify-center gap-2 mt-2"
       >
         {isPending ? (
-          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
-            <CircularProgress size={16} color="inherit" />
-            <Typography sx={{ fontSize: 'inherit', fontWeight: 'inherit', textTransform: 'uppercase' }}>Enviando Solicitud...</Typography>
-          </Stack>
+          <>
+            <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span>Enviando Solicitud...</span>
+          </>
         ) : (
-          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
+          <>
             <Send size={16} />
-            <Typography sx={{ fontSize: 'inherit', fontWeight: 'inherit', textTransform: 'uppercase' }}>Solicitar Pre-Aprobación</Typography>
-          </Stack>
+            <span>Solicitar Pre-Aprobación</span>
+          </>
         )}
-      </Button>
-    </Box>
+      </button>
+    </form>
   );
 };

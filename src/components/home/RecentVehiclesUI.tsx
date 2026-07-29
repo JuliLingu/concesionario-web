@@ -3,90 +3,38 @@
 import Link from "next/link";
 import { VehicleCard } from "../catalog/VehicleCard";
 import { ArrowRight } from "lucide-react";
-import { Box, Container, Typography, Stack, Grid } from "@mui/material";
 
 export function RecentVehiclesUI({ vehicles, cotizacionDolar }: { vehicles: any[], cotizacionDolar?: number | null }) {
   return (
-    <Box component="section" sx={{ bgcolor: 'background.paper', py: 16 }}>
-      <Container maxWidth="lg">
-        <Stack
-          direction={{ xs: 'column', md: 'row' }}
-          spacing={4}
-          sx={{
-            mb: 12,
-            alignItems: { xs: 'flex-start', md: 'flex-end' },
-            justifyContent: "space-between"
-          }}
-        >
-          <Box sx={{ maxWidth: '36rem' }}>
-            <Typography
-              variant="overline"
-              sx={{
-                fontSize: '10px',
-                fontWeight: 900,
-                letterSpacing: '0.5em',
-                color: 'primary.main',
-                mb: 3,
-                display: 'block',
-                textTransform: 'uppercase'
-              }}
-            >
-              The Selection / 2024
-            </Typography>
-            <Typography
-              variant="h2"
-              sx={{
-                fontSize: { xs: '3rem', md: '3.75rem' },
-                fontWeight: 800,
-                color: 'text.primary',
-                textTransform: 'uppercase',
-                letterSpacing: '-0.02em',
-                lineHeight: 1
-              }}
-            >
-              Curaduría <br /> de Excelencia.
-            </Typography>
-          </Box>
-          <Box
-            component={Link}
+    <section className="bg-white py-32">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+
+        <div className="flex flex-col md:flex-row gap-8 mb-24 md:items-end justify-between">
+          <div className="max-w-xl">
+            <h2 className="text-[3rem] md:text-[3.75rem] font-extrabold text-[hsl(var(--foreground))] uppercase tracking-[-0.02em] leading-none">
+              Algunos de nuestros vehiculos
+            </h2>
+          </div>
+          <Link
             href="/catalogo"
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              fontSize: '10px',
-              fontWeight: 900,
-              textTransform: 'uppercase',
-              letterSpacing: '0.3em',
-              color: 'text.primary',
-              textDecoration: 'none',
-              pb: 1,
-              borderBottom: '2px solid rgba(194,65,12,0.2)',
-              transition: 'all 0.3s',
-              '&:hover': {
-                color: 'primary.main',
-                borderColor: 'primary.main',
-                '& .icon': {
-                  transform: 'translateX(8px)'
-                }
-              }
-            }}
+            className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(var(--foreground))] no-underline pb-2 border-b-2 border-[#b5000b]/20 hover:text-[#b5000b] hover:border-[#b5000b] transition-all duration-300"
           >
             Ver Catálogo Completo
-            <Box component="span" className="icon" sx={{ transition: 'transform 0.3s', display: 'flex' }}>
+            <span className="flex transition-transform duration-300 group-hover:translate-x-2">
               <ArrowRight size={14} />
-            </Box>
-          </Box>
-        </Stack>
+            </span>
+          </Link>
+        </div>
 
-        <Grid container spacing={0}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
           {vehicles.map((vehicle, index) => (
-            <Grid size={{ xs: 12, md: 4 }} key={vehicle.id}>
+            <div key={vehicle.id} className="w-full">
               <VehicleCard vehiculo={vehicle} priority={index === 0} cotizacionDolar={cotizacionDolar} />
-            </Grid>
+            </div>
           ))}
-        </Grid>
-      </Container>
-    </Box>
+        </div>
+
+      </div>
+    </section>
   );
 }

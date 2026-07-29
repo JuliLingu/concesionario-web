@@ -7,7 +7,6 @@ import * as z from "zod";
 import Link from "next/link";
 import { LoginSchema } from "@/schemas/auth";
 import { login } from "@/actions/login";
-import { Box, Button, TextField, Typography, CircularProgress, Link as MuiLink } from "@mui/material";
 
 export const LoginForm = () => {
   const [error, setError] = useState<string | undefined>("");
@@ -15,96 +14,83 @@ export const LoginForm = () => {
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
-
     const formData = new FormData();
     formData.append("email", values.email);
     formData.append("password", values.password);
-
     startTransition(() => {
       login(formData).then((data) => {
-        if (data?.error) {
-          setError(data.error);
-        }
+        if (data?.error) setError(data.error);
       });
     });
   };
 
   return (
-    <Box component="form" onSubmit={form.handleSubmit(onSubmit)} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <TextField
-        {...form.register("email")}
-        label="Email Address"
-        placeholder="name@gallery.com"
-        type="email"
-        disabled={isPending}
-        error={!!form.formState.errors.email}
-        helperText={form.formState.errors.email?.message}
-        fullWidth
-        variant="filled"
-        slotProps={{
-          input: { disableUnderline: true },
-          inputLabel: { shrink: true, sx: { textTransform: 'uppercase', fontSize: '10px', fontWeight: 900, letterSpacing: '0.2em', color: 'text.secondary' } }
-        }}
-        sx={{ '& .MuiFilledInput-root': { bgcolor: 'background.paper', borderRadius: 1 } }}
-      />
+    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
+      {/* Email */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
+          Email Address
+        </label>
+        <input
+          {...form.register("email")}
+          placeholder="name@gallery.com"
+          type="email"
+          disabled={isPending}
+          className={`w-full bg-gray-100 rounded px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#c2410c]/20 disabled:opacity-60 ${form.formState.errors.email ? "ring-2 ring-red-400 bg-red-50" : ""}`}
+        />
+        {form.formState.errors.email && (
+          <span className="text-red-500 text-xs">{form.formState.errors.email.message}</span>
+        )}
+      </div>
 
-      <TextField
-        {...form.register("password")}
-        label="Password"
-        placeholder="••••••••"
-        type="password"
-        disabled={isPending}
-        error={!!form.formState.errors.password}
-        helperText={form.formState.errors.password?.message}
-        fullWidth
-        variant="filled"
-        slotProps={{
-          input: { disableUnderline: true },
-          inputLabel: { shrink: true, sx: { textTransform: 'uppercase', fontSize: '10px', fontWeight: 900, letterSpacing: '0.2em', color: 'text.secondary' } }
-        }}
-        sx={{ '& .MuiFilledInput-root': { bgcolor: 'background.paper', borderRadius: 1 } }}
-      />
+      {/* Password */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
+          Password
+        </label>
+        <input
+          {...form.register("password")}
+          placeholder="••••••••"
+          type="password"
+          disabled={isPending}
+          className={`w-full bg-gray-100 rounded px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#c2410c]/20 disabled:opacity-60 ${form.formState.errors.password ? "ring-2 ring-red-400 bg-red-50" : ""}`}
+        />
+        {form.formState.errors.password && (
+          <span className="text-red-500 text-xs">{form.formState.errors.password.message}</span>
+        )}
+      </div>
 
+      {/* Error */}
       {error && (
-        <Typography sx={{ bgcolor: 'rgba(194,65,12,0.1)', color: 'primary.main', p: 2, fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        <div className="bg-[#c2410c]/10 text-[#c2410c] p-3 text-[10px] font-black uppercase tracking-[0.1em] rounded">
           {error}
-        </Typography>
+        </div>
       )}
 
-      <Button
+      {/* Submit */}
+      <button
         type="submit"
         disabled={isPending}
-        variant="contained"
-        fullWidth
-        sx={{
-          bgcolor: '#c2410c',
-          color: 'white',
-          py: 2,
-          fontSize: '12px',
-          fontWeight: 900,
-          textTransform: 'uppercase',
-          letterSpacing: '0.3em',
-          '&:hover': { bgcolor: '#9a3412', transform: 'translateY(-2px)', boxShadow: '0 25px 50px -12px rgba(194,65,12,0.5)' },
-          transition: 'all 0.3s'
-        }}
+        className="w-full bg-[#c2410c] hover:bg-[#9a3412] text-white py-4 rounded text-xs font-black uppercase tracking-[0.3em] transition-all hover:-translate-y-0.5 hover:shadow-[0_25px_50px_-12px_rgba(194,65,12,0.5)] disabled:opacity-70 flex items-center justify-center"
       >
-        {isPending ? <CircularProgress size={20} color="inherit" /> : "Enter the Gallery"}
-      </Button>
+        {isPending ? (
+          <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        ) : (
+          "Enter the Gallery"
+        )}
+      </button>
 
-      <Typography sx={{ textAlign: 'center', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'text.secondary' }}>
+      <p className="text-center text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
         ¿No tienes una cuenta?{" "}
-        <MuiLink component={Link} href="/register" sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+        <Link href="/register" className="text-[#c2410c] hover:underline">
           Regístrate aquí
-        </MuiLink>
-      </Typography>
-    </Box>
+        </Link>
+      </p>
+    </form>
   );
 };

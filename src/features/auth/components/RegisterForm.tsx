@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { registerSchema } from "@/schemas/auth.schemas";
+import { RegisterSchema } from "@/schemas/auth";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -21,7 +21,7 @@ export function RegisterForm() {
       password: formData.get("password") as string,
     };
 
-    const parsed = registerSchema.safeParse(data);
+    const parsed = RegisterSchema.safeParse(data);
     if (!parsed.success) {
       setError(parsed.error.issues[0].message);
       setLoading(false);

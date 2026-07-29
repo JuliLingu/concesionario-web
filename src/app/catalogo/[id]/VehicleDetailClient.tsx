@@ -5,95 +5,82 @@ import { ArrowLeft, Calendar, Fuel, AlignJustify, Disc, MessageCircle } from "lu
 import { VehicleGallery } from "@/components/catalog/VehicleGallery";
 import { ContactForm } from "@/components/catalog/ContactForm";
 import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
-import { Box, Button, Container, Grid, Stack, Typography } from "@mui/material";
 
 export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, cotizacionDolar, planes }: any) => {
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.paper', color: 'text.primary', pt: 4, pb: 8 }}>
-      <Container maxWidth="xl">
-        <Box sx={{ height: 64, display: 'flex', alignItems: 'center', mb: 4 }}>
-          <Button
-            component={Link}
+    <div className="min-h-screen bg-[hsl(var(--background))] text-foreground pt-4 pb-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="h-16 flex items-center mb-4">
+          <Link
             href="/catalogo"
-            startIcon={<ArrowLeft size={16} />}
-            sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'transparent' }, fontSize: '0.875rem', fontWeight: 700, textTransform: 'none' }}
+            className="flex items-center gap-2 text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--primary))] text-sm font-bold transition-colors"
           >
+            <ArrowLeft size={16} />
             Volver al catálogo
-          </Button>
-        </Box>
+          </Link>
+        </div>
 
-        <Grid container spacing={6}>
-          <Grid size={{ xs: 12, lg: 7, xl: 8 }} >
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8">
+          <div className="lg:col-span-7 xl:col-span-8">
             <VehicleGallery images={vehicle.imagenes} altText={vehiculoNombre}/>
-          </Grid>
+          </div>
 
-          <Grid size={{ xs: 12, lg: 5, xl: 4 }} >
-            <Stack spacing={4}>
-              <Box>
-                <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-                  <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'primary.main', bgcolor: 'rgba(194,65,12,0.1)', px: 1, py: 0.5, borderRadius: 1 }}>
+          <div className="lg:col-span-5 xl:col-span-4">
+            <div className="flex flex-col gap-4">
+              <div>
+                <div className="flex items-center gap-1 mb-2">
+                  <span className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10 px-1 py-0.5 rounded">
                     {vehicle.estado}
-                  </Typography>
-                  <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary', bgcolor: '#0a0a0a', px: 1, py: 0.5, borderRadius: 1 }}>
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] bg-[#0a0a0a] px-1 py-0.5 rounded">
                     {vehicle.categoria.nombre}
-                  </Typography>
-                </Stack>
+                  </span>
+                </div>
 
-                <Typography variant="h1" sx={{ fontSize: { xs: '2.25rem', lg: '2.5rem' }, fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', mb: 1 }}>
+                <h1 className="text-4xl lg:text-[2.5rem] font-black tracking-tight uppercase mb-1 leading-none">
                   {vehicle.marca} {vehicle.modelo}
-                </Typography>
-                <Typography sx={{ fontSize: '1rem', color: 'text.secondary', fontWeight: 500 }}>
+                </h1>
+                <p className="text-base text-[hsl(var(--muted-foreground))] font-medium">
                   {vehicle.version || vehicle.motor || "Especificación Estándar"}
-                </Typography>
-              </Box>
+                </p>
+              </div>
 
-              <Typography sx={{ fontSize: '2.5rem', fontWeight: 900, color: 'primary.main', letterSpacing: '-0.05em' }}>
+              <p className="text-[2.5rem] font-black text-[hsl(var(--primary))] tracking-tighter">
                 {cotizacionDolar 
                   ? `ARS $ ${(Number(vehicle.precio) * cotizacionDolar).toLocaleString("es-AR")}` 
                   : `U$D ${Number(vehicle.precio).toLocaleString("es-AR")}`}
-              </Typography>
+              </p>
 
-              <Button
+              <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noreferrer"
-                variant="contained"
-                endIcon={<MessageCircle size={18} />}
-                sx={{
-                  bgcolor: '#c2410c',
-                  color: 'white',
-                  py: 2,
-                  fontSize: '0.875rem',
-                  fontWeight: 900,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)',
-                  '&:hover': { bgcolor: 'black' }
-                }}
+                className="bg-[#c2410c] text-white py-2 px-4 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-[0.1em] rounded shadow-lg hover:bg-black transition-colors"
               >
                 Consultar por WhatsApp
-              </Button>
+                <MessageCircle size={18} />
+              </a>
 
-              <Box sx={{ bgcolor: '#0a0a0a', borderRadius: 2, p: 3, border: '1px solid rgba(255,255,255,0.05)' }}>
-                <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary', mb: 2 }}>Ficha Rápida</Typography>
-                <Stack spacing={2}>
+              <div className="bg-[hsl(var(--card))] rounded-lg p-4 lg:p-6 shadow-sm border border-black/5">
+                <p className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] mb-4">Ficha Rápida</p>
+                <div className="flex flex-col gap-3">
                   <SpecItem icon={<Calendar size={16} />} label="Año" value={vehicle.anio} />
                   <SpecItem icon={<Disc size={16} />} label="KM" value={vehicle.kilometraje.toLocaleString("es-AR")} />
                   <SpecItem icon={<AlignJustify size={16} />} label="Transmisión" value={vehicle.transmision?.toLowerCase()} capitalize />
                   <SpecItem icon={<Fuel size={16} />} label="Combustible" value={vehicle.combustible?.toLowerCase()} capitalize border={false} />
-                </Stack>
-              </Box>
-            </Stack>
-          </Grid>
-        </Grid>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Box sx={{ mt: { xs: 8, lg: 12 }, pt: { xs: 6, lg: 8 }, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <Grid container spacing={6}>
-            <Grid size={{ xs: 12, lg: 4 }} >
-              <Typography variant="h2" sx={{ fontSize: '1.125rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em', mb: 3 }}>
+        <div className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-black/5">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8">
+            <div className="lg:col-span-4">
+              <h2 className="text-lg font-black uppercase tracking-tight mb-3">
                 Especificaciones
-              </Typography>
-              <Stack spacing={0}>
+              </h2>
+              <div className="flex flex-col">
                 <SpecRow label="Año" value={vehicle.anio} />
                 <SpecRow label="Kilometraje" value={`${vehicle.kilometraje.toLocaleString("es-AR")} KM`} />
                 <SpecRow label="Combustible" value={vehicle.combustible || "N/A"} />
@@ -101,98 +88,97 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
                 <SpecRow label="Potencia" value={vehicle.potencia ? `${vehicle.potencia} CV` : "N/A"} />
                 <SpecRow label="Color" value={vehicle.color || "N/A"} />
                 <SpecRow label="Puertas" value={vehicle.puertas || "N/A"} />
-              </Stack>
-            </Grid>
+              </div>
+            </div>
 
-            <Grid size={{ xs: 12, lg: 8 }} >
-              <Typography variant="h2" sx={{ fontSize: '1.125rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.02em', mb: 3 }}>
+            <div className="lg:col-span-8">
+              <h2 className="text-lg font-black uppercase tracking-tight mb-3">
                 Descripción
-              </Typography>
+              </h2>
               {vehicle.descripcion ? (
-                <Typography sx={{ fontSize: '1rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, fontWeight: 500, whiteSpace: 'pre-line' }}>
+                <p className="text-base text-foreground/80 leading-relaxed font-medium whitespace-pre-line">
                   {vehicle.descripcion}
-                </Typography>
+                </p>
               ) : (
-                <Typography sx={{ fontSize: '0.875rem', color: 'text.secondary', fontStyle: 'italic' }}>
+                <p className="text-sm text-[hsl(var(--muted-foreground))] italic">
                   El vendedor no ha añadido una descripción para este vehículo.
-                </Typography>
+                </p>
               )}
-            </Grid>
-          </Grid>
-        </Box>
+            </div>
+          </div>
+        </div>
 
-        <Box sx={{ mt: { xs: 8, lg: 12 }, pt: { xs: 6, lg: 8 }, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <Grid container spacing={6} sx={{ alignItems: 'flex-start' }}>
-            <Grid size={{ xs: 12, lg: 5 }} >
-              <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'primary.main', mb: 2 }}>
+        <div className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-black/5">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
+            <div className="lg:col-span-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(var(--primary))] mb-2">
                 Financiación Exclusiva
-              </Typography>
-              <Typography variant="h2" sx={{ fontSize: '1.875rem', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', mb: 2 }}>
+              </p>
+              <h2 className="text-3xl font-black tracking-tight uppercase mb-2">
                 Llevátelo hoy, <br/> pagalo a tu ritmo
-              </Typography>
-              <Typography sx={{ color: 'text.secondary', fontWeight: 500, lineHeight: 1.6, mb: 3 }}>
+              </h2>
+              <p className="text-[hsl(var(--muted-foreground))] font-medium leading-relaxed mb-3">
                 Calculá tu cuota mensual ajustando el anticipo y los plazos. Nuestras tasas son fijas y en pesos.
-              </Typography>
-            </Grid>
-            <Grid size={{ xs: 12, lg: 7 }} >
+              </p>
+            </div>
+            <div className="lg:col-span-7">
               <FinancingSimulator 
                 vehiculoId={vehicle.id} 
                 precioOriginal={Number(vehicle.precio)} 
                 cotizacionDolar={cotizacionDolar} 
                 planes={planes || []} 
               />
-            </Grid>
-          </Grid>
-        </Box>
+            </div>
+          </div>
+        </div>
 
-        <Box sx={{ mt: { xs: 8, lg: 12 }, pt: { xs: 6, lg: 8 }, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <Grid container spacing={6} sx={{ alignItems: 'flex-start' }}>
-            <Grid size={{ xs: 12, lg: 6 }} >
-              <Typography sx={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'primary.main', mb: 2 }}>
+        <div className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-black/5">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
+            <div className="lg:col-span-6">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(var(--primary))] mb-2">
                 ¿Te interesa?
-              </Typography>
-              <Typography variant="h2" sx={{ fontSize: '1.875rem', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', mb: 2 }}>
+              </p>
+              <h2 className="text-3xl font-black tracking-tight uppercase mb-2">
                 Consultá por esta unidad
-              </Typography>
-              <Typography sx={{ color: 'text.secondary', fontWeight: 500, lineHeight: 1.6, mb: 3 }}>
+              </h2>
+              <p className="text-[hsl(var(--muted-foreground))] font-medium leading-relaxed mb-3">
                 Completá el formulario y un asesor de JBJ Automotores se comunicará con vos a la brevedad para coordinar una visita o responder todas tus preguntas.
-              </Typography>
-              <Button
+              </p>
+              <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noreferrer"
-                variant="text"
-                startIcon={<MessageCircle size={14} />}
-                sx={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'text.secondary', p: 0, '&:hover': { color: 'primary.main', bgcolor: 'transparent' } }}
+                className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--primary))] transition-colors"
               >
+                <MessageCircle size={14} />
                 O escribinos directo por WhatsApp
-              </Button>
-            </Grid>
+              </a>
+            </div>
 
-            <Grid size={{ xs: 12, lg: 6 }} >
+            <div className="lg:col-span-6">
               <ContactForm vehiculoId={vehicle.id} vehiculoNombre={vehiculoNombre} />
-            </Grid>
-          </Grid>
-        </Box>
+            </div>
+          </div>
+        </div>
 
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 };
 
 const SpecItem = ({ icon, label, value, capitalize = false, border = true }: any) => (
-  <Stack direction="row" sx={{ pb: border ? 1.5 : 0, borderBottom: border ? '1px solid rgba(255,255,255,0.05)' : 'none', alignItems: "center", justifyContent: "space-between" }}>
-    <Stack direction="row" spacing={1} sx={{ color: 'text.secondary', alignItems: "center" }}>
+  <div className={`flex flex-row items-center justify-between ${border ? 'pb-3 border-b border-black/5' : ''}`}>
+    <div className="flex items-center gap-2 text-[hsl(var(--muted-foreground))]">
       {icon}
-      <Typography sx={{ fontSize: '0.875rem', fontWeight: 700 }}>{label}</Typography>
-    </Stack>
-    <Typography sx={{ fontSize: '0.875rem', fontWeight: 900, textTransform: capitalize ? 'capitalize' : 'none' }}>{value}</Typography>
-  </Stack>
+      <span className="text-sm font-bold">{label}</span>
+    </div>
+    <span className={`text-sm font-black ${capitalize ? 'capitalize' : ''}`}>{value}</span>
+  </div>
 );
 
 const SpecRow = ({ label, value }: { label: string; value: string | number }) => (
-  <Stack direction="row" sx={{ py: 1.5, borderBottom: '1px solid rgba(255,255,255,0.05)', alignItems: "center", justifyContent: "space-between" }}>
-    <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, color: 'text.secondary' }}>{label}</Typography>
-    <Typography sx={{ fontSize: '0.875rem', fontWeight: 700,whiteSpace: "nowrap", pl: 2 }}>{value}</Typography>
-  </Stack>
+  <div className="flex flex-row py-3 border-b border-black/5 items-center justify-between">
+    <span className="text-sm font-medium text-[hsl(var(--muted-foreground))]">{label}</span>
+    <span className="text-sm font-bold whitespace-nowrap pl-4">{value}</span>
+  </div>
 );

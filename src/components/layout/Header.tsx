@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { Car, DoorOpen } from "lucide-react";
 import Link from "next/link";
 import { handleSignOut } from "@/actions/auth-actions";
-import { AppBar, Toolbar, Box, Button, Typography } from "@mui/material";
 
 interface HeaderProps {
   session: any;
@@ -11,8 +10,9 @@ interface HeaderProps {
 }
 
 export function Header({ session, configuracion }: HeaderProps) {
-  // Extraer primera palabra del nombre si existe
-  const parts = configuracion?.nombreConcesionaria ? configuracion.nombreConcesionaria.split(" ") : ["JBJ", "Automotores"];
+  const parts = configuracion?.nombreConcesionaria
+    ? configuracion.nombreConcesionaria.split(" ")
+    : ["JBJ", "Automotores"];
   const firstWord = parts[0];
   const restWords = parts.slice(1).join(" ");
 
@@ -20,105 +20,73 @@ export function Header({ session, configuracion }: HeaderProps) {
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      style={{ 
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-      }}
+      className="fixed top-0 left-0 right-0 z-50 glass-nav"
     >
-      <AppBar 
-        position="static" 
-        color="transparent" 
-        elevation={0}
-        sx={{
-          backdropFilter: 'blur(20px)',
-          backgroundColor: 'rgba(255,255,255,0.80)',
-          boxShadow: '0 20px 40px rgba(26,28,30,0.06)',
-        }}
-      >
-        <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, md: 4 } }}>
-          <Box component={Link} href="/" sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none' }}>
-            <Car style={{ color: "#c2410c", width: 24, height: 24 }} />
-            <Typography variant="body2" sx={{ fontWeight: 800, color: '#1a1c1e', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+      <div className="max-w-7xl mx-auto flex justify-between items-center px-4 md:px-8 py-4">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 no-underline">
+          <Car className="text-[#c2410c] w-6 h-6" />
+          <div className="flex items-center">
+            <span className="font-extrabold text-[#1a1c1e] uppercase tracking-tighter text-sm">
               {firstWord}
-            </Typography>
+            </span>
             {restWords && (
-              <Typography variant="body2" sx={{ fontWeight: 800, color: '#c2410c', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+              <span className="font-extrabold text-[#c2410c] uppercase tracking-tighter text-sm ml-1">
                 {restWords}
-              </Typography>
+              </span>
             )}
-          </Box>
+          </div>
+        </Link>
 
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>
-            <Button component={Link} href="/" variant="text" sx={{ color: 'rgba(26,28,30,0.6)', '&:hover': { color: '#1a1c1e' } }}>
-              Inicio
-            </Button>
-            <Button component={Link} href="/#nosotros" variant="text" sx={{ color: 'rgba(26,28,30,0.6)', '&:hover': { color: '#1a1c1e' } }}>
-              Nosotros
-            </Button>
-            <Button component={Link} href="/#ubicacion" variant="text" sx={{ color: 'rgba(26,28,30,0.6)', '&:hover': { color: '#1a1c1e' } }}>
-              Ubicación
-            </Button>
-            {session?.user?.role === "ADMIN" && (
-              <Button component={Link} href="/dashboard" variant="text" sx={{ color: 'rgba(26,28,30,0.6)', '&:hover': { color: '#1a1c1e' } }}>
-                Administrador
-              </Button>
-            )}
-            <Button 
-              component={Link} 
-              href="/catalogo" 
-              variant="contained" 
-              disableElevation
-              sx={{
-                background: "linear-gradient(135deg, #c2410c 0%, #ea580c 100%)",
-                color: "#ffffff",
-                '&:hover': {
-                  background: "linear-gradient(135deg, #9a3412 0%, #c2410c 100%)",
-                }
-              }}
-            >
-              Ver Vehículos
-            </Button>
-          </Box>
-
-          {session ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography variant="body2" sx={{ fontWeight: 700, color: '#1a1c1e', display: { xs: 'none', sm: 'block' } }}>
-                {session.user?.name}
-              </Typography>
-              <form action={handleSignOut}>
-                <Button 
-                  type="submit" 
-                  variant="contained" 
-                  disableElevation
-                  sx={{ backgroundColor: '#dc2626', '&:hover': { backgroundColor: '#b91c1c' } }}
-                >
-                  Salir
-                </Button>
-              </form>
-            </Box>
-          ) : (
-            <Button
-              component={Link}
-              href="/login"
-              variant="contained"
-              disableElevation
-              startIcon={<DoorOpen />}
-              sx={{
-                background: "linear-gradient(135deg, #c2410c 0%, #ea580c 100%)",
-                color: "#ffffff",
-                '&:hover': {
-                  background: "linear-gradient(135deg, #9a3412 0%, #c2410c 100%)",
-                }
-              }}
-            >
-              Iniciar Sesión
-            </Button>
+        {/* Nav Links */}
+        <nav className="hidden md:flex items-center gap-6">
+          <Link href="/" className="text-[#1a1c1e]/60 hover:text-[#1a1c1e] font-medium transition-colors text-sm">
+            Inicio
+          </Link>
+          <Link href="/#nosotros" className="text-[#1a1c1e]/60 hover:text-[#1a1c1e] font-medium transition-colors text-sm">
+            Nosotros
+          </Link>
+          <Link href="/#ubicacion" className="text-[#1a1c1e]/60 hover:text-[#1a1c1e] font-medium transition-colors text-sm">
+            Ubicación
+          </Link>
+          {session?.user?.role === "ADMIN" && (
+            <Link href="/dashboard" className="text-[#1a1c1e]/60 hover:text-[#1a1c1e] font-medium transition-colors text-sm">
+              Administrador
+            </Link>
           )}
-        </Toolbar>
-      </AppBar>
+          <Link
+            href="/catalogo"
+            className="bg-gradient-to-br from-[#c2410c] to-[#ea580c] hover:from-[#9a3412] hover:to-[#c2410c] text-white px-5 py-2.5 rounded text-xs font-black uppercase tracking-widest transition-all shadow-md"
+          >
+            Ver Vehículos
+          </Link>
+        </nav>
+
+        {/* Session */}
+        {session ? (
+          <div className="flex items-center gap-4">
+            <span className="font-bold text-[#1a1c1e] text-sm hidden sm:block">
+              {session.user?.name}
+            </span>
+            <form action={handleSignOut}>
+              <button
+                type="submit"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-semibold transition-colors"
+              >
+                Salir
+              </button>
+            </form>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="flex items-center gap-2 bg-gradient-to-br from-[#c2410c] to-[#ea580c] hover:from-[#9a3412] hover:to-[#c2410c] text-white px-4 py-2.5 rounded text-sm font-bold transition-all shadow-md"
+          >
+            <DoorOpen className="w-4 h-4" />
+            <span>Iniciar Sesión</span>
+          </Link>
+        )}
+      </div>
     </motion.header>
   );
 }
