@@ -34,7 +34,7 @@ export const LoginForm = () => {
       {/* Email */}
       <div className="flex flex-col gap-1.5">
         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
-          Email Address
+          Correo Electrónico
         </label>
         <input
           {...form.register("email")}
@@ -51,7 +51,7 @@ export const LoginForm = () => {
       {/* Password */}
       <div className="flex flex-col gap-1.5">
         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
-          Password
+          Contraseña
         </label>
         <input
           {...form.register("password")}
@@ -81,7 +81,7 @@ export const LoginForm = () => {
         {isPending ? (
           <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         ) : (
-          "Enter the Gallery"
+          "Iniciar Sesión"
         )}
       </button>
 

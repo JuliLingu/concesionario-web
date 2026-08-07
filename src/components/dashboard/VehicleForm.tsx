@@ -6,16 +6,25 @@ import * as z from "zod";
 import { useState, useTransition } from "react";
 import { VehicleSchema } from "@/schemas/vehicle";
 import { createVehicle, updateVehicle } from "@/actions/vehicle";
-import { CldUploadWidget } from "next-cloudinary";
+import { ImageDropzone } from "@/components/dashboard/ImageDropzone";
 import Image from "next/image";
-import { ImagePlus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { getCldUrl } from "@/lib/cloudinary";
-import { 
-  Combustible, 
-  Transmision, 
-  EstadoVehiculo, 
-  EstadoPublicacion 
+import {
+  Combustible,
+  Transmision,
+  EstadoVehiculo,
+  EstadoPublicacion,
+  Moneda
 } from "../../../generated/prisma";
+import { formatArs, formatNumeroAr, parseNumeroAr, precioEnPesos } from "@/lib/precio";
+
+const MAX_IMAGENES = 10;
+
+const MONEDA_LABEL: Record<Moneda, string> = {
+  [Moneda.ARS]: "Pesos (ARS)",
+  [Moneda.USD]: "Dólares (USD)",
+};
 
 interface Category {
   id: string;
@@ -26,9 +35,10 @@ interface VehicleFormProps {
   categorias: Category[];
   initialData?: any; // The full vehicle object if we are editing
   onSuccess?: () => void;
+  cotizacionDolar?: number | null;
 }
 
-export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormProps) => {
+export const VehicleForm = ({ categorias, initialData, onSuccess, cotizacionDolar }: VehicleFormProps) => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
@@ -47,6 +57,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
       motor: initialData.motor || "",
       anio: initialData.anio,
       precio: Number(initialData.precio),
+      moneda: initialData.moneda || Moneda.USD,
       kilometraje: initialData.kilometraje,
       combustible: initialData.combustible || Combustible.NAFTA,
       transmision: initialData.transmision || Transmision.MANUAL,
@@ -65,6 +76,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
       motor: "",
       anio: new Date().getFullYear(),
       precio: 0,
+      moneda: Moneda.USD,
       kilometraje: 0,
       combustible: Combustible.NAFTA,
       transmision: Transmision.MANUAL,
@@ -79,15 +91,27 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
     },
   });
 
-  const onUpload = (result: any) => {
-    const info = result.info;
-    if (info && info.secure_url) {
-      setImagenes((prev) => {
-        const newImages = [...prev, info.secure_url];
-        form.setValue("imagenes", newImages);
-        return newImages;
-      });
-    }
+  const moneda = form.watch("moneda");
+  const precio = form.watch("precio");
+  const [precioTexto, setPrecioTexto] = useState(
+    initialData?.precio ? formatNumeroAr(Number(initialData.precio)) : ""
+  );
+
+  /** El precio se escribe con separadores de miles, pero se envía como número. */
+  const onPrecioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valor = parseNumeroAr(e.target.value);
+    setPrecioTexto(valor ? formatNumeroAr(valor) : "");
+    form.setValue("precio", valor, { shouldValidate: true });
+  };
+
+  const precioArs = precioEnPesos(precio || 0, moneda, cotizacionDolar);
+
+  const onUpload = (urls: string[]) => {
+    setImagenes((prev) => {
+      const newImages = [...prev, ...urls].slice(0, MAX_IMAGENES);
+      form.setValue("imagenes", newImages);
+      return newImages;
+    });
   };
 
   const removeImage = (url: string) => {
@@ -118,6 +142,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
             if (data.success) {
               setSuccess(data.success);
               setImagenes([]);
+              setPrecioTexto("");
               form.reset();
               if (onSuccess) onSuccess();
             }
@@ -136,9 +161,6 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
         <h2 className="text-3xl font-bold tracking-tight uppercase text-foreground">
           {isEditing ? "Editar Vehículo" : "Gestión de Inventario"}
         </h2>
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[hsl(var(--primary))] mt-2">
-          {isEditing ? "Vehicle Modification" : "Vehicle Specification / Entry"}
-        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -188,15 +210,54 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
           />
         </div>
 
-        {/* Precio */}
+        {/* Moneda */}
         <div className="flex flex-col gap-1">
-          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Precio (USD)</label>
-          <input
-            {...form.register("precio", { valueAsNumber: true })}
-            type="number"
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Moneda del Precio</label>
+          <select
+            {...form.register("moneda")}
             disabled={isPending}
             className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
-          />
+          >
+            {Object.values(Moneda).map((m) => (
+              <option key={m} value={m}>{MONEDA_LABEL[m]}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Precio */}
+        <div className="flex flex-col gap-1 md:col-span-2">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">
+            Precio {moneda === Moneda.ARS ? "en Pesos" : "en Dólares"}
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-black text-[hsl(var(--muted-foreground))] pointer-events-none">
+              {moneda === Moneda.ARS ? "$" : "U$D"}
+            </span>
+            <input
+              value={precioTexto}
+              onChange={onPrecioChange}
+              inputMode="numeric"
+              placeholder={moneda === Moneda.ARS ? "15.000.000" : "20.000"}
+              disabled={isPending}
+              className={`w-full bg-[hsl(var(--surface-low))] py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20 pr-3 ${moneda === Moneda.ARS ? "pl-7" : "pl-12"}`}
+            />
+          </div>
+
+          {/* Lo que va a ver el visitante: siempre pesos */}
+          {precioArs !== null && precio > 0 && (
+            <span className="text-[10px] font-bold text-[hsl(var(--muted-foreground))]">
+              Se publica como <span className="text-[hsl(var(--primary))]">{formatArs(precioArs)}</span>
+              {moneda === Moneda.USD && cotizacionDolar
+                ? ` · cotización ${formatArs(cotizacionDolar)}`
+                : ""}
+            </span>
+          )}
+          {moneda === Moneda.USD && !cotizacionDolar && (
+            <span className="text-[10px] font-bold text-amber-600">
+              Cargá la cotización del dólar en Configuración para que el precio se muestre en pesos.
+            </span>
+          )}
+          {form.formState.errors.precio && <span className="text-[10px] text-red-500">{form.formState.errors.precio.message}</span>}
         </div>
 
         {/* Kilometraje */}
@@ -215,7 +276,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
           <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Motor</label>
           <input
             {...form.register("motor")}
-            placeholder="Ej: 2.0 TDI, V8 Twinturbo"
+            placeholder="Ej: 2.0 TDI, 1.0 Turbo"
             disabled={isPending}
             className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           />
@@ -286,7 +347,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
 
         {/* Estado Vehículo */}
         <div className="flex flex-col gap-1">
-          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Estatus Físico</label>
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Estado Vehiculo</label>
           <select
             {...form.register("estado")}
             disabled={isPending}
@@ -330,51 +391,37 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
       <div className="pt-8 border-t border-black/5 flex flex-col gap-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">Galería de Imágenes</p>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {imagenes.map((url) => (
-            <div key={url} className="relative aspect-[4/3] overflow-hidden rounded bg-black/5 group">
-              <Image 
-                src={getCldUrl(url, "4:3")} 
-                alt="Imagen vehículo" 
-                fill 
-                sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 16vw"
-                className="object-cover object-center transition-transform duration-500"
-              />
-              <button
-                type="button"
-                onClick={() => removeImage(url)}
-                className="absolute top-1 right-1 w-6 h-6 bg-[hsl(var(--primary))] text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded hover:bg-red-800"
-              >
-                <X size={14} />
-              </button>
-            </div>
-          ))}
-
-          <div>
-            <CldUploadWidget 
-              onSuccess={onUpload} 
-              uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "concesionario_unsigned"}
-              options={{
-                multiple: true,
-                maxFiles: 10,
-                resourceType: "image",
-                clientAllowedFormats: ["webp", "png", "jpg", "jpeg"]
-              }}
-            >
-              {({ open }) => (
+        {imagenes.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {imagenes.map((url) => (
+              <div key={url} className="relative aspect-[4/3] overflow-hidden rounded bg-black/5 group">
+                <Image
+                  src={getCldUrl(url, { modo: "recorte", relacion: "4:3" })}
+                  alt="Imagen vehículo"
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 16vw"
+                  className="object-cover object-center transition-transform duration-500"
+                />
                 <button
                   type="button"
-                  onClick={() => open()}
-                  className="w-full aspect-square flex flex-col items-center justify-center gap-2 bg-[hsl(var(--surface-low))] border-2 border-dashed border-black/10 rounded cursor-pointer transition-colors text-[hsl(var(--muted-foreground))] hover:border-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))]/5 hover:text-[hsl(var(--primary))]"
+                  onClick={() => removeImage(url)}
+                  className="absolute top-1 right-1 w-6 h-6 bg-[hsl(var(--primary))] text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded hover:bg-red-800"
                 >
-                  <ImagePlus size={24} />
-                  <span className="text-[10px] font-black uppercase tracking-[0.1em]">Añadir</span>
+                  <X size={14} />
                 </button>
-              )}
-            </CldUploadWidget>
+              </div>
+            ))}
           </div>
-        </div>
-        
+        )}
+
+        <ImageDropzone
+          onUpload={onUpload}
+          multiple
+          cupoDisponible={MAX_IMAGENES - imagenes.length}
+          disabled={isPending}
+          titulo="Arrastrá las fotos o hacé clic"
+        />
+
         {imagenes.length === 0 && (
           <p className="text-[10px] font-medium italic text-[hsl(var(--muted-foreground))]">Sube al menos una imagen para que el vehículo sea visible en el catálogo.</p>
         )}

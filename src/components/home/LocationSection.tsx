@@ -1,11 +1,13 @@
 "use client";
 
+import type { SiteConfig } from "@/lib/configuracion-defaults";
+
 interface LocationSectionProps {
-  configuracion?: any;
+  configuracion: SiteConfig;
 }
 
 export function LocationSection({ configuracion }: LocationSectionProps) {
-  const address = configuracion?.direccion || "Av. Principal 123, Buenos Aires";
+  const address = configuracion.direccion;
 
   return (
     <section id="ubicacion" className="py-24 bg-[hsl(var(--surface-low))]">
@@ -32,10 +34,10 @@ export function LocationSection({ configuracion }: LocationSectionProps) {
                 <div>
                   <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] mb-1">Contacto</div>
                   <div className="text-[hsl(var(--foreground))] font-bold text-sm uppercase tracking-[0.1em]">
-                    {configuracion?.telefono || "+54 9 11 1234-5678"}
+                    {configuracion.telefono}
                   </div>
                   <div className="text-[hsl(var(--muted-foreground))] font-bold text-xs uppercase tracking-[0.1em] mt-1">
-                    {configuracion?.email || "contacto@concesionaria.com"}
+                    {configuracion.email}
                   </div>
                 </div>
               </div>
@@ -45,7 +47,7 @@ export function LocationSection({ configuracion }: LocationSectionProps) {
                 <div>
                   <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] mb-1">Horarios</div>
                   <div className="text-[hsl(var(--foreground))] font-bold text-sm uppercase tracking-[0.1em] whitespace-pre-line">
-                    {configuracion?.horariosAtencion || "Lun — Vie: 09:00 — 19:00\nSábados: 10:00 — 14:00"}
+                    {configuracion.horariosAtencion}
                   </div>
                 </div>
               </div>

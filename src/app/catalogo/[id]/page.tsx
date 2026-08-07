@@ -1,8 +1,11 @@
 import { getVehicleById } from "@/actions/vehicle";
-import { getConfiguracion } from "@/actions/configuracion";
+import { getConfiguracion } from "@/services/configuracion.service";
+import { conNombreConcesionaria } from "@/lib/configuracion-defaults";
 import { getPlanes } from "@/actions/financiacion";
 import { notFound } from "next/navigation";
 import { VehicleDetailClient } from "./VehicleDetailClient";
+import { FEATURE_FINANCIACION } from "@/lib/features";
+import { whatsappUrl } from "@/lib/whatsapp";
 
 interface VehiclePageProps {
   params: Promise<{
@@ -18,20 +21,18 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
     notFound();
   }
 
+  // Con la financiación en stand by no se consultan los planes: la ficha no
+  // muestra el simulador.
   const [configuracion, rawPlanes] = await Promise.all([
     getConfiguracion(),
-    getPlanes(false) // solo activos
+    FEATURE_FINANCIACION ? getPlanes(false) : [] // solo activos
   ]);
   
-  // Clean phone number for WhatsApp
-  const rawPhone = configuracion?.telefono || "5492234214414";
-  const cleanPhone = rawPhone.replace(/\D/g, "");
-
   const vehiculoNombre = `${vehicle.marca} ${vehicle.modelo} ${vehicle.anio}`;
-  const whatsappText = encodeURIComponent(
-    `Hola, me interesa el ${vehiculoNombre}. ¿Podría darme más información?`
+  const whatsappHref = whatsappUrl(
+    configuracion.telefono,
+    `Hola, me interesa el ${vehiculoNombre}. ¿Podría darme más información?`,
   );
-  const whatsappUrl = `https://wa.me/${cleanPhone}?text=${whatsappText}`;
 
   const planes = rawPlanes.map(p => ({
     id: p.id,
@@ -40,13 +41,26 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
     tasaAnual: p.tasaAnual.toNumber(),
   }));
 
+  // Textos de la sección de consulta: se editan en /dashboard/settings y
+  // admiten el marcador {concesionaria}, que se resuelve acá.
+  const contacto = {
+    eyebrow: configuracion.contactoEyebrow,
+    titulo: configuracion.contactoTitulo,
+    texto: conNombreConcesionaria(
+      configuracion.contactoTexto,
+      configuracion.nombreConcesionaria,
+    ),
+    whatsappTexto: configuracion.contactoWhatsappTexto,
+  };
+
   return (
-    <VehicleDetailClient 
-      vehicle={vehicle} 
-      vehiculoNombre={vehiculoNombre} 
-      whatsappUrl={whatsappUrl} 
+    <VehicleDetailClient
+      vehicle={vehicle}
+      vehiculoNombre={vehiculoNombre}
+      whatsappUrl={whatsappHref}
       cotizacionDolar={configuracion?.cotizacionDolar}
       planes={planes}
+      contacto={contacto}
     />
   );
 }

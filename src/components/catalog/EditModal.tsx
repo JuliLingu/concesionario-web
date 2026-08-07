@@ -8,9 +8,10 @@ interface EditModalProps {
   onClose: () => void;
   vehiculo: any;
   categorias: { id: string; nombre: string }[];
+  cotizacionDolar?: number | null;
 }
 
-export const EditModal = ({ isOpen, onClose, vehiculo, categorias }: EditModalProps) => {
+export const EditModal = ({ isOpen, onClose, vehiculo, categorias, cotizacionDolar }: EditModalProps) => {
   if (!isOpen) return null;
 
   return (
@@ -29,7 +30,7 @@ export const EditModal = ({ isOpen, onClose, vehiculo, categorias }: EditModalPr
         </button>
 
         <div className="flex-1 overflow-y-auto p-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-black/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-black/20">
-          <VehicleForm initialData={vehiculo} categorias={categorias} onSuccess={onClose} />
+          <VehicleForm initialData={vehiculo} categorias={categorias} onSuccess={onClose} cotizacionDolar={cotizacionDolar} />
         </div>
       </div>
     </div>

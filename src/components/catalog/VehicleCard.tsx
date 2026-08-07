@@ -7,6 +7,7 @@ import { Vehiculo, ImagenVehiculo } from "../../../generated/prisma";
 import { Calendar, Fuel, AlignJustify, ArrowRight, Settings2 } from "lucide-react";
 import { EditModal } from "./EditModal";
 import { getCldUrl } from "@/lib/cloudinary";
+import { formatPrecio } from "@/lib/precio";
 
 interface VehicleCardProps {
   vehiculo: Omit<Vehiculo, "precio"> & {
@@ -29,11 +30,11 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
       <div className="relative aspect-[4/3] w-full bg-[hsl(var(--surface-low))] overflow-hidden">
         {imagenPrincipal ? (
           <Image
-            src={getCldUrl(imagenPrincipal, "4:3")}
+            src={getCldUrl(imagenPrincipal, { modo: "recorte", relacion: "4:3" })}
             alt={`${vehiculo.marca} ${vehiculo.modelo}`}
             fill
-            priority={priority}
             loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className="object-cover object-center transition-transform duration-700 ease-in-out group-hover:scale-105"
           />
@@ -78,7 +79,7 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
         </p>
 
         {/* Inline Specs */}
-        <div className="flex items-center gap-4 mb-6 text-[hsl(var(--muted-foreground))]">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6 text-[hsl(var(--muted-foreground))]">
           <div className="flex items-center gap-1">
             <Calendar size={14} className="opacity-40" />
             <span className="text-[11px] font-bold">{vehiculo.anio}</span>
@@ -94,15 +95,13 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
         </div>
 
         {/* Price and CTA */}
-        <div className="mt-auto flex items-center justify-between">
-          <span className="text-2xl font-black text-[#b5000b] tracking-[-0.05em]">
-            {cotizacionDolar
-              ? `ARS $ ${(vehiculo.precio * cotizacionDolar).toLocaleString("es-AR")}`
-              : `U$D ${vehiculo.precio.toLocaleString("es-AR")}`}
+        <div className="mt-auto pt-4 border-t border-[hsl(var(--border))]">
+          <span className="block text-2xl font-black text-[#b5000b] tracking-[-0.05em] leading-none tabular-nums">
+            {formatPrecio(vehiculo.precio, vehiculo.moneda, cotizacionDolar)}
           </span>
           <Link
             href={`/catalogo/${vehiculo.id}`}
-            className="bg-[#b5000b] text-white px-4 py-2.5 text-[11px] font-black uppercase tracking-[0.1em] flex items-center gap-1.5 hover:bg-red-800 active:scale-95 transition-all shadow-[0_4px_6px_-1px_rgba(181,0,11,0.2)]"
+            className="mt-4 w-full bg-[#b5000b] text-white px-4 py-3 text-[11px] font-black uppercase tracking-[0.1em] flex items-center justify-center gap-1.5 hover:bg-red-800 active:scale-95 transition-all shadow-[0_4px_6px_-1px_rgba(181,0,11,0.2)]"
           >
             Ver Detalles <ArrowRight size={14} />
           </Link>
@@ -114,6 +113,7 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
         onClose={() => setIsEditModalOpen(false)}
         vehiculo={vehiculo}
         categorias={categorias}
+        cotizacionDolar={cotizacionDolar}
       />
     </div>
   );

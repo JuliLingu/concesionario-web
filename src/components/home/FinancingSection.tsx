@@ -1,8 +1,18 @@
 "use client";
 
 import { Building2 } from "lucide-react";
+import type { SiteConfig } from "@/lib/configuracion-defaults";
 
-export function FinancingSection() {
+interface FinancingSectionProps {
+  configuracion: SiteConfig;
+}
+
+export function FinancingSection({ configuracion }: FinancingSectionProps) {
+  const cifras = [
+    { label: "Tasa Anual", valor: configuracion.finanTasaAnual },
+    { label: "Entrega Mínima", valor: configuracion.finanEntregaMinima },
+  ].filter((cifra) => cifra.valor !== null);
+
   return (
     <section id="financiacion" className="py-24 bg-[hsl(var(--background))]">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -15,33 +25,36 @@ export function FinancingSection() {
 
           <div className="relative z-10 max-w-2xl">
             <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/60 mb-8 block">
-              Financial Services
+              {configuracion.finanEyebrow}
             </span>
-            <h2 className="text-5xl md:text-[4.5rem] font-extrabold text-white uppercase tracking-[-0.02em] mb-10 italic leading-none">
-              Financiación <br /> de Autor.
+            <h2 className="text-5xl md:text-[4.5rem] font-extrabold text-white uppercase tracking-[-0.02em] mb-10 italic leading-none whitespace-pre-line">
+              {configuracion.finanTitulo}
             </h2>
             <p className="text-white/70 leading-relaxed mb-16 text-lg font-medium">
-              Planes personalizados con tasas preferenciales para nuestra selección más exclusiva. Transparencia técnica en cada cuota.
+              {configuracion.finanTexto}
             </p>
 
-            <div className="flex flex-wrap gap-12 mb-16">
-              <div>
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">Tasa Anual</div>
-                <div className="text-4xl font-bold text-white tracking-[-0.05em]">
-                  29.0<span className="text-white/50 italic">%</span>
-                </div>
+            {cifras.length > 0 && (
+              <div className="flex flex-wrap items-center gap-12 mb-16">
+                {cifras.map((cifra, index) => (
+                  <div key={cifra.label} className="flex items-center gap-12">
+                    {index > 0 && <div className="w-px h-12 bg-white/10" />}
+                    <div>
+                      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">
+                        {cifra.label}
+                      </div>
+                      <div className="text-4xl font-bold text-white tracking-[-0.05em]">
+                        {cifra.valor!.toFixed(1)}
+                        <span className="text-white/50 italic">%</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="w-px h-12 bg-white/10" />
-              <div>
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">Entrega Mínima</div>
-                <div className="text-4xl font-bold text-white tracking-[-0.05em]">
-                  30.0<span className="text-white/50 italic">%</span>
-                </div>
-              </div>
-            </div>
+            )}
 
             <button className="bg-white text-[#b5000b] px-12 py-5 text-[10px] font-black uppercase tracking-[0.3em] rounded shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] hover:bg-[hsl(var(--foreground))] hover:text-white transition-colors">
-              Simular Crédito
+              {configuracion.finanCtaTexto}
             </button>
           </div>
         </div>

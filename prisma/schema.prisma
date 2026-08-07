@@ -82,6 +82,7 @@ model Vehiculo {
   version                String?
   estado                 EstadoVehiculo          @default(USADO)
   precio                 Decimal                 @db.Decimal(12, 2)
+  moneda                 Moneda                  @default(USD)
   kilometraje            Int                     @default(0)
   color                  String?
   motor                  String?
@@ -147,6 +148,50 @@ model Configuracion {
   updatedAt           DateTime @updatedAt
   cotizacionDolar     Decimal? @db.Decimal(10, 2)
 
+  // Identidad visual
+  logoUrl    String? @db.Text
+  faviconUrl String? @db.Text
+
+  // SEO / metadata del layout
+  siteTitle       String?
+  siteDescription String? @db.Text
+
+  // Portada (Hero)
+  heroTitulo    String?
+  heroSubtitulo String?
+  heroCtaTexto  String?
+  heroCtaUrl    String?
+  heroImagenUrl String? @db.Text
+
+  // Nosotros (CompanyInfo)
+  nosotrosTitulo         String? @db.Text
+  nosotrosTexto          String? @db.Text
+  nosotrosMetrica1Valor  String?
+  nosotrosMetrica1Sufijo String?
+  nosotrosMetrica1Label  String?
+  nosotrosMetrica2Valor  String?
+  nosotrosMetrica2Sufijo String?
+  nosotrosMetrica2Label  String?
+
+  // Financiación
+  finanEyebrow       String?
+  finanTitulo        String?  @db.Text
+  finanTexto         String?  @db.Text
+  finanTasaAnual     Decimal? @db.Decimal(5, 2)
+  finanEntregaMinima Decimal? @db.Decimal(5, 2)
+  finanCtaTexto      String?
+
+  // Consulta por unidad (ficha de vehículo)
+  contactoEyebrow       String?
+  contactoTitulo        String? @db.Text
+  contactoTexto         String? @db.Text
+  contactoWhatsappTexto String?
+
+  // Pie de página
+  footerTexto   String?
+  terminosUrl   String?
+  privacidadUrl String?
+
   @@map("configuraciones")
 }
 
@@ -158,6 +203,11 @@ enum Role {
 enum EstadoVehiculo {
   NUEVO
   USADO
+}
+
+enum Moneda {
+  ARS
+  USD
 }
 
 enum EstadoPublicacion {

@@ -1,59 +1,103 @@
 import { prisma } from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
+import { Combustible, EstadoVehiculo, Prisma, Transmision } from "../../generated/prisma";
 
 // Constantes para los tags de caché, por si queremos revalidarlos a demanda
 export const CACHE_TAGS = {
-  MARCAS: "marcas",
-  COMBUSTIBLES: "combustibles",
-  ANIOS: "anios",
+  FILTROS: "catalogo-filtros",
   CATEGORIAS: "categorias",
+  CONFIGURACION: "configuracion",
 };
 
 // Revalidar cada 1 hora (3600 segundos)
 const REVALIDATE_TIME = 3600;
 
-export const getCachedMarcas = unstable_cache(
-  async () => {
-    const dbMarcas = await prisma.vehiculo.findMany({
-      where: { publicacion: "PUBLICADO" },
-      select: { marca: true },
-      distinct: ["marca"],
-    });
-    return dbMarcas.map((r) => r.marca).sort();
-  },
-  ["catalogo-marcas"],
-  { tags: [CACHE_TAGS.MARCAS], revalidate: REVALIDATE_TIME }
-);
+export type FiltrosCatalogo = {
+  marcas: string[];
+  /** Categorías con al menos una unidad. Se filtra por slug, no por id. */
+  categorias: { nombre: string; slug: string }[];
+  estados: EstadoVehiculo[];
+  transmisiones: Transmision[];
+  combustibles: Combustible[];
+  /** Años con stock, de más nuevo a más viejo. Vacío si no hay vehículos. */
+  anios: number[];
+};
 
-export const getCachedCombustibles = unstable_cache(
-  async () => {
-    const dbCombustibles = await prisma.vehiculo.findMany({
-      where: { publicacion: "PUBLICADO", combustible: { not: null } },
-      select: { combustible: true },
-      distinct: ["combustible"],
-    });
-    return dbCombustibles
-      .map((r) => r.combustible)
-      .filter(Boolean) as string[];
-  },
-  ["catalogo-combustibles"],
-  { tags: [CACHE_TAGS.COMBUSTIBLES], revalidate: REVALIDATE_TIME }
-);
+/** Ordena según cómo están declarados en el enum, no alfabéticamente. */
+function ordenDeEnum<T extends string>(valores: T[], enumObj: Record<string, string>): T[] {
+  const orden = Object.keys(enumObj);
+  return [...valores].sort((a, b) => orden.indexOf(a) - orden.indexOf(b));
+}
 
-export const getCachedAnioRange = unstable_cache(
-  async () => {
-    const anioRange = await prisma.vehiculo.aggregate({
-      where: { publicacion: "PUBLICADO" },
-      _min: { anio: true },
-      _max: { anio: true },
-    });
+/**
+ * Opciones de los filtros del catálogo, derivadas del stock cargado en la base.
+ *
+ * Solo se ofrece lo que existe: si ninguna unidad es diésel, el filtro de
+ * combustible no muestra esa opción. `incluirBorradores` distingue la vista de
+ * administrador (que ve también los borradores) y forma parte de la clave de
+ * caché, así cada variante se guarda por separado.
+ */
+export const getCachedFiltrosCatalogo = unstable_cache(
+  async (incluirBorradores: boolean): Promise<FiltrosCatalogo> => {
+    const where: Prisma.VehiculoWhereInput = incluirBorradores
+      ? {}
+      : { publicacion: "PUBLICADO" };
+
+    const [dbMarcas, dbCategorias, dbEstados, dbTransmisiones, dbCombustibles, dbAnios] =
+      await Promise.all([
+        prisma.vehiculo.findMany({
+          where,
+          select: { marca: true },
+          distinct: ["marca"],
+        }),
+        prisma.categoria.findMany({
+          where: { vehiculos: { some: where } },
+          select: { nombre: true, slug: true },
+          orderBy: { nombre: "asc" },
+        }),
+        prisma.vehiculo.findMany({
+          where,
+          select: { estado: true },
+          distinct: ["estado"],
+        }),
+        prisma.vehiculo.findMany({
+          where: { ...where, transmision: { not: null } },
+          select: { transmision: true },
+          distinct: ["transmision"],
+        }),
+        prisma.vehiculo.findMany({
+          where: { ...where, combustible: { not: null } },
+          select: { combustible: true },
+          distinct: ["combustible"],
+        }),
+        prisma.vehiculo.findMany({
+          where,
+          select: { anio: true },
+          distinct: ["anio"],
+          orderBy: { anio: "desc" },
+        }),
+      ]);
+
     return {
-      anioMin: anioRange._min.anio ?? 2000,
-      anioMax: anioRange._max.anio ?? new Date().getFullYear(),
+      marcas: dbMarcas.map((r) => r.marca).sort((a, b) => a.localeCompare(b, "es")),
+      categorias: dbCategorias,
+      estados: ordenDeEnum(
+        dbEstados.map((r) => r.estado),
+        EstadoVehiculo,
+      ),
+      transmisiones: ordenDeEnum(
+        dbTransmisiones.map((r) => r.transmision).filter((t) => t !== null),
+        Transmision,
+      ),
+      combustibles: ordenDeEnum(
+        dbCombustibles.map((r) => r.combustible).filter((c) => c !== null),
+        Combustible,
+      ),
+      anios: dbAnios.map((r) => r.anio),
     };
   },
-  ["catalogo-anios"],
-  { tags: [CACHE_TAGS.ANIOS], revalidate: REVALIDATE_TIME }
+  ["catalogo-filtros"],
+  { tags: [CACHE_TAGS.FILTROS], revalidate: REVALIDATE_TIME }
 );
 
 export const getCachedCategorias = unstable_cache(

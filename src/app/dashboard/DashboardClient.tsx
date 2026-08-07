@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Car, CheckCircle2, FileText, MessageSquare, Plus, LayoutList, ArrowRight, ExternalLink, Tags, Wallet, CreditCard } from "lucide-react";
 import { ConsultaStatusButton } from "@/components/dashboard/ConsultaStatusButton";
+import { FEATURE_FINANCIACION } from "@/lib/features";
 
 export const DashboardClient = ({
   userName,
@@ -19,7 +20,7 @@ export const DashboardClient = ({
     }).format(new Date(date));
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--background))] pt-16 pb-8">
+    <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-8">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
 
         {/* ── Header ── */}
@@ -57,12 +58,16 @@ export const DashboardClient = ({
           <div className="md:col-span-6 lg:col-span-1">
             <QuickAction href="/dashboard/consultas" icon={<MessageSquare size={18} />} label="Ver Consultas" description={consultasPendientes > 0 ? `${consultasPendientes} sin atender` : "Historial completo"} badge={consultasPendientes > 0 ? consultasPendientes : undefined} />
           </div>
-          <div className="md:col-span-6 lg:col-span-1">
-            <QuickAction href="/dashboard/solicitudes" icon={<Wallet size={18} />} label="Solicitudes Crédito" description="Ver pedidos de financiación" />
-          </div>
-          <div className="md:col-span-6 lg:col-span-1">
-            <QuickAction href="/dashboard/planes" icon={<CreditCard size={18} />} label="Planes Financiación" description="Configurar tasas y cuotas" />
-          </div>
+          {FEATURE_FINANCIACION && (
+            <>
+              <div className="md:col-span-6 lg:col-span-1">
+                <QuickAction href="/dashboard/solicitudes" icon={<Wallet size={18} />} label="Solicitudes Crédito" description="Ver pedidos de financiación" />
+              </div>
+              <div className="md:col-span-6 lg:col-span-1">
+                <QuickAction href="/dashboard/planes" icon={<CreditCard size={18} />} label="Planes Financiación" description="Configurar tasas y cuotas" />
+              </div>
+            </>
+          )}
           <div className="md:col-span-6 lg:col-span-1">
             <QuickAction href="/dashboard/settings" icon={<ExternalLink size={18} />} label="Configuración" description="Ajustes generales del sitio" />
           </div>

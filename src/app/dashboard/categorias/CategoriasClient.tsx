@@ -40,7 +40,7 @@ export const CategoriasClient = ({ initialCategorias }: any) => {
   };
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--background))] pt-16 pb-8">
+    <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-8">
       <div className="max-w-5xl mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="mb-4">

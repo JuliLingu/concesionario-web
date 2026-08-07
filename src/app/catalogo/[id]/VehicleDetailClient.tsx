@@ -5,10 +5,14 @@ import { ArrowLeft, Calendar, Fuel, AlignJustify, Disc, MessageCircle } from "lu
 import { VehicleGallery } from "@/components/catalog/VehicleGallery";
 import { ContactForm } from "@/components/catalog/ContactForm";
 import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
+import { FEATURE_FINANCIACION } from "@/lib/features";
+import { formatPrecio, precioEnPesos } from "@/lib/precio";
 
-export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, cotizacionDolar, planes }: any) => {
+export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, cotizacionDolar, planes, contacto }: any) => {
+  const precioArs = precioEnPesos(Number(vehicle.precio), vehicle.moneda, cotizacionDolar);
+
   return (
-    <div className="min-h-screen bg-[hsl(var(--background))] text-foreground pt-4 pb-8">
+    <div className="min-h-screen bg-[hsl(var(--background))] text-foreground pt-header pb-8">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="h-16 flex items-center mb-4">
           <Link
@@ -46,9 +50,7 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
               </div>
 
               <p className="text-[2.5rem] font-black text-[hsl(var(--primary))] tracking-tighter">
-                {cotizacionDolar 
-                  ? `ARS $ ${(Number(vehicle.precio) * cotizacionDolar).toLocaleString("es-AR")}` 
-                  : `U$D ${Number(vehicle.precio).toLocaleString("es-AR")}`}
+                {formatPrecio(Number(vehicle.precio), vehicle.moneda, cotizacionDolar)}
               </p>
 
               <a
@@ -108,6 +110,7 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
           </div>
         </div>
 
+        {FEATURE_FINANCIACION && precioArs !== null && (
         <div className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-black/5">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
             <div className="lg:col-span-5">
@@ -122,27 +125,27 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
               </p>
             </div>
             <div className="lg:col-span-7">
-              <FinancingSimulator 
-                vehiculoId={vehicle.id} 
-                precioOriginal={Number(vehicle.precio)} 
-                cotizacionDolar={cotizacionDolar} 
-                planes={planes || []} 
+              <FinancingSimulator
+                vehiculoId={vehicle.id}
+                precioArs={precioArs}
+                planes={planes || []}
               />
             </div>
           </div>
         </div>
+        )}
 
         <div className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-black/5">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
             <div className="lg:col-span-6">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(var(--primary))] mb-2">
-                ¿Te interesa?
+                {contacto?.eyebrow}
               </p>
-              <h2 className="text-3xl font-black tracking-tight uppercase mb-2">
-                Consultá por esta unidad
+              <h2 className="text-3xl font-black tracking-tight uppercase mb-2 whitespace-pre-line">
+                {contacto?.titulo}
               </h2>
-              <p className="text-[hsl(var(--muted-foreground))] font-medium leading-relaxed mb-3">
-                Completá el formulario y un asesor de JBJ Automotores se comunicará con vos a la brevedad para coordinar una visita o responder todas tus preguntas.
+              <p className="text-[hsl(var(--muted-foreground))] font-medium leading-relaxed mb-3 whitespace-pre-line">
+                {contacto?.texto}
               </p>
               <a
                 href={whatsappUrl}
@@ -151,7 +154,7 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
                 className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--primary))] transition-colors"
               >
                 <MessageCircle size={14} />
-                O escribinos directo por WhatsApp
+                {contacto?.whatsappTexto}
               </a>
             </div>
 

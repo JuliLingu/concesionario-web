@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { getConfiguracion } from "@/actions/configuracion";
+import { getConfiguracion } from "@/services/configuracion.service";
 import { SettingsClient } from "./SettingsClient";
 
 export const metadata = {

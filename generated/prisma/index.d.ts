@@ -89,6 +89,14 @@ export const EstadoVehiculo: {
 export type EstadoVehiculo = (typeof EstadoVehiculo)[keyof typeof EstadoVehiculo]
 
 
+export const Moneda: {
+  ARS: 'ARS',
+  USD: 'USD'
+};
+
+export type Moneda = (typeof Moneda)[keyof typeof Moneda]
+
+
 export const EstadoPublicacion: {
   BORRADOR: 'BORRADOR',
   PUBLICADO: 'PUBLICADO',
@@ -137,6 +145,10 @@ export const Role: typeof $Enums.Role
 export type EstadoVehiculo = $Enums.EstadoVehiculo
 
 export const EstadoVehiculo: typeof $Enums.EstadoVehiculo
+
+export type Moneda = $Enums.Moneda
+
+export const Moneda: typeof $Enums.Moneda
 
 export type EstadoPublicacion = $Enums.EstadoPublicacion
 
@@ -194,7 +206,7 @@ export class PrismaClient<
    * Read more in our [docs](https://pris.ly/d/client).
    */
 
-  constructor(optionsArg ?: Prisma.Subset<ClientOptions, Prisma.PrismaClientOptions>);
+  constructor(optionsArg ?: Prisma.PrismaClientConstructorArgs<ClientOptions>);
   $on<V extends U>(eventType: V, callback: (event: V extends 'query' ? Prisma.QueryEvent : Prisma.LogEvent) => void): PrismaClient;
 
   /**
@@ -434,8 +446,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.8.0
-   * Query Engine version: 3c6e192761c0362d496ed980de936e2f3cebcd3a
+   * Prisma Client JS version: 7.9.1
+   * Query Engine version: e922089b7d7502aff4249d5da3420f6fa55fc6ad
    */
   export type PrismaVersion = {
     client: string
@@ -570,6 +582,19 @@ export namespace Prisma {
   };
 
   /**
+   * Resolved type of the argument passed to the `PrismaClient` constructor.
+   *
+   * When called without a narrower options type (the common case), this resolves
+   * to `PrismaClientOptions` directly, which produces a clear TypeScript error
+   * message (`not assignable to parameter of type 'PrismaClientOptions'`) when
+   * the argument is missing or incomplete. When the user supplies a narrower
+   * options type (e.g. via a literal), it falls back to `Subset` to keep
+   * filtering out unknown properties.
+   */
+  export type PrismaClientConstructorArgs<Options extends PrismaClientOptions> =
+    [PrismaClientOptions] extends [Options] ? PrismaClientOptions : Subset<Options, PrismaClientOptions>;
+
+  /**
    * SelectSubset
    * @desc From `T` pick properties that exist in `U`. Simple version of Intersection.
    * Additionally, it validates, if both select and include are present. If the case, it errors.
@@ -601,7 +626,7 @@ export namespace Prisma {
   type XOR<T, U> =
     T extends object ?
     U extends object ?
-      (Without<T, U> & U) | (Without<U, T> & T)
+      ((Without<T, U> & U) | (Without<U, T> & T)) & object
     : U : T
 
 
@@ -1642,11 +1667,26 @@ export namespace Prisma {
       isolationLevel?: Prisma.TransactionIsolationLevel
     }
     /**
-     * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
+     * A driver adapter that PrismaClient uses to connect to your database, such as the ones provided by `@prisma/adapter-pg`, `@prisma/adapter-libsql`, `@prisma/adapter-planetscale`, etc.
+     * 
+     * A driver adapter is **required** unless you connect to your database through Prisma Accelerate (in which case use `accelerateUrl` instead).
+     * 
+     * Learn more: https://pris.ly/d/driver-adapters
+     * 
+     * @example
+     * ```ts
+     * import { PrismaPg } from '@prisma/adapter-pg'
+     * import { PrismaClient } from './generated/prisma/client'
+     * 
+     * const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+     * const prisma = new PrismaClient({ adapter })
+     * ```
      */
     adapter?: runtime.SqlDriverAdapterFactory
     /**
-     * Prisma Accelerate URL allowing the client to connect through Accelerate instead of a direct database.
+     * The Prisma Accelerate connection URL. Use this option to connect to your database through Prisma Accelerate instead of using a driver adapter to connect directly.
+     * 
+     * Learn more: https://pris.ly/d/accelerate
      */
     accelerateUrl?: string
     /**
@@ -6743,6 +6783,7 @@ export namespace Prisma {
     version: string | null
     estado: $Enums.EstadoVehiculo | null
     precio: Decimal | null
+    moneda: $Enums.Moneda | null
     kilometraje: number | null
     color: string | null
     motor: string | null
@@ -6765,6 +6806,7 @@ export namespace Prisma {
     version: string | null
     estado: $Enums.EstadoVehiculo | null
     precio: Decimal | null
+    moneda: $Enums.Moneda | null
     kilometraje: number | null
     color: string | null
     motor: string | null
@@ -6787,6 +6829,7 @@ export namespace Prisma {
     version: number
     estado: number
     precio: number
+    moneda: number
     kilometraje: number
     color: number
     motor: number
@@ -6827,6 +6870,7 @@ export namespace Prisma {
     version?: true
     estado?: true
     precio?: true
+    moneda?: true
     kilometraje?: true
     color?: true
     motor?: true
@@ -6849,6 +6893,7 @@ export namespace Prisma {
     version?: true
     estado?: true
     precio?: true
+    moneda?: true
     kilometraje?: true
     color?: true
     motor?: true
@@ -6871,6 +6916,7 @@ export namespace Prisma {
     version?: true
     estado?: true
     precio?: true
+    moneda?: true
     kilometraje?: true
     color?: true
     motor?: true
@@ -6980,6 +7026,7 @@ export namespace Prisma {
     version: string | null
     estado: $Enums.EstadoVehiculo
     precio: Decimal
+    moneda: $Enums.Moneda
     kilometraje: number
     color: string | null
     motor: string | null
@@ -7021,6 +7068,7 @@ export namespace Prisma {
     version?: boolean
     estado?: boolean
     precio?: boolean
+    moneda?: boolean
     kilometraje?: boolean
     color?: boolean
     motor?: boolean
@@ -7050,6 +7098,7 @@ export namespace Prisma {
     version?: boolean
     estado?: boolean
     precio?: boolean
+    moneda?: boolean
     kilometraje?: boolean
     color?: boolean
     motor?: boolean
@@ -7063,7 +7112,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type VehiculoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "categoriaId" | "marca" | "modelo" | "anio" | "version" | "estado" | "precio" | "kilometraje" | "color" | "motor" | "transmision" | "combustible" | "puertas" | "potencia" | "descripcion" | "publicacion" | "createdAt" | "updatedAt", ExtArgs["result"]["vehiculo"]>
+  export type VehiculoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "categoriaId" | "marca" | "modelo" | "anio" | "version" | "estado" | "precio" | "moneda" | "kilometraje" | "color" | "motor" | "transmision" | "combustible" | "puertas" | "potencia" | "descripcion" | "publicacion" | "createdAt" | "updatedAt", ExtArgs["result"]["vehiculo"]>
   export type VehiculoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     categoria?: boolean | CategoriaDefaultArgs<ExtArgs>
     imagenes?: boolean | Vehiculo$imagenesArgs<ExtArgs>
@@ -7089,6 +7138,7 @@ export namespace Prisma {
       version: string | null
       estado: $Enums.EstadoVehiculo
       precio: Prisma.Decimal
+      moneda: $Enums.Moneda
       kilometraje: number
       color: string | null
       motor: string | null
@@ -7481,6 +7531,7 @@ export namespace Prisma {
     readonly version: FieldRef<"Vehiculo", 'String'>
     readonly estado: FieldRef<"Vehiculo", 'EstadoVehiculo'>
     readonly precio: FieldRef<"Vehiculo", 'Decimal'>
+    readonly moneda: FieldRef<"Vehiculo", 'Moneda'>
     readonly kilometraje: FieldRef<"Vehiculo", 'Int'>
     readonly color: FieldRef<"Vehiculo", 'String'>
     readonly motor: FieldRef<"Vehiculo", 'String'>
@@ -9931,10 +9982,14 @@ export namespace Prisma {
 
   export type ConfiguracionAvgAggregateOutputType = {
     cotizacionDolar: Decimal | null
+    finanTasaAnual: Decimal | null
+    finanEntregaMinima: Decimal | null
   }
 
   export type ConfiguracionSumAggregateOutputType = {
     cotizacionDolar: Decimal | null
+    finanTasaAnual: Decimal | null
+    finanEntregaMinima: Decimal | null
   }
 
   export type ConfiguracionMinAggregateOutputType = {
@@ -9948,6 +10003,36 @@ export namespace Prisma {
     horariosAtencion: string | null
     updatedAt: Date | null
     cotizacionDolar: Decimal | null
+    logoUrl: string | null
+    faviconUrl: string | null
+    siteTitle: string | null
+    siteDescription: string | null
+    heroTitulo: string | null
+    heroSubtitulo: string | null
+    heroCtaTexto: string | null
+    heroCtaUrl: string | null
+    heroImagenUrl: string | null
+    nosotrosTitulo: string | null
+    nosotrosTexto: string | null
+    nosotrosMetrica1Valor: string | null
+    nosotrosMetrica1Sufijo: string | null
+    nosotrosMetrica1Label: string | null
+    nosotrosMetrica2Valor: string | null
+    nosotrosMetrica2Sufijo: string | null
+    nosotrosMetrica2Label: string | null
+    finanEyebrow: string | null
+    finanTitulo: string | null
+    finanTexto: string | null
+    finanTasaAnual: Decimal | null
+    finanEntregaMinima: Decimal | null
+    finanCtaTexto: string | null
+    contactoEyebrow: string | null
+    contactoTitulo: string | null
+    contactoTexto: string | null
+    contactoWhatsappTexto: string | null
+    footerTexto: string | null
+    terminosUrl: string | null
+    privacidadUrl: string | null
   }
 
   export type ConfiguracionMaxAggregateOutputType = {
@@ -9961,6 +10046,36 @@ export namespace Prisma {
     horariosAtencion: string | null
     updatedAt: Date | null
     cotizacionDolar: Decimal | null
+    logoUrl: string | null
+    faviconUrl: string | null
+    siteTitle: string | null
+    siteDescription: string | null
+    heroTitulo: string | null
+    heroSubtitulo: string | null
+    heroCtaTexto: string | null
+    heroCtaUrl: string | null
+    heroImagenUrl: string | null
+    nosotrosTitulo: string | null
+    nosotrosTexto: string | null
+    nosotrosMetrica1Valor: string | null
+    nosotrosMetrica1Sufijo: string | null
+    nosotrosMetrica1Label: string | null
+    nosotrosMetrica2Valor: string | null
+    nosotrosMetrica2Sufijo: string | null
+    nosotrosMetrica2Label: string | null
+    finanEyebrow: string | null
+    finanTitulo: string | null
+    finanTexto: string | null
+    finanTasaAnual: Decimal | null
+    finanEntregaMinima: Decimal | null
+    finanCtaTexto: string | null
+    contactoEyebrow: string | null
+    contactoTitulo: string | null
+    contactoTexto: string | null
+    contactoWhatsappTexto: string | null
+    footerTexto: string | null
+    terminosUrl: string | null
+    privacidadUrl: string | null
   }
 
   export type ConfiguracionCountAggregateOutputType = {
@@ -9974,16 +10089,50 @@ export namespace Prisma {
     horariosAtencion: number
     updatedAt: number
     cotizacionDolar: number
+    logoUrl: number
+    faviconUrl: number
+    siteTitle: number
+    siteDescription: number
+    heroTitulo: number
+    heroSubtitulo: number
+    heroCtaTexto: number
+    heroCtaUrl: number
+    heroImagenUrl: number
+    nosotrosTitulo: number
+    nosotrosTexto: number
+    nosotrosMetrica1Valor: number
+    nosotrosMetrica1Sufijo: number
+    nosotrosMetrica1Label: number
+    nosotrosMetrica2Valor: number
+    nosotrosMetrica2Sufijo: number
+    nosotrosMetrica2Label: number
+    finanEyebrow: number
+    finanTitulo: number
+    finanTexto: number
+    finanTasaAnual: number
+    finanEntregaMinima: number
+    finanCtaTexto: number
+    contactoEyebrow: number
+    contactoTitulo: number
+    contactoTexto: number
+    contactoWhatsappTexto: number
+    footerTexto: number
+    terminosUrl: number
+    privacidadUrl: number
     _all: number
   }
 
 
   export type ConfiguracionAvgAggregateInputType = {
     cotizacionDolar?: true
+    finanTasaAnual?: true
+    finanEntregaMinima?: true
   }
 
   export type ConfiguracionSumAggregateInputType = {
     cotizacionDolar?: true
+    finanTasaAnual?: true
+    finanEntregaMinima?: true
   }
 
   export type ConfiguracionMinAggregateInputType = {
@@ -9997,6 +10146,36 @@ export namespace Prisma {
     horariosAtencion?: true
     updatedAt?: true
     cotizacionDolar?: true
+    logoUrl?: true
+    faviconUrl?: true
+    siteTitle?: true
+    siteDescription?: true
+    heroTitulo?: true
+    heroSubtitulo?: true
+    heroCtaTexto?: true
+    heroCtaUrl?: true
+    heroImagenUrl?: true
+    nosotrosTitulo?: true
+    nosotrosTexto?: true
+    nosotrosMetrica1Valor?: true
+    nosotrosMetrica1Sufijo?: true
+    nosotrosMetrica1Label?: true
+    nosotrosMetrica2Valor?: true
+    nosotrosMetrica2Sufijo?: true
+    nosotrosMetrica2Label?: true
+    finanEyebrow?: true
+    finanTitulo?: true
+    finanTexto?: true
+    finanTasaAnual?: true
+    finanEntregaMinima?: true
+    finanCtaTexto?: true
+    contactoEyebrow?: true
+    contactoTitulo?: true
+    contactoTexto?: true
+    contactoWhatsappTexto?: true
+    footerTexto?: true
+    terminosUrl?: true
+    privacidadUrl?: true
   }
 
   export type ConfiguracionMaxAggregateInputType = {
@@ -10010,6 +10189,36 @@ export namespace Prisma {
     horariosAtencion?: true
     updatedAt?: true
     cotizacionDolar?: true
+    logoUrl?: true
+    faviconUrl?: true
+    siteTitle?: true
+    siteDescription?: true
+    heroTitulo?: true
+    heroSubtitulo?: true
+    heroCtaTexto?: true
+    heroCtaUrl?: true
+    heroImagenUrl?: true
+    nosotrosTitulo?: true
+    nosotrosTexto?: true
+    nosotrosMetrica1Valor?: true
+    nosotrosMetrica1Sufijo?: true
+    nosotrosMetrica1Label?: true
+    nosotrosMetrica2Valor?: true
+    nosotrosMetrica2Sufijo?: true
+    nosotrosMetrica2Label?: true
+    finanEyebrow?: true
+    finanTitulo?: true
+    finanTexto?: true
+    finanTasaAnual?: true
+    finanEntregaMinima?: true
+    finanCtaTexto?: true
+    contactoEyebrow?: true
+    contactoTitulo?: true
+    contactoTexto?: true
+    contactoWhatsappTexto?: true
+    footerTexto?: true
+    terminosUrl?: true
+    privacidadUrl?: true
   }
 
   export type ConfiguracionCountAggregateInputType = {
@@ -10023,6 +10232,36 @@ export namespace Prisma {
     horariosAtencion?: true
     updatedAt?: true
     cotizacionDolar?: true
+    logoUrl?: true
+    faviconUrl?: true
+    siteTitle?: true
+    siteDescription?: true
+    heroTitulo?: true
+    heroSubtitulo?: true
+    heroCtaTexto?: true
+    heroCtaUrl?: true
+    heroImagenUrl?: true
+    nosotrosTitulo?: true
+    nosotrosTexto?: true
+    nosotrosMetrica1Valor?: true
+    nosotrosMetrica1Sufijo?: true
+    nosotrosMetrica1Label?: true
+    nosotrosMetrica2Valor?: true
+    nosotrosMetrica2Sufijo?: true
+    nosotrosMetrica2Label?: true
+    finanEyebrow?: true
+    finanTitulo?: true
+    finanTexto?: true
+    finanTasaAnual?: true
+    finanEntregaMinima?: true
+    finanCtaTexto?: true
+    contactoEyebrow?: true
+    contactoTitulo?: true
+    contactoTexto?: true
+    contactoWhatsappTexto?: true
+    footerTexto?: true
+    terminosUrl?: true
+    privacidadUrl?: true
     _all?: true
   }
 
@@ -10123,6 +10362,36 @@ export namespace Prisma {
     horariosAtencion: string | null
     updatedAt: Date
     cotizacionDolar: Decimal | null
+    logoUrl: string | null
+    faviconUrl: string | null
+    siteTitle: string | null
+    siteDescription: string | null
+    heroTitulo: string | null
+    heroSubtitulo: string | null
+    heroCtaTexto: string | null
+    heroCtaUrl: string | null
+    heroImagenUrl: string | null
+    nosotrosTitulo: string | null
+    nosotrosTexto: string | null
+    nosotrosMetrica1Valor: string | null
+    nosotrosMetrica1Sufijo: string | null
+    nosotrosMetrica1Label: string | null
+    nosotrosMetrica2Valor: string | null
+    nosotrosMetrica2Sufijo: string | null
+    nosotrosMetrica2Label: string | null
+    finanEyebrow: string | null
+    finanTitulo: string | null
+    finanTexto: string | null
+    finanTasaAnual: Decimal | null
+    finanEntregaMinima: Decimal | null
+    finanCtaTexto: string | null
+    contactoEyebrow: string | null
+    contactoTitulo: string | null
+    contactoTexto: string | null
+    contactoWhatsappTexto: string | null
+    footerTexto: string | null
+    terminosUrl: string | null
+    privacidadUrl: string | null
     _count: ConfiguracionCountAggregateOutputType | null
     _avg: ConfiguracionAvgAggregateOutputType | null
     _sum: ConfiguracionSumAggregateOutputType | null
@@ -10155,6 +10424,36 @@ export namespace Prisma {
     horariosAtencion?: boolean
     updatedAt?: boolean
     cotizacionDolar?: boolean
+    logoUrl?: boolean
+    faviconUrl?: boolean
+    siteTitle?: boolean
+    siteDescription?: boolean
+    heroTitulo?: boolean
+    heroSubtitulo?: boolean
+    heroCtaTexto?: boolean
+    heroCtaUrl?: boolean
+    heroImagenUrl?: boolean
+    nosotrosTitulo?: boolean
+    nosotrosTexto?: boolean
+    nosotrosMetrica1Valor?: boolean
+    nosotrosMetrica1Sufijo?: boolean
+    nosotrosMetrica1Label?: boolean
+    nosotrosMetrica2Valor?: boolean
+    nosotrosMetrica2Sufijo?: boolean
+    nosotrosMetrica2Label?: boolean
+    finanEyebrow?: boolean
+    finanTitulo?: boolean
+    finanTexto?: boolean
+    finanTasaAnual?: boolean
+    finanEntregaMinima?: boolean
+    finanCtaTexto?: boolean
+    contactoEyebrow?: boolean
+    contactoTitulo?: boolean
+    contactoTexto?: boolean
+    contactoWhatsappTexto?: boolean
+    footerTexto?: boolean
+    terminosUrl?: boolean
+    privacidadUrl?: boolean
   }, ExtArgs["result"]["configuracion"]>
 
 
@@ -10170,9 +10469,39 @@ export namespace Prisma {
     horariosAtencion?: boolean
     updatedAt?: boolean
     cotizacionDolar?: boolean
+    logoUrl?: boolean
+    faviconUrl?: boolean
+    siteTitle?: boolean
+    siteDescription?: boolean
+    heroTitulo?: boolean
+    heroSubtitulo?: boolean
+    heroCtaTexto?: boolean
+    heroCtaUrl?: boolean
+    heroImagenUrl?: boolean
+    nosotrosTitulo?: boolean
+    nosotrosTexto?: boolean
+    nosotrosMetrica1Valor?: boolean
+    nosotrosMetrica1Sufijo?: boolean
+    nosotrosMetrica1Label?: boolean
+    nosotrosMetrica2Valor?: boolean
+    nosotrosMetrica2Sufijo?: boolean
+    nosotrosMetrica2Label?: boolean
+    finanEyebrow?: boolean
+    finanTitulo?: boolean
+    finanTexto?: boolean
+    finanTasaAnual?: boolean
+    finanEntregaMinima?: boolean
+    finanCtaTexto?: boolean
+    contactoEyebrow?: boolean
+    contactoTitulo?: boolean
+    contactoTexto?: boolean
+    contactoWhatsappTexto?: boolean
+    footerTexto?: boolean
+    terminosUrl?: boolean
+    privacidadUrl?: boolean
   }
 
-  export type ConfiguracionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombreConcesionaria" | "telefono" | "email" | "direccion" | "facebookUrl" | "instagramUrl" | "horariosAtencion" | "updatedAt" | "cotizacionDolar", ExtArgs["result"]["configuracion"]>
+  export type ConfiguracionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombreConcesionaria" | "telefono" | "email" | "direccion" | "facebookUrl" | "instagramUrl" | "horariosAtencion" | "updatedAt" | "cotizacionDolar" | "logoUrl" | "faviconUrl" | "siteTitle" | "siteDescription" | "heroTitulo" | "heroSubtitulo" | "heroCtaTexto" | "heroCtaUrl" | "heroImagenUrl" | "nosotrosTitulo" | "nosotrosTexto" | "nosotrosMetrica1Valor" | "nosotrosMetrica1Sufijo" | "nosotrosMetrica1Label" | "nosotrosMetrica2Valor" | "nosotrosMetrica2Sufijo" | "nosotrosMetrica2Label" | "finanEyebrow" | "finanTitulo" | "finanTexto" | "finanTasaAnual" | "finanEntregaMinima" | "finanCtaTexto" | "contactoEyebrow" | "contactoTitulo" | "contactoTexto" | "contactoWhatsappTexto" | "footerTexto" | "terminosUrl" | "privacidadUrl", ExtArgs["result"]["configuracion"]>
 
   export type $ConfiguracionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Configuracion"
@@ -10188,6 +10517,36 @@ export namespace Prisma {
       horariosAtencion: string | null
       updatedAt: Date
       cotizacionDolar: Prisma.Decimal | null
+      logoUrl: string | null
+      faviconUrl: string | null
+      siteTitle: string | null
+      siteDescription: string | null
+      heroTitulo: string | null
+      heroSubtitulo: string | null
+      heroCtaTexto: string | null
+      heroCtaUrl: string | null
+      heroImagenUrl: string | null
+      nosotrosTitulo: string | null
+      nosotrosTexto: string | null
+      nosotrosMetrica1Valor: string | null
+      nosotrosMetrica1Sufijo: string | null
+      nosotrosMetrica1Label: string | null
+      nosotrosMetrica2Valor: string | null
+      nosotrosMetrica2Sufijo: string | null
+      nosotrosMetrica2Label: string | null
+      finanEyebrow: string | null
+      finanTitulo: string | null
+      finanTexto: string | null
+      finanTasaAnual: Prisma.Decimal | null
+      finanEntregaMinima: Prisma.Decimal | null
+      finanCtaTexto: string | null
+      contactoEyebrow: string | null
+      contactoTitulo: string | null
+      contactoTexto: string | null
+      contactoWhatsappTexto: string | null
+      footerTexto: string | null
+      terminosUrl: string | null
+      privacidadUrl: string | null
     }, ExtArgs["result"]["configuracion"]>
     composites: {}
   }
@@ -10567,6 +10926,36 @@ export namespace Prisma {
     readonly horariosAtencion: FieldRef<"Configuracion", 'String'>
     readonly updatedAt: FieldRef<"Configuracion", 'DateTime'>
     readonly cotizacionDolar: FieldRef<"Configuracion", 'Decimal'>
+    readonly logoUrl: FieldRef<"Configuracion", 'String'>
+    readonly faviconUrl: FieldRef<"Configuracion", 'String'>
+    readonly siteTitle: FieldRef<"Configuracion", 'String'>
+    readonly siteDescription: FieldRef<"Configuracion", 'String'>
+    readonly heroTitulo: FieldRef<"Configuracion", 'String'>
+    readonly heroSubtitulo: FieldRef<"Configuracion", 'String'>
+    readonly heroCtaTexto: FieldRef<"Configuracion", 'String'>
+    readonly heroCtaUrl: FieldRef<"Configuracion", 'String'>
+    readonly heroImagenUrl: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosTitulo: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosTexto: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosMetrica1Valor: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosMetrica1Sufijo: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosMetrica1Label: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosMetrica2Valor: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosMetrica2Sufijo: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosMetrica2Label: FieldRef<"Configuracion", 'String'>
+    readonly finanEyebrow: FieldRef<"Configuracion", 'String'>
+    readonly finanTitulo: FieldRef<"Configuracion", 'String'>
+    readonly finanTexto: FieldRef<"Configuracion", 'String'>
+    readonly finanTasaAnual: FieldRef<"Configuracion", 'Decimal'>
+    readonly finanEntregaMinima: FieldRef<"Configuracion", 'Decimal'>
+    readonly finanCtaTexto: FieldRef<"Configuracion", 'String'>
+    readonly contactoEyebrow: FieldRef<"Configuracion", 'String'>
+    readonly contactoTitulo: FieldRef<"Configuracion", 'String'>
+    readonly contactoTexto: FieldRef<"Configuracion", 'String'>
+    readonly contactoWhatsappTexto: FieldRef<"Configuracion", 'String'>
+    readonly footerTexto: FieldRef<"Configuracion", 'String'>
+    readonly terminosUrl: FieldRef<"Configuracion", 'String'>
+    readonly privacidadUrl: FieldRef<"Configuracion", 'String'>
   }
     
 
@@ -13019,6 +13408,7 @@ export namespace Prisma {
     version: 'version',
     estado: 'estado',
     precio: 'precio',
+    moneda: 'moneda',
     kilometraje: 'kilometraje',
     color: 'color',
     motor: 'motor',
@@ -13073,7 +13463,37 @@ export namespace Prisma {
     instagramUrl: 'instagramUrl',
     horariosAtencion: 'horariosAtencion',
     updatedAt: 'updatedAt',
-    cotizacionDolar: 'cotizacionDolar'
+    cotizacionDolar: 'cotizacionDolar',
+    logoUrl: 'logoUrl',
+    faviconUrl: 'faviconUrl',
+    siteTitle: 'siteTitle',
+    siteDescription: 'siteDescription',
+    heroTitulo: 'heroTitulo',
+    heroSubtitulo: 'heroSubtitulo',
+    heroCtaTexto: 'heroCtaTexto',
+    heroCtaUrl: 'heroCtaUrl',
+    heroImagenUrl: 'heroImagenUrl',
+    nosotrosTitulo: 'nosotrosTitulo',
+    nosotrosTexto: 'nosotrosTexto',
+    nosotrosMetrica1Valor: 'nosotrosMetrica1Valor',
+    nosotrosMetrica1Sufijo: 'nosotrosMetrica1Sufijo',
+    nosotrosMetrica1Label: 'nosotrosMetrica1Label',
+    nosotrosMetrica2Valor: 'nosotrosMetrica2Valor',
+    nosotrosMetrica2Sufijo: 'nosotrosMetrica2Sufijo',
+    nosotrosMetrica2Label: 'nosotrosMetrica2Label',
+    finanEyebrow: 'finanEyebrow',
+    finanTitulo: 'finanTitulo',
+    finanTexto: 'finanTexto',
+    finanTasaAnual: 'finanTasaAnual',
+    finanEntregaMinima: 'finanEntregaMinima',
+    finanCtaTexto: 'finanCtaTexto',
+    contactoEyebrow: 'contactoEyebrow',
+    contactoTitulo: 'contactoTitulo',
+    contactoTexto: 'contactoTexto',
+    contactoWhatsappTexto: 'contactoWhatsappTexto',
+    footerTexto: 'footerTexto',
+    terminosUrl: 'terminosUrl',
+    privacidadUrl: 'privacidadUrl'
   };
 
   export type ConfiguracionScalarFieldEnum = (typeof ConfiguracionScalarFieldEnum)[keyof typeof ConfiguracionScalarFieldEnum]
@@ -13226,7 +13646,35 @@ export namespace Prisma {
     direccion: 'direccion',
     facebookUrl: 'facebookUrl',
     instagramUrl: 'instagramUrl',
-    horariosAtencion: 'horariosAtencion'
+    horariosAtencion: 'horariosAtencion',
+    logoUrl: 'logoUrl',
+    faviconUrl: 'faviconUrl',
+    siteTitle: 'siteTitle',
+    siteDescription: 'siteDescription',
+    heroTitulo: 'heroTitulo',
+    heroSubtitulo: 'heroSubtitulo',
+    heroCtaTexto: 'heroCtaTexto',
+    heroCtaUrl: 'heroCtaUrl',
+    heroImagenUrl: 'heroImagenUrl',
+    nosotrosTitulo: 'nosotrosTitulo',
+    nosotrosTexto: 'nosotrosTexto',
+    nosotrosMetrica1Valor: 'nosotrosMetrica1Valor',
+    nosotrosMetrica1Sufijo: 'nosotrosMetrica1Sufijo',
+    nosotrosMetrica1Label: 'nosotrosMetrica1Label',
+    nosotrosMetrica2Valor: 'nosotrosMetrica2Valor',
+    nosotrosMetrica2Sufijo: 'nosotrosMetrica2Sufijo',
+    nosotrosMetrica2Label: 'nosotrosMetrica2Label',
+    finanEyebrow: 'finanEyebrow',
+    finanTitulo: 'finanTitulo',
+    finanTexto: 'finanTexto',
+    finanCtaTexto: 'finanCtaTexto',
+    contactoEyebrow: 'contactoEyebrow',
+    contactoTitulo: 'contactoTitulo',
+    contactoTexto: 'contactoTexto',
+    contactoWhatsappTexto: 'contactoWhatsappTexto',
+    footerTexto: 'footerTexto',
+    terminosUrl: 'terminosUrl',
+    privacidadUrl: 'privacidadUrl'
   };
 
   export type ConfiguracionOrderByRelevanceFieldEnum = (typeof ConfiguracionOrderByRelevanceFieldEnum)[keyof typeof ConfiguracionOrderByRelevanceFieldEnum]
@@ -13298,6 +13746,13 @@ export namespace Prisma {
    * Reference to a field of type 'Decimal'
    */
   export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+  /**
+   * Reference to a field of type 'Moneda'
+   */
+  export type EnumMonedaFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Moneda'>
     
 
 
@@ -13677,6 +14132,7 @@ export namespace Prisma {
     version?: StringNullableFilter<"Vehiculo"> | string | null
     estado?: EnumEstadoVehiculoFilter<"Vehiculo"> | $Enums.EstadoVehiculo
     precio?: DecimalFilter<"Vehiculo"> | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFilter<"Vehiculo"> | $Enums.Moneda
     kilometraje?: IntFilter<"Vehiculo"> | number
     color?: StringNullableFilter<"Vehiculo"> | string | null
     motor?: StringNullableFilter<"Vehiculo"> | string | null
@@ -13703,6 +14159,7 @@ export namespace Prisma {
     version?: SortOrderInput | SortOrder
     estado?: SortOrder
     precio?: SortOrder
+    moneda?: SortOrder
     kilometraje?: SortOrder
     color?: SortOrderInput | SortOrder
     motor?: SortOrderInput | SortOrder
@@ -13733,6 +14190,7 @@ export namespace Prisma {
     version?: StringNullableFilter<"Vehiculo"> | string | null
     estado?: EnumEstadoVehiculoFilter<"Vehiculo"> | $Enums.EstadoVehiculo
     precio?: DecimalFilter<"Vehiculo"> | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFilter<"Vehiculo"> | $Enums.Moneda
     kilometraje?: IntFilter<"Vehiculo"> | number
     color?: StringNullableFilter<"Vehiculo"> | string | null
     motor?: StringNullableFilter<"Vehiculo"> | string | null
@@ -13759,6 +14217,7 @@ export namespace Prisma {
     version?: SortOrderInput | SortOrder
     estado?: SortOrder
     precio?: SortOrder
+    moneda?: SortOrder
     kilometraje?: SortOrder
     color?: SortOrderInput | SortOrder
     motor?: SortOrderInput | SortOrder
@@ -13789,6 +14248,7 @@ export namespace Prisma {
     version?: StringNullableWithAggregatesFilter<"Vehiculo"> | string | null
     estado?: EnumEstadoVehiculoWithAggregatesFilter<"Vehiculo"> | $Enums.EstadoVehiculo
     precio?: DecimalWithAggregatesFilter<"Vehiculo"> | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaWithAggregatesFilter<"Vehiculo"> | $Enums.Moneda
     kilometraje?: IntWithAggregatesFilter<"Vehiculo"> | number
     color?: StringNullableWithAggregatesFilter<"Vehiculo"> | string | null
     motor?: StringNullableWithAggregatesFilter<"Vehiculo"> | string | null
@@ -13960,6 +14420,36 @@ export namespace Prisma {
     horariosAtencion?: StringNullableFilter<"Configuracion"> | string | null
     updatedAt?: DateTimeFilter<"Configuracion"> | Date | string
     cotizacionDolar?: DecimalNullableFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: StringNullableFilter<"Configuracion"> | string | null
+    faviconUrl?: StringNullableFilter<"Configuracion"> | string | null
+    siteTitle?: StringNullableFilter<"Configuracion"> | string | null
+    siteDescription?: StringNullableFilter<"Configuracion"> | string | null
+    heroTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    heroSubtitulo?: StringNullableFilter<"Configuracion"> | string | null
+    heroCtaTexto?: StringNullableFilter<"Configuracion"> | string | null
+    heroCtaUrl?: StringNullableFilter<"Configuracion"> | string | null
+    heroImagenUrl?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosTexto?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Valor?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Sufijo?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Label?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Valor?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Sufijo?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Label?: StringNullableFilter<"Configuracion"> | string | null
+    finanEyebrow?: StringNullableFilter<"Configuracion"> | string | null
+    finanTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    finanTexto?: StringNullableFilter<"Configuracion"> | string | null
+    finanTasaAnual?: DecimalNullableFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: DecimalNullableFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: StringNullableFilter<"Configuracion"> | string | null
+    contactoEyebrow?: StringNullableFilter<"Configuracion"> | string | null
+    contactoTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    contactoTexto?: StringNullableFilter<"Configuracion"> | string | null
+    contactoWhatsappTexto?: StringNullableFilter<"Configuracion"> | string | null
+    footerTexto?: StringNullableFilter<"Configuracion"> | string | null
+    terminosUrl?: StringNullableFilter<"Configuracion"> | string | null
+    privacidadUrl?: StringNullableFilter<"Configuracion"> | string | null
   }
 
   export type ConfiguracionOrderByWithRelationInput = {
@@ -13973,6 +14463,36 @@ export namespace Prisma {
     horariosAtencion?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
     cotizacionDolar?: SortOrderInput | SortOrder
+    logoUrl?: SortOrderInput | SortOrder
+    faviconUrl?: SortOrderInput | SortOrder
+    siteTitle?: SortOrderInput | SortOrder
+    siteDescription?: SortOrderInput | SortOrder
+    heroTitulo?: SortOrderInput | SortOrder
+    heroSubtitulo?: SortOrderInput | SortOrder
+    heroCtaTexto?: SortOrderInput | SortOrder
+    heroCtaUrl?: SortOrderInput | SortOrder
+    heroImagenUrl?: SortOrderInput | SortOrder
+    nosotrosTitulo?: SortOrderInput | SortOrder
+    nosotrosTexto?: SortOrderInput | SortOrder
+    nosotrosMetrica1Valor?: SortOrderInput | SortOrder
+    nosotrosMetrica1Sufijo?: SortOrderInput | SortOrder
+    nosotrosMetrica1Label?: SortOrderInput | SortOrder
+    nosotrosMetrica2Valor?: SortOrderInput | SortOrder
+    nosotrosMetrica2Sufijo?: SortOrderInput | SortOrder
+    nosotrosMetrica2Label?: SortOrderInput | SortOrder
+    finanEyebrow?: SortOrderInput | SortOrder
+    finanTitulo?: SortOrderInput | SortOrder
+    finanTexto?: SortOrderInput | SortOrder
+    finanTasaAnual?: SortOrderInput | SortOrder
+    finanEntregaMinima?: SortOrderInput | SortOrder
+    finanCtaTexto?: SortOrderInput | SortOrder
+    contactoEyebrow?: SortOrderInput | SortOrder
+    contactoTitulo?: SortOrderInput | SortOrder
+    contactoTexto?: SortOrderInput | SortOrder
+    contactoWhatsappTexto?: SortOrderInput | SortOrder
+    footerTexto?: SortOrderInput | SortOrder
+    terminosUrl?: SortOrderInput | SortOrder
+    privacidadUrl?: SortOrderInput | SortOrder
     _relevance?: ConfiguracionOrderByRelevanceInput
   }
 
@@ -13990,6 +14510,36 @@ export namespace Prisma {
     horariosAtencion?: StringNullableFilter<"Configuracion"> | string | null
     updatedAt?: DateTimeFilter<"Configuracion"> | Date | string
     cotizacionDolar?: DecimalNullableFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: StringNullableFilter<"Configuracion"> | string | null
+    faviconUrl?: StringNullableFilter<"Configuracion"> | string | null
+    siteTitle?: StringNullableFilter<"Configuracion"> | string | null
+    siteDescription?: StringNullableFilter<"Configuracion"> | string | null
+    heroTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    heroSubtitulo?: StringNullableFilter<"Configuracion"> | string | null
+    heroCtaTexto?: StringNullableFilter<"Configuracion"> | string | null
+    heroCtaUrl?: StringNullableFilter<"Configuracion"> | string | null
+    heroImagenUrl?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosTexto?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Valor?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Sufijo?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Label?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Valor?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Sufijo?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Label?: StringNullableFilter<"Configuracion"> | string | null
+    finanEyebrow?: StringNullableFilter<"Configuracion"> | string | null
+    finanTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    finanTexto?: StringNullableFilter<"Configuracion"> | string | null
+    finanTasaAnual?: DecimalNullableFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: DecimalNullableFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: StringNullableFilter<"Configuracion"> | string | null
+    contactoEyebrow?: StringNullableFilter<"Configuracion"> | string | null
+    contactoTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    contactoTexto?: StringNullableFilter<"Configuracion"> | string | null
+    contactoWhatsappTexto?: StringNullableFilter<"Configuracion"> | string | null
+    footerTexto?: StringNullableFilter<"Configuracion"> | string | null
+    terminosUrl?: StringNullableFilter<"Configuracion"> | string | null
+    privacidadUrl?: StringNullableFilter<"Configuracion"> | string | null
   }, "id">
 
   export type ConfiguracionOrderByWithAggregationInput = {
@@ -14003,6 +14553,36 @@ export namespace Prisma {
     horariosAtencion?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
     cotizacionDolar?: SortOrderInput | SortOrder
+    logoUrl?: SortOrderInput | SortOrder
+    faviconUrl?: SortOrderInput | SortOrder
+    siteTitle?: SortOrderInput | SortOrder
+    siteDescription?: SortOrderInput | SortOrder
+    heroTitulo?: SortOrderInput | SortOrder
+    heroSubtitulo?: SortOrderInput | SortOrder
+    heroCtaTexto?: SortOrderInput | SortOrder
+    heroCtaUrl?: SortOrderInput | SortOrder
+    heroImagenUrl?: SortOrderInput | SortOrder
+    nosotrosTitulo?: SortOrderInput | SortOrder
+    nosotrosTexto?: SortOrderInput | SortOrder
+    nosotrosMetrica1Valor?: SortOrderInput | SortOrder
+    nosotrosMetrica1Sufijo?: SortOrderInput | SortOrder
+    nosotrosMetrica1Label?: SortOrderInput | SortOrder
+    nosotrosMetrica2Valor?: SortOrderInput | SortOrder
+    nosotrosMetrica2Sufijo?: SortOrderInput | SortOrder
+    nosotrosMetrica2Label?: SortOrderInput | SortOrder
+    finanEyebrow?: SortOrderInput | SortOrder
+    finanTitulo?: SortOrderInput | SortOrder
+    finanTexto?: SortOrderInput | SortOrder
+    finanTasaAnual?: SortOrderInput | SortOrder
+    finanEntregaMinima?: SortOrderInput | SortOrder
+    finanCtaTexto?: SortOrderInput | SortOrder
+    contactoEyebrow?: SortOrderInput | SortOrder
+    contactoTitulo?: SortOrderInput | SortOrder
+    contactoTexto?: SortOrderInput | SortOrder
+    contactoWhatsappTexto?: SortOrderInput | SortOrder
+    footerTexto?: SortOrderInput | SortOrder
+    terminosUrl?: SortOrderInput | SortOrder
+    privacidadUrl?: SortOrderInput | SortOrder
     _count?: ConfiguracionCountOrderByAggregateInput
     _avg?: ConfiguracionAvgOrderByAggregateInput
     _max?: ConfiguracionMaxOrderByAggregateInput
@@ -14024,6 +14604,36 @@ export namespace Prisma {
     horariosAtencion?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"Configuracion"> | Date | string
     cotizacionDolar?: DecimalNullableWithAggregatesFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    faviconUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    siteTitle?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    siteDescription?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    heroTitulo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    heroSubtitulo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    heroCtaTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    heroCtaUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    heroImagenUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosTitulo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Valor?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Sufijo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Label?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Valor?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Sufijo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Label?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    finanEyebrow?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    finanTitulo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    finanTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    finanTasaAnual?: DecimalNullableWithAggregatesFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: DecimalNullableWithAggregatesFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    contactoEyebrow?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    contactoTitulo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    contactoTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    contactoWhatsappTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    footerTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    terminosUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    privacidadUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
   }
 
   export type PlanFinanciacionWhereInput = {
@@ -14541,6 +15151,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -14567,6 +15178,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -14591,6 +15203,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14617,6 +15230,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14642,6 +15256,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -14663,6 +15278,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14685,6 +15301,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14861,6 +15478,36 @@ export namespace Prisma {
     horariosAtencion?: string | null
     updatedAt?: Date | string
     cotizacionDolar?: Decimal | DecimalJsLike | number | string | null
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    siteTitle?: string | null
+    siteDescription?: string | null
+    heroTitulo?: string | null
+    heroSubtitulo?: string | null
+    heroCtaTexto?: string | null
+    heroCtaUrl?: string | null
+    heroImagenUrl?: string | null
+    nosotrosTitulo?: string | null
+    nosotrosTexto?: string | null
+    nosotrosMetrica1Valor?: string | null
+    nosotrosMetrica1Sufijo?: string | null
+    nosotrosMetrica1Label?: string | null
+    nosotrosMetrica2Valor?: string | null
+    nosotrosMetrica2Sufijo?: string | null
+    nosotrosMetrica2Label?: string | null
+    finanEyebrow?: string | null
+    finanTitulo?: string | null
+    finanTexto?: string | null
+    finanTasaAnual?: Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: string | null
+    contactoEyebrow?: string | null
+    contactoTitulo?: string | null
+    contactoTexto?: string | null
+    contactoWhatsappTexto?: string | null
+    footerTexto?: string | null
+    terminosUrl?: string | null
+    privacidadUrl?: string | null
   }
 
   export type ConfiguracionUncheckedCreateInput = {
@@ -14874,6 +15521,36 @@ export namespace Prisma {
     horariosAtencion?: string | null
     updatedAt?: Date | string
     cotizacionDolar?: Decimal | DecimalJsLike | number | string | null
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    siteTitle?: string | null
+    siteDescription?: string | null
+    heroTitulo?: string | null
+    heroSubtitulo?: string | null
+    heroCtaTexto?: string | null
+    heroCtaUrl?: string | null
+    heroImagenUrl?: string | null
+    nosotrosTitulo?: string | null
+    nosotrosTexto?: string | null
+    nosotrosMetrica1Valor?: string | null
+    nosotrosMetrica1Sufijo?: string | null
+    nosotrosMetrica1Label?: string | null
+    nosotrosMetrica2Valor?: string | null
+    nosotrosMetrica2Sufijo?: string | null
+    nosotrosMetrica2Label?: string | null
+    finanEyebrow?: string | null
+    finanTitulo?: string | null
+    finanTexto?: string | null
+    finanTasaAnual?: Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: string | null
+    contactoEyebrow?: string | null
+    contactoTitulo?: string | null
+    contactoTexto?: string | null
+    contactoWhatsappTexto?: string | null
+    footerTexto?: string | null
+    terminosUrl?: string | null
+    privacidadUrl?: string | null
   }
 
   export type ConfiguracionUpdateInput = {
@@ -14887,6 +15564,36 @@ export namespace Prisma {
     horariosAtencion?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cotizacionDolar?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    siteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    siteDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    heroTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroSubtitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    heroImagenUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Label?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Label?: NullableStringFieldUpdateOperationsInput | string | null
+    finanEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTasaAnual?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoWhatsappTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    footerTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    terminosUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    privacidadUrl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ConfiguracionUncheckedUpdateInput = {
@@ -14900,6 +15607,36 @@ export namespace Prisma {
     horariosAtencion?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cotizacionDolar?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    siteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    siteDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    heroTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroSubtitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    heroImagenUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Label?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Label?: NullableStringFieldUpdateOperationsInput | string | null
+    finanEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTasaAnual?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoWhatsappTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    footerTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    terminosUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    privacidadUrl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ConfiguracionCreateManyInput = {
@@ -14913,6 +15650,36 @@ export namespace Prisma {
     horariosAtencion?: string | null
     updatedAt?: Date | string
     cotizacionDolar?: Decimal | DecimalJsLike | number | string | null
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    siteTitle?: string | null
+    siteDescription?: string | null
+    heroTitulo?: string | null
+    heroSubtitulo?: string | null
+    heroCtaTexto?: string | null
+    heroCtaUrl?: string | null
+    heroImagenUrl?: string | null
+    nosotrosTitulo?: string | null
+    nosotrosTexto?: string | null
+    nosotrosMetrica1Valor?: string | null
+    nosotrosMetrica1Sufijo?: string | null
+    nosotrosMetrica1Label?: string | null
+    nosotrosMetrica2Valor?: string | null
+    nosotrosMetrica2Sufijo?: string | null
+    nosotrosMetrica2Label?: string | null
+    finanEyebrow?: string | null
+    finanTitulo?: string | null
+    finanTexto?: string | null
+    finanTasaAnual?: Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: string | null
+    contactoEyebrow?: string | null
+    contactoTitulo?: string | null
+    contactoTexto?: string | null
+    contactoWhatsappTexto?: string | null
+    footerTexto?: string | null
+    terminosUrl?: string | null
+    privacidadUrl?: string | null
   }
 
   export type ConfiguracionUpdateManyMutationInput = {
@@ -14926,6 +15693,36 @@ export namespace Prisma {
     horariosAtencion?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cotizacionDolar?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    siteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    siteDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    heroTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroSubtitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    heroImagenUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Label?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Label?: NullableStringFieldUpdateOperationsInput | string | null
+    finanEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTasaAnual?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoWhatsappTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    footerTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    terminosUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    privacidadUrl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ConfiguracionUncheckedUpdateManyInput = {
@@ -14939,6 +15736,36 @@ export namespace Prisma {
     horariosAtencion?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cotizacionDolar?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    siteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    siteDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    heroTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroSubtitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    heroImagenUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Label?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Label?: NullableStringFieldUpdateOperationsInput | string | null
+    finanEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTasaAnual?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoWhatsappTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    footerTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    terminosUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    privacidadUrl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PlanFinanciacionCreateInput = {
@@ -15547,6 +16374,13 @@ export namespace Prisma {
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
   }
 
+  export type EnumMonedaFilter<$PrismaModel = never> = {
+    equals?: $Enums.Moneda | EnumMonedaFieldRefInput<$PrismaModel>
+    in?: $Enums.Moneda[]
+    notIn?: $Enums.Moneda[]
+    not?: NestedEnumMonedaFilter<$PrismaModel> | $Enums.Moneda
+  }
+
   export type EnumTransmisionNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.Transmision | EnumTransmisionFieldRefInput<$PrismaModel> | null
     in?: $Enums.Transmision[] | null
@@ -15618,6 +16452,7 @@ export namespace Prisma {
     version?: SortOrder
     estado?: SortOrder
     precio?: SortOrder
+    moneda?: SortOrder
     kilometraje?: SortOrder
     color?: SortOrder
     motor?: SortOrder
@@ -15648,6 +16483,7 @@ export namespace Prisma {
     version?: SortOrder
     estado?: SortOrder
     precio?: SortOrder
+    moneda?: SortOrder
     kilometraje?: SortOrder
     color?: SortOrder
     motor?: SortOrder
@@ -15670,6 +16506,7 @@ export namespace Prisma {
     version?: SortOrder
     estado?: SortOrder
     precio?: SortOrder
+    moneda?: SortOrder
     kilometraje?: SortOrder
     color?: SortOrder
     motor?: SortOrder
@@ -15731,6 +16568,16 @@ export namespace Prisma {
     _sum?: NestedDecimalFilter<$PrismaModel>
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type EnumMonedaWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Moneda | EnumMonedaFieldRefInput<$PrismaModel>
+    in?: $Enums.Moneda[]
+    notIn?: $Enums.Moneda[]
+    not?: NestedEnumMonedaWithAggregatesFilter<$PrismaModel> | $Enums.Moneda
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMonedaFilter<$PrismaModel>
+    _max?: NestedEnumMonedaFilter<$PrismaModel>
   }
 
   export type EnumTransmisionNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -15917,10 +16764,42 @@ export namespace Prisma {
     horariosAtencion?: SortOrder
     updatedAt?: SortOrder
     cotizacionDolar?: SortOrder
+    logoUrl?: SortOrder
+    faviconUrl?: SortOrder
+    siteTitle?: SortOrder
+    siteDescription?: SortOrder
+    heroTitulo?: SortOrder
+    heroSubtitulo?: SortOrder
+    heroCtaTexto?: SortOrder
+    heroCtaUrl?: SortOrder
+    heroImagenUrl?: SortOrder
+    nosotrosTitulo?: SortOrder
+    nosotrosTexto?: SortOrder
+    nosotrosMetrica1Valor?: SortOrder
+    nosotrosMetrica1Sufijo?: SortOrder
+    nosotrosMetrica1Label?: SortOrder
+    nosotrosMetrica2Valor?: SortOrder
+    nosotrosMetrica2Sufijo?: SortOrder
+    nosotrosMetrica2Label?: SortOrder
+    finanEyebrow?: SortOrder
+    finanTitulo?: SortOrder
+    finanTexto?: SortOrder
+    finanTasaAnual?: SortOrder
+    finanEntregaMinima?: SortOrder
+    finanCtaTexto?: SortOrder
+    contactoEyebrow?: SortOrder
+    contactoTitulo?: SortOrder
+    contactoTexto?: SortOrder
+    contactoWhatsappTexto?: SortOrder
+    footerTexto?: SortOrder
+    terminosUrl?: SortOrder
+    privacidadUrl?: SortOrder
   }
 
   export type ConfiguracionAvgOrderByAggregateInput = {
     cotizacionDolar?: SortOrder
+    finanTasaAnual?: SortOrder
+    finanEntregaMinima?: SortOrder
   }
 
   export type ConfiguracionMaxOrderByAggregateInput = {
@@ -15934,6 +16813,36 @@ export namespace Prisma {
     horariosAtencion?: SortOrder
     updatedAt?: SortOrder
     cotizacionDolar?: SortOrder
+    logoUrl?: SortOrder
+    faviconUrl?: SortOrder
+    siteTitle?: SortOrder
+    siteDescription?: SortOrder
+    heroTitulo?: SortOrder
+    heroSubtitulo?: SortOrder
+    heroCtaTexto?: SortOrder
+    heroCtaUrl?: SortOrder
+    heroImagenUrl?: SortOrder
+    nosotrosTitulo?: SortOrder
+    nosotrosTexto?: SortOrder
+    nosotrosMetrica1Valor?: SortOrder
+    nosotrosMetrica1Sufijo?: SortOrder
+    nosotrosMetrica1Label?: SortOrder
+    nosotrosMetrica2Valor?: SortOrder
+    nosotrosMetrica2Sufijo?: SortOrder
+    nosotrosMetrica2Label?: SortOrder
+    finanEyebrow?: SortOrder
+    finanTitulo?: SortOrder
+    finanTexto?: SortOrder
+    finanTasaAnual?: SortOrder
+    finanEntregaMinima?: SortOrder
+    finanCtaTexto?: SortOrder
+    contactoEyebrow?: SortOrder
+    contactoTitulo?: SortOrder
+    contactoTexto?: SortOrder
+    contactoWhatsappTexto?: SortOrder
+    footerTexto?: SortOrder
+    terminosUrl?: SortOrder
+    privacidadUrl?: SortOrder
   }
 
   export type ConfiguracionMinOrderByAggregateInput = {
@@ -15947,10 +16856,42 @@ export namespace Prisma {
     horariosAtencion?: SortOrder
     updatedAt?: SortOrder
     cotizacionDolar?: SortOrder
+    logoUrl?: SortOrder
+    faviconUrl?: SortOrder
+    siteTitle?: SortOrder
+    siteDescription?: SortOrder
+    heroTitulo?: SortOrder
+    heroSubtitulo?: SortOrder
+    heroCtaTexto?: SortOrder
+    heroCtaUrl?: SortOrder
+    heroImagenUrl?: SortOrder
+    nosotrosTitulo?: SortOrder
+    nosotrosTexto?: SortOrder
+    nosotrosMetrica1Valor?: SortOrder
+    nosotrosMetrica1Sufijo?: SortOrder
+    nosotrosMetrica1Label?: SortOrder
+    nosotrosMetrica2Valor?: SortOrder
+    nosotrosMetrica2Sufijo?: SortOrder
+    nosotrosMetrica2Label?: SortOrder
+    finanEyebrow?: SortOrder
+    finanTitulo?: SortOrder
+    finanTexto?: SortOrder
+    finanTasaAnual?: SortOrder
+    finanEntregaMinima?: SortOrder
+    finanCtaTexto?: SortOrder
+    contactoEyebrow?: SortOrder
+    contactoTitulo?: SortOrder
+    contactoTexto?: SortOrder
+    contactoWhatsappTexto?: SortOrder
+    footerTexto?: SortOrder
+    terminosUrl?: SortOrder
+    privacidadUrl?: SortOrder
   }
 
   export type ConfiguracionSumOrderByAggregateInput = {
     cotizacionDolar?: SortOrder
+    finanTasaAnual?: SortOrder
+    finanEntregaMinima?: SortOrder
   }
 
   export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -16334,6 +17275,10 @@ export namespace Prisma {
     divide?: Decimal | DecimalJsLike | number | string
   }
 
+  export type EnumMonedaFieldUpdateOperationsInput = {
+    set?: $Enums.Moneda
+  }
+
   export type NullableEnumTransmisionFieldUpdateOperationsInput = {
     set?: $Enums.Transmision | null
   }
@@ -16700,6 +17645,13 @@ export namespace Prisma {
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
   }
 
+  export type NestedEnumMonedaFilter<$PrismaModel = never> = {
+    equals?: $Enums.Moneda | EnumMonedaFieldRefInput<$PrismaModel>
+    in?: $Enums.Moneda[]
+    notIn?: $Enums.Moneda[]
+    not?: NestedEnumMonedaFilter<$PrismaModel> | $Enums.Moneda
+  }
+
   export type NestedEnumTransmisionNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.Transmision | EnumTransmisionFieldRefInput<$PrismaModel> | null
     in?: $Enums.Transmision[] | null
@@ -16772,6 +17724,16 @@ export namespace Prisma {
     _sum?: NestedDecimalFilter<$PrismaModel>
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type NestedEnumMonedaWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Moneda | EnumMonedaFieldRefInput<$PrismaModel>
+    in?: $Enums.Moneda[]
+    notIn?: $Enums.Moneda[]
+    not?: NestedEnumMonedaWithAggregatesFilter<$PrismaModel> | $Enums.Moneda
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMonedaFilter<$PrismaModel>
+    _max?: NestedEnumMonedaFilter<$PrismaModel>
   }
 
   export type NestedEnumTransmisionNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -17125,6 +18087,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -17149,6 +18112,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -17203,6 +18167,7 @@ export namespace Prisma {
     version?: StringNullableFilter<"Vehiculo"> | string | null
     estado?: EnumEstadoVehiculoFilter<"Vehiculo"> | $Enums.EstadoVehiculo
     precio?: DecimalFilter<"Vehiculo"> | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFilter<"Vehiculo"> | $Enums.Moneda
     kilometraje?: IntFilter<"Vehiculo"> | number
     color?: StringNullableFilter<"Vehiculo"> | string | null
     motor?: StringNullableFilter<"Vehiculo"> | string | null
@@ -17466,6 +18431,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -17491,6 +18457,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -17530,6 +18497,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17555,6 +18523,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17578,6 +18547,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -17603,6 +18573,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -17642,6 +18613,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17667,6 +18639,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17690,6 +18663,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -17715,6 +18689,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -17754,6 +18729,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17779,6 +18755,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17882,6 +18859,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -17903,6 +18881,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17927,6 +18906,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17951,6 +18931,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null

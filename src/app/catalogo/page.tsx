@@ -1,14 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma, Transmision, Combustible } from "../../../generated/prisma";
+import { Prisma, Transmision, Combustible, EstadoVehiculo } from "../../../generated/prisma";
 import { auth } from "@/auth";
 import { CatalogoClient } from "./CatalogoClient";
-import { 
-  getCachedMarcas, 
-  getCachedCombustibles, 
-  getCachedAnioRange, 
-  getCachedCategorias 
-} from "@/services/cache.service";
-import { getConfiguracion } from "@/actions/configuracion";
+import { getCachedFiltrosCatalogo, getCachedCategorias } from "@/services/cache.service";
+import { getConfiguracion } from "@/services/configuracion.service";
+import { precioEnPesos } from "@/lib/precio";
+import { whatsappUrl } from "@/lib/whatsapp";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -25,11 +22,10 @@ const SORT_OPTIONS = [
 
 type SortValue = typeof SORT_OPTIONS[number]["value"];
 
+/** El orden por precio no pasa por acá: se resuelve en pesos más abajo. */
 function getOrderBy(sort: SortValue): Prisma.VehiculoOrderByWithRelationInput {
   switch (sort) {
     case "oldest":     return { createdAt: "asc" };
-    case "price_asc":  return { precio: "asc" };
-    case "price_desc": return { precio: "desc" };
     case "km_asc":     return { kilometraje: "asc" };
     case "km_desc":    return { kilometraje: "desc" };
     case "year_desc":  return { anio: "desc" };
@@ -52,6 +48,10 @@ export default async function CatalogoPage({
     val ? (Array.isArray(val) ? val : [val]) : [];
 
   const marcasArray       = toArray(params.marca);
+  const categoriasArray   = toArray(params.categoria);
+  const estadosArray      = toArray(params.estado).filter((e) =>
+    Object.keys(EstadoVehiculo).includes(e)
+  ) as EstadoVehiculo[];
   const transmisionesArray = toArray(params.transmision).filter((t) =>
     Object.keys(Transmision).includes(t)
   ) as Transmision[];
@@ -70,6 +70,8 @@ export default async function CatalogoPage({
   };
 
   if (marcasArray.length > 0)       where.marca = { in: marcasArray };
+  if (categoriasArray.length > 0)   where.categoria = { slug: { in: categoriasArray } };
+  if (estadosArray.length > 0)      where.estado = { in: estadosArray };
   if (transmisionesArray.length > 0) where.transmision = { in: transmisionesArray };
   if (combustiblesArray.length > 0)  where.combustible = { in: combustiblesArray };
   if (anioDesde || anioHasta) {
@@ -79,32 +81,84 @@ export default async function CatalogoPage({
     };
   }
 
+  const configuracion = await getConfiguracion();
+
+  /**
+   * Cada vehículo guarda su precio en la moneda que eligió el administrador,
+   * así que ordenar por la columna `precio` mezclaría pesos con dólares.
+   * Para esos dos criterios pasamos todo a pesos y paginamos en memoria.
+   */
+  const ordenaPorPrecio = sort === "price_asc" || sort === "price_desc";
+  let idsDeLaPagina: string[] | null = null;
+
+  if (ordenaPorPrecio) {
+    const candidatos = await prisma.vehiculo.findMany({
+      where,
+      select: { id: true, precio: true, moneda: true },
+    });
+
+    idsDeLaPagina = candidatos
+      .map((v) => ({
+        id: v.id,
+        precioArs:
+          precioEnPesos(Number(v.precio), v.moneda, configuracion.cotizacionDolar) ??
+          Number(v.precio),
+      }))
+      .sort((a, b) =>
+        sort === "price_asc" ? a.precioArs - b.precioArs : b.precioArs - a.precioArs,
+      )
+      .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+      .map((v) => v.id);
+  }
+
   const [totalCount, rawVehiculos] = await Promise.all([
     prisma.vehiculo.count({ where }),
     prisma.vehiculo.findMany({
-      where,
+      where: idsDeLaPagina ? { id: { in: idsDeLaPagina } } : where,
       include: {
         imagenes: { orderBy: { orden: "asc" } },
       },
-      orderBy: getOrderBy(sort),
-      skip:  (currentPage - 1) * ITEMS_PER_PAGE,
-      take:  ITEMS_PER_PAGE,
+      ...(idsDeLaPagina
+        ? {}
+        : {
+            orderBy: getOrderBy(sort),
+            skip: (currentPage - 1) * ITEMS_PER_PAGE,
+            take: ITEMS_PER_PAGE,
+          }),
     }),
   ]);
 
-  const vehiculos = rawVehiculos.map((v) => ({
+  const ordenados = idsDeLaPagina
+    ? idsDeLaPagina
+        .map((id) => rawVehiculos.find((v) => v.id === id))
+        .filter((v) => v !== undefined)
+    : rawVehiculos;
+
+  const vehiculos = ordenados.map((v) => ({
     ...v,
     precio: Number(v.precio),
   }));
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
-  const [marcasDisponibles, combustiblesDisponibles, { anioMin, anioMax }, configuracion] = await Promise.all([
-    getCachedMarcas(),
-    getCachedCombustibles(),
-    getCachedAnioRange(),
-    getConfiguracion(),
-  ]);
+  /**
+   * Banner de cierre: los dos botones abren WhatsApp con el número de la
+   * concesionaria y un mensaje distinto según lo que el cliente esté buscando.
+   */
+  const whatsapp = {
+    importacion: whatsappUrl(
+      configuracion.telefono,
+      `Hola, no encontré lo que busco en el catálogo de ${configuracion.nombreConcesionaria}. ¿Pueden conseguirme un vehículo?`,
+    ),
+    asesor: whatsappUrl(
+      configuracion.telefono,
+      `Hola, estoy viendo el catálogo de ${configuracion.nombreConcesionaria} y me gustaría hablar con un asesor.`,
+    ),
+  };
+
+  // Las opciones salen del stock real. Al administrador se le ofrecen también
+  // las de los borradores, que es lo que ve listado más arriba.
+  const filtros = await getCachedFiltrosCatalogo(isAdmin);
 
   let categorias: { id: string; nombre: string }[] = [];
   if (isAdmin) {
@@ -115,10 +169,7 @@ export default async function CatalogoPage({
     <CatalogoClient 
       vehiculos={vehiculos}
       cotizacionDolar={configuracion?.cotizacionDolar}
-      marcasDisponibles={marcasDisponibles}
-      combustiblesDisponibles={combustiblesDisponibles}
-      anioMin={anioMin}
-      anioMax={anioMax}
+      filtros={filtros}
       categorias={categorias}
       isAdmin={isAdmin}
       totalCount={totalCount}
@@ -128,10 +179,13 @@ export default async function CatalogoPage({
       sort={sort}
       SORT_OPTIONS={SORT_OPTIONS}
       marcasArray={marcasArray}
+      categoriasArray={categoriasArray}
+      estadosArray={estadosArray}
       transmisionesArray={transmisionesArray}
       combustiblesArray={combustiblesArray}
       anioDesde={anioDesde}
       anioHasta={anioHasta}
+      whatsapp={whatsapp}
     />
   );
 }

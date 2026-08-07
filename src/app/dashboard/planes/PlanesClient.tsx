@@ -29,9 +29,8 @@ export const PlanesClient = ({ planes }: { planes: any[] }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--background))] pt-16 pb-8">
+    <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-8">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
-        
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#b5000b] mb-1">
@@ -55,46 +54,70 @@ export const PlanesClient = ({ planes }: { planes: any[] }) => {
             <table className="w-full text-sm">
               <thead className="bg-[#f3f3f6]">
                 <tr className="border-b border-[#e5e7eb]">
-                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Nombre</th>
-                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Cuotas</th>
-                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Tasa Anual (TNA)</th>
-                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Estado</th>
-                  <th className="text-right py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Acciones</th>
+                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">
+                    Nombre
+                  </th>
+                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">
+                    Cuotas
+                  </th>
+                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">
+                    Tasa Anual (TNA)
+                  </th>
+                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">
+                    Estado
+                  </th>
+                  <th className="text-right py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {planes.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-10 text-[hsl(var(--muted-foreground))] text-sm italic">
+                    <td
+                      colSpan={5}
+                      className="text-center py-10 text-[hsl(var(--muted-foreground))] text-sm italic"
+                    >
                       No hay planes configurados
                     </td>
                   </tr>
                 ) : (
                   planes.map((p) => (
-                    <tr key={p.id} className="border-b border-[#e5e7eb]/50 hover:bg-[hsl(var(--surface-low))] transition-colors">
-                      <td className="py-3 px-4 font-bold text-[hsl(var(--foreground))]">{p.nombre}</td>
-                      <td className="py-3 px-4 text-[hsl(var(--muted-foreground))]">{p.cuotas}</td>
-                      <td className="py-3 px-4 text-[hsl(var(--muted-foreground))]">{p.tasaAnual}%</td>
+                    <tr
+                      key={p.id}
+                      className="border-b border-[#e5e7eb]/50 hover:bg-[hsl(var(--surface-low))] transition-colors"
+                    >
+                      <td className="py-3 px-4 font-bold text-[hsl(var(--foreground))]">
+                        {p.nombre}
+                      </td>
+                      <td className="py-3 px-4 text-[hsl(var(--muted-foreground))]">
+                        {p.cuotas}
+                      </td>
+                      <td className="py-3 px-4 text-[hsl(var(--muted-foreground))]">
+                        {p.tasaAnual}%
+                      </td>
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-sm ${
-                          p.activo 
-                            ? "bg-green-100 text-green-700" 
-                            : "bg-gray-100 text-gray-500"
-                        }`}>
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-sm ${
+                            p.activo
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-500"
+                          }`}
+                        >
                           {p.activo ? "Activo" : "Inactivo"}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button 
-                            onClick={() => handleOpenEdit(p)} 
+                          <button
+                            onClick={() => handleOpenEdit(p)}
                             disabled={isPending}
                             className="p-2 rounded text-[hsl(var(--muted-foreground))] hover:text-[#b5000b] hover:bg-red-50 transition-colors disabled:opacity-50"
                           >
                             <Edit2 size={16} />
                           </button>
-                          <button 
-                            onClick={() => handleDelete(p.id)} 
+                          <button
+                            onClick={() => handleDelete(p.id)}
                             disabled={isPending}
                             className="p-2 rounded text-[hsl(var(--muted-foreground))] hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
                           >
@@ -113,19 +136,22 @@ export const PlanesClient = ({ planes }: { planes: any[] }) => {
         {/* Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div 
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
-              onClick={() => setIsModalOpen(false)} 
+            <div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setIsModalOpen(false)}
             />
             <div className="relative bg-white rounded-lg shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden">
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 className="absolute right-4 top-4 z-10 p-2 text-[hsl(var(--muted-foreground))] hover:text-[#b5000b] hover:bg-red-50 rounded-full transition-colors"
               >
                 <X size={20} />
               </button>
               <div className="overflow-y-auto">
-                <PlanForm initialData={editingPlan} onSuccess={() => setIsModalOpen(false)} />
+                <PlanForm
+                  initialData={editingPlan}
+                  onSuccess={() => setIsModalOpen(false)}
+                />
               </div>
             </div>
           </div>

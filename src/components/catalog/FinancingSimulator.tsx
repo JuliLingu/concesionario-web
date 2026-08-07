@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Calculator } from "lucide-react";
 import { FinancingForm } from "./FinancingForm";
+import { formatArs } from "@/lib/precio";
 
 interface Plan {
   id: string;
@@ -13,14 +14,12 @@ interface Plan {
 
 interface FinancingSimulatorProps {
   vehiculoId: string;
-  precioOriginal: number;
-  cotizacionDolar?: number | null;
+  /** El vehículo puede estar cargado en dólares; acá siempre llega convertido a pesos. */
+  precioArs: number;
   planes: Plan[];
 }
 
-export const FinancingSimulator = ({ vehiculoId, precioOriginal, cotizacionDolar, planes }: FinancingSimulatorProps) => {
-  const precioArs = cotizacionDolar ? precioOriginal * cotizacionDolar : precioOriginal;
-  
+export const FinancingSimulator = ({ vehiculoId, precioArs, planes }: FinancingSimulatorProps) => {
   const [anticipoPercent, setAnticipoPercent] = useState<number>(50);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(planes.length > 0 ? planes[0].id : null);
   const [showForm, setShowForm] = useState(false);
@@ -42,9 +41,6 @@ export const FinancingSimulator = ({ vehiculoId, precioOriginal, cotizacionDolar
     return null; // No financing available
   }
 
-  const formatCurrency = (val: number) => 
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(val);
-
   return (
     <div className="bg-[hsl(var(--surface-low))] border border-black/5 rounded-lg overflow-hidden">
       <div className="p-6 md:p-8">
@@ -64,7 +60,7 @@ export const FinancingSimulator = ({ vehiculoId, precioOriginal, cotizacionDolar
                 Tu Anticipo ({anticipoPercent}%)
               </span>
               <span className="text-sm font-black text-[hsl(var(--foreground))]">
-                {formatCurrency(anticipoArs)}
+                {formatArs(anticipoArs)}
               </span>
             </div>
             <input
@@ -104,7 +100,7 @@ export const FinancingSimulator = ({ vehiculoId, precioOriginal, cotizacionDolar
               Cuota Fija Mensual
             </div>
             <div className="text-5xl font-black tracking-[-0.05em] text-[hsl(var(--foreground))] leading-none">
-              {formatCurrency(cuotaMensual)}
+              {formatArs(cuotaMensual)}
             </div>
             <div className="text-xs text-[hsl(var(--muted-foreground))] font-medium mt-3">
               TNA: {selectedPlan?.tasaAnual}% (Interés Simple)

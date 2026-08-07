@@ -4,24 +4,35 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { auth } from "@/auth";
+import { getConfiguracion } from "@/services/configuracion.service";
 
 
-const spaceGrotesk = Space_Grotesk({ 
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: '--font-space',
 });
 
-const manrope = Manrope({ 
+const manrope = Manrope({
   subsets: ["latin"],
   variable: '--font-manrope',
 });
 
-export const metadata: Metadata = {
-  title: "JBJ Automotores | The Kinetic Gallery",
-  description: "Una experiencia automotriz editorial y premium.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const configuracion = await getConfiguracion();
 
-import { getConfiguracion } from "@/actions/configuracion";
+  return {
+    title: configuracion.siteTitle,
+    description: configuracion.siteDescription,
+    // Solo se declara si el administrador cargó uno. Ojo: un archivo
+    // app/icon.* o app/favicon.ico tendría prioridad sobre esto.
+    ...(configuracion.faviconUrl && {
+      icons: {
+        icon: configuracion.faviconUrl,
+        apple: configuracion.faviconUrl,
+      },
+    }),
+  };
+}
 
 export default async function RootLayout({
   children,

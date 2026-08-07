@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { getConfiguracion } from "@/services/configuracion.service";
 
 interface EditVehiclePageProps {
   params: Promise<{ id: string }>;
@@ -31,10 +32,13 @@ export default async function EditVehiclePage({ params }: EditVehiclePageProps) 
     notFound();
   }
 
-  const categorias = await prisma.categoria.findMany({
-    select: { id: true, nombre: true },
-    orderBy: { nombre: "asc" },
-  });
+  const [categorias, configuracion] = await Promise.all([
+    prisma.categoria.findMany({
+      select: { id: true, nombre: true },
+      orderBy: { nombre: "asc" },
+    }),
+    getConfiguracion(),
+  ]);
 
   // Serialize Decimal to number to avoid Next.js serialization error
   const initialData = {
@@ -43,7 +47,7 @@ export default async function EditVehiclePage({ params }: EditVehiclePageProps) 
   };
 
   return (
-    <div className="max-w-5xl mx-auto pt-32 pb-16 px-6 min-h-screen">
+    <div className="max-w-5xl mx-auto pt-header pb-16 px-6 min-h-screen">
       <div className="mb-10">
         <Link
           href="/dashboard/vehicles"
@@ -58,7 +62,7 @@ export default async function EditVehiclePage({ params }: EditVehiclePageProps) 
           {vehiculo.marca} {vehiculo.modelo} — {vehiculo.anio}
         </p>
       </div>
-      <VehicleForm categorias={categorias} initialData={initialData} />
+      <VehicleForm categorias={categorias} initialData={initialData} cotizacionDolar={configuracion.cotizacionDolar} />
     </div>
   );
 }

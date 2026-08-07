@@ -38,7 +38,7 @@ export const RegisterForm = () => {
       {/* Name */}
       <div className="flex flex-col gap-1.5">
         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
-          Full Name
+          Nombre y Apellido
         </label>
         <input
           {...form.register("name")}
@@ -54,7 +54,7 @@ export const RegisterForm = () => {
       {/* Email */}
       <div className="flex flex-col gap-1.5">
         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
-          Email Address
+          Correo Electrónico
         </label>
         <input
           {...form.register("email")}
@@ -71,7 +71,7 @@ export const RegisterForm = () => {
       {/* Password */}
       <div className="flex flex-col gap-1.5">
         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
-          Secure Password
+          Contraseña
         </label>
         <input
           {...form.register("password")}
@@ -106,7 +106,7 @@ export const RegisterForm = () => {
         {isPending ? (
           <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         ) : (
-          "Join the Gallery"
+          "Registrarse"
         )}
       </button>
 

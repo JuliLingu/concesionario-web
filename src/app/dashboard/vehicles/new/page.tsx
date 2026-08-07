@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { NewVehicleClient } from "./NewVehicleClient";
+import { getConfiguracion } from "@/services/configuracion.service";
 
 export default async function NewVehiclePage() {
   const session = await auth();
@@ -10,10 +11,13 @@ export default async function NewVehiclePage() {
     redirect("/");
   }
 
-  const categorias = await prisma.categoria.findMany({
-    select:  { id: true, nombre: true },
-    orderBy: { nombre: "asc" },
-  });
+  const [categorias, configuracion] = await Promise.all([
+    prisma.categoria.findMany({
+      select:  { id: true, nombre: true },
+      orderBy: { nombre: "asc" },
+    }),
+    getConfiguracion(),
+  ]);
 
-  return <NewVehicleClient categorias={categorias} />;
+  return <NewVehicleClient categorias={categorias} cotizacionDolar={configuracion.cotizacionDolar} />;
 }

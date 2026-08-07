@@ -3,20 +3,25 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
+import type { FiltrosCatalogo } from "@/services/cache.service";
 
 interface CatalogFiltersProps {
-  marcasDisponibles: string[];
-  combustiblesDisponibles: string[];
-  anioMin: number;
-  anioMax: number;
+  /** Opciones derivadas del stock: ver getCachedFiltrosCatalogo. */
+  filtros: FiltrosCatalogo;
 }
 
-export const CatalogFilters = ({
-  marcasDisponibles,
-  combustiblesDisponibles,
-  anioMin,
-  anioMax,
-}: CatalogFiltersProps) => {
+/** Etiquetas legibles de los enums; el resto se muestra capitalizado. */
+const LABEL_TRANSMISION: Record<string, string> = {
+  AUTOMATICA: "Automática",
+  MANUAL: "Manual",
+  CVT: "CVT",
+};
+
+const capitalizar = (valor: string) =>
+  valor.charAt(0) + valor.slice(1).toLowerCase();
+
+export const CatalogFilters = ({ filtros }: CatalogFiltersProps) => {
+  const { marcas, categorias, estados, transmisiones, combustibles, anios } = filtros;
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -59,21 +64,23 @@ export const CatalogFilters = ({
 
   // ── Read current state ────────────────────────────────────────────────
   const currentMarcas = searchParams.getAll("marca");
+  const currentCategorias = searchParams.getAll("categoria");
+  const currentEstados = searchParams.getAll("estado");
   const currentTransmisiones = searchParams.getAll("transmision");
   const currentCombustibles = searchParams.getAll("combustible");
   const currentAnioDesde = searchParams.get("anioDesde") || "";
   const currentAnioHasta = searchParams.get("anioHasta") || "";
 
-  const hasFilters =
-    currentMarcas.length > 0 ||
-    currentTransmisiones.length > 0 ||
-    currentCombustibles.length > 0 ||
-    currentAnioDesde ||
-    currentAnioHasta;
+  const cantidadFiltros =
+    currentMarcas.length +
+    currentCategorias.length +
+    currentEstados.length +
+    currentTransmisiones.length +
+    currentCombustibles.length +
+    (currentAnioDesde ? 1 : 0) +
+    (currentAnioHasta ? 1 : 0);
 
-  // Year options
-  const years: number[] = [];
-  for (let y = anioMax; y >= anioMin; y--) years.push(y);
+  const hasFilters = cantidadFiltros > 0;
 
   return (
     <div
@@ -90,11 +97,7 @@ export const CatalogFilters = ({
           </span>
           {hasFilters && (
             <div className="w-5 h-5 rounded-full bg-[#b5000b] text-white text-[9px] font-black flex items-center justify-center">
-              {currentMarcas.length +
-                currentTransmisiones.length +
-                currentCombustibles.length +
-                (currentAnioDesde ? 1 : 0) +
-                (currentAnioHasta ? 1 : 0)}
+              {cantidadFiltros}
             </div>
           )}
         </div>
@@ -109,37 +112,69 @@ export const CatalogFilters = ({
         )}
       </div>
 
+      {/* ── Categoría ── */}
+      {categorias.length > 0 && (
+        <FilterSection title="Categoría">
+          {categorias.map((c) => (
+            <CheckItem
+              key={c.slug}
+              label={c.nombre}
+              checked={currentCategorias.includes(c.slug)}
+              onChange={() => toggleMulti("categoria", c.slug)}
+            />
+          ))}
+        </FilterSection>
+      )}
+
+      {/* ── Estado ── */}
+      {estados.length > 1 && (
+        <FilterSection title="Condición">
+          {estados.map((e) => (
+            <CheckItem
+              key={e}
+              label={capitalizar(e)}
+              checked={currentEstados.includes(e)}
+              onChange={() => toggleMulti("estado", e)}
+            />
+          ))}
+        </FilterSection>
+      )}
+
       {/* ── Marca ── */}
-      <FilterSection title="Marca">
-        {marcasDisponibles.map((marca) => (
-          <CheckItem
-            key={marca}
-            label={marca}
-            checked={currentMarcas.includes(marca)}
-            onChange={() => toggleMulti("marca", marca)}
-          />
-        ))}
-      </FilterSection>
+      {marcas.length > 0 && (
+        <FilterSection title="Marca">
+          {marcas.map((marca) => (
+            <CheckItem
+              key={marca}
+              label={marca}
+              checked={currentMarcas.includes(marca)}
+              onChange={() => toggleMulti("marca", marca)}
+            />
+          ))}
+        </FilterSection>
+      )}
 
       {/* ── Transmisión ── */}
-      <FilterSection title="Transmisión">
-        {(["MANUAL", "AUTOMATICA", "CVT"] as const).map((t) => (
-          <CheckItem
-            key={t}
-            label={t === "AUTOMATICA" ? "Automática" : t === "CVT" ? "CVT" : "Manual"}
-            checked={currentTransmisiones.includes(t)}
-            onChange={() => toggleMulti("transmision", t)}
-          />
-        ))}
-      </FilterSection>
+      {transmisiones.length > 0 && (
+        <FilterSection title="Transmisión">
+          {transmisiones.map((t) => (
+            <CheckItem
+              key={t}
+              label={LABEL_TRANSMISION[t] ?? capitalizar(t)}
+              checked={currentTransmisiones.includes(t)}
+              onChange={() => toggleMulti("transmision", t)}
+            />
+          ))}
+        </FilterSection>
+      )}
 
       {/* ── Combustible ── */}
-      {combustiblesDisponibles.length > 0 && (
+      {combustibles.length > 0 && (
         <FilterSection title="Combustible">
-          {combustiblesDisponibles.map((c) => (
+          {combustibles.map((c) => (
             <CheckItem
               key={c}
-              label={c.charAt(0) + c.slice(1).toLowerCase()}
+              label={capitalizar(c)}
               checked={currentCombustibles.includes(c)}
               onChange={() => toggleMulti("combustible", c)}
             />
@@ -148,6 +183,7 @@ export const CatalogFilters = ({
       )}
 
       {/* ── Año ── */}
+      {anios.length > 0 && (
       <FilterSection title="Año" noBorder>
         <div className="flex gap-4">
           <div className="flex-1 flex flex-col gap-1.5">
@@ -160,7 +196,7 @@ export const CatalogFilters = ({
               className="bg-[hsl(var(--input))] text-xs font-medium px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 text-[hsl(var(--foreground))] w-full appearance-none cursor-pointer"
             >
               <option value="">Todos</option>
-              {years.map((y) => (
+              {anios.map((y) => (
                 <option key={y} value={y.toString()}>{y}</option>
               ))}
             </select>
@@ -175,13 +211,14 @@ export const CatalogFilters = ({
               className="bg-[hsl(var(--input))] text-xs font-medium px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 text-[hsl(var(--foreground))] w-full appearance-none cursor-pointer"
             >
               <option value="">Todos</option>
-              {years.map((y) => (
+              {anios.map((y) => (
                 <option key={y} value={y.toString()}>{y}</option>
               ))}
             </select>
           </div>
         </div>
       </FilterSection>
+      )}
     </div>
   );
 };

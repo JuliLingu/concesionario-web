@@ -1,77 +1,44 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { CACHE_TAGS } from "@/services/cache.service";
+import { ConfiguracionSchema } from "@/schemas/configuracion";
 
-export async function getConfiguracion() {
-  try {
-    let config = await prisma.configuracion.findFirst();
-    
-    // Si no existe, creamos una por defecto
-    if (!config) {
-      config = await prisma.configuracion.create({
-        data: {
-          id: "1",
-          nombreConcesionaria: "JBJ Automotores",
-        },
-      });
-    }
-    
+// `values` llega sin tipar a propósito: es la entrada de una server action, o
+// sea un límite de confianza. La forma la garantiza Zod, no el compilador.
+export async function updateConfiguracion(values: unknown) {
+  const session = await auth();
+
+  if (session?.user?.role !== "ADMIN") {
+    return { success: false, error: "No autorizado" };
+  }
+
+  const validatedFields = ConfiguracionSchema.safeParse(values);
+
+  if (!validatedFields.success) {
+    const primerError = validatedFields.error.issues[0];
     return {
-      ...config,
-      cotizacionDolar: config.cotizacionDolar ? Number(config.cotizacionDolar) : null,
-    };
-  } catch (error) {
-    console.error("Error al obtener la configuración:", error);
-    // Retornamos algo por defecto para evitar romper la página si falla la BD
-    return {
-      id: "1",
-      nombreConcesionaria: "JBJ Automotores",
-      telefono: null,
-      email: null,
-      direccion: null,
-      facebookUrl: null,
-      instagramUrl: null,
-      cotizacionDolar: null,
+      success: false,
+      error: primerError?.message ?? "Campos inválidos",
     };
   }
-}
 
-export async function updateConfiguracion(data: any) {
+  const data = validatedFields.data;
+
   try {
-    let config = await prisma.configuracion.findFirst();
-    
-    if (config) {
-      await prisma.configuracion.update({
-        where: { id: config.id },
-        data: {
-          nombreConcesionaria: data.nombreConcesionaria,
-          telefono: data.telefono,
-          email: data.email,
-          direccion: data.direccion,
-          facebookUrl: data.facebookUrl,
-          instagramUrl: data.instagramUrl,
-          cotizacionDolar: data.cotizacionDolar ? Number(data.cotizacionDolar) : null,
-        }
-      });
-    } else {
-      await prisma.configuracion.create({
-        data: {
-          id: "1",
-          nombreConcesionaria: data.nombreConcesionaria,
-          telefono: data.telefono,
-          email: data.email,
-          direccion: data.direccion,
-          facebookUrl: data.facebookUrl,
-          instagramUrl: data.instagramUrl,
-          cotizacionDolar: data.cotizacionDolar ? Number(data.cotizacionDolar) : null,
-        }
-      });
-    }
-    
-    // Revalidar en toda la app ya que afecta al header y footer
+    await prisma.configuracion.upsert({
+      where: { id: "1" },
+      update: data,
+      create: { id: "1", ...data },
+    });
+
+    // Invalida la lectura cacheada del service...
+    revalidateTag(CACHE_TAGS.CONFIGURACION, "max");
+    // ...y el render de todas las rutas, ya que la config afecta al layout.
     revalidatePath("/", "layout");
-    
+
     return { success: true };
   } catch (error) {
     console.error("Error al actualizar la configuración:", error);

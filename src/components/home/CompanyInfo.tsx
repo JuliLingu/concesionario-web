@@ -1,6 +1,29 @@
 "use client";
 
-export function CompanyInfo() {
+import Image from "next/image";
+import type { SiteConfig } from "@/lib/configuracion-defaults";
+
+interface CompanyInfoProps {
+  configuracion: SiteConfig;
+}
+
+export function CompanyInfo({ configuracion }: CompanyInfoProps) {
+  // Marca de agua decorativa: la primera palabra del nombre de la concesionaria.
+  const marcaDeAgua = configuracion.nombreConcesionaria.split(" ")[0];
+
+  const metricas = [
+    {
+      valor: configuracion.nosotrosMetrica1Valor,
+      sufijo: configuracion.nosotrosMetrica1Sufijo,
+      label: configuracion.nosotrosMetrica1Label,
+    },
+    {
+      valor: configuracion.nosotrosMetrica2Valor,
+      sufijo: configuracion.nosotrosMetrica2Sufijo,
+      label: configuracion.nosotrosMetrica2Label,
+    },
+  ];
+
   return (
     <section id="nosotros" className="py-32 bg-[hsl(var(--background))] overflow-hidden relative">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -8,43 +31,47 @@ export function CompanyInfo() {
 
           {/* Content Area */}
           <div>
-            <h2 className="text-[3.75rem] md:text-[4.5rem] font-extrabold uppercase tracking-[-0.02em] text-[hsl(var(--foreground))] leading-none mb-10">
-              La Maestría <br />
-              detrás del <br />
-              volante.
+            <h2 className="text-[3.75rem] md:text-[4.5rem] font-extrabold uppercase tracking-[-0.02em] text-[hsl(var(--foreground))] leading-none mb-10 whitespace-pre-line">
+              {configuracion.nosotrosTitulo}
             </h2>
             <p className="text-[hsl(var(--muted-foreground))] leading-relaxed mb-16 text-lg font-medium max-w-md">
-              En JBJ Automotores, operamos bajo el principio de que un vehículo es una extensión de la identidad. Nuestra trayectoria de dos décadas redefine la curaduría automotriz, seleccionando piezas que trascienden lo convencional.
+              {configuracion.nosotrosTexto}
             </p>
 
             <div className="grid grid-cols-2 gap-12 pt-8 border-t border-black/5">
-              <div>
-                <div className="text-5xl font-bold text-[hsl(var(--foreground))] mb-3 leading-none">
-                  5K<span className="text-[#b5000b] italic">+</span>
+              {metricas.map((metrica) => (
+                <div key={metrica.label}>
+                  <div className="text-5xl font-bold text-[hsl(var(--foreground))] mb-3 leading-none">
+                    {metrica.valor}
+                    <span className="text-[#b5000b] italic">{metrica.sufijo}</span>
+                  </div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
+                    {metrica.label}
+                  </div>
                 </div>
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
-                  Relaciones Consolidadas
-                </div>
-              </div>
-              <div>
-                <div className="text-5xl font-bold text-[hsl(var(--foreground))] mb-3 leading-none">
-                  24<span className="text-[#b5000b] italic">/</span>7
-                </div>
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
-                  Soporte de Ingeniería
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
           {/* Image Area */}
           <div className="relative">
             <div className="aspect-square bg-[hsl(var(--surface-low))] rounded-lg relative z-10 overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)]">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-[15rem] font-black text-black/[0.03] -rotate-12 italic">
-                  JBJ
-                </span>
-              </div>
+              {configuracion.logoUrl ? (
+                <Image
+                  src={configuracion.logoUrl}
+                  alt={configuracion.nombreConcesionaria}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-contain p-16"
+                />
+              ) : (
+                // Sin logo cargado: se mantiene la marca de agua con el nombre.
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-[15rem] font-black text-black/[0.03] -rotate-12 italic">
+                    {marcaDeAgua}
+                  </span>
+                </div>
+              )}
             </div>
             {/* Decorative elements */}
             <div className="absolute -top-12 -right-12 w-64 h-64 bg-[#b5000b]/5 rounded-full blur-3xl" />

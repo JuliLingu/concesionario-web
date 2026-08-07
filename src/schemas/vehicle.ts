@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { Transmision, Combustible, EstadoVehiculo, EstadoPublicacion } from "../../generated/prisma";
+import { Transmision, Combustible, EstadoVehiculo, EstadoPublicacion, Moneda } from "../../generated/prisma";
 
 export const VehicleSchema = z.object({
   categoriaId: z.string().min(1, "La categoría es obligatoria"),
@@ -9,6 +9,7 @@ export const VehicleSchema = z.object({
   motor: z.string().optional(),
   anio: z.number().min(1900).max(new Date().getFullYear() + 1),
   precio: z.number().min(0, "El precio debe ser positivo"),
+  moneda: z.nativeEnum(Moneda),
   kilometraje: z.number().min(0, "El kilometraje no puede ser negativo"),
   combustible: z.nativeEnum(Combustible),
   transmision: z.nativeEnum(Transmision),

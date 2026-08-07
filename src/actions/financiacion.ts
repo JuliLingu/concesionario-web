@@ -6,6 +6,7 @@ import { PlanFinanciacionSchema, SolicitudFinanciacionSchema } from "@/schemas/f
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { EstadoConsulta } from "../../generated/prisma";
+import { FEATURE_FINANCIACION } from "@/lib/features";
 
 // ── Planes de Financiación (Admin) ──────────────────────────────────────────
 
@@ -73,6 +74,10 @@ export const deletePlan = async (id: string) => {
 // ── Solicitudes de Financiación ─────────────────────────────────────────────
 
 export const createSolicitud = async (values: z.infer<typeof SolicitudFinanciacionSchema>) => {
+  // Es la única acción pública de financiación: con la feature en stand by no se
+  // aceptan solicitudes nuevas (nadie estaría mirando esa bandeja).
+  if (!FEATURE_FINANCIACION) return { error: "La financiación no está disponible por el momento." };
+
   const validated = SolicitudFinanciacionSchema.safeParse(values);
   if (!validated.success) return { error: "Datos inválidos" };
 
