@@ -252,7 +252,14 @@ exports.Prisma.ConfiguracionScalarFieldEnum = {
   contactoWhatsappTexto: 'contactoWhatsappTexto',
   footerTexto: 'footerTexto',
   terminosUrl: 'terminosUrl',
-  privacidadUrl: 'privacidadUrl'
+  privacidadUrl: 'privacidadUrl',
+  colorPrimario: 'colorPrimario',
+  colorAcento: 'colorAcento',
+  colorFondo: 'colorFondo',
+  colorSuperficie: 'colorSuperficie',
+  colorTexto: 'colorTexto',
+  colorTextoSuave: 'colorTextoSuave',
+  colorTextoSobrePrimario: 'colorTextoSobrePrimario'
 };
 
 exports.Prisma.PlanFinanciacionScalarFieldEnum = {
@@ -394,7 +401,14 @@ exports.Prisma.ConfiguracionOrderByRelevanceFieldEnum = {
   contactoWhatsappTexto: 'contactoWhatsappTexto',
   footerTexto: 'footerTexto',
   terminosUrl: 'terminosUrl',
-  privacidadUrl: 'privacidadUrl'
+  privacidadUrl: 'privacidadUrl',
+  colorPrimario: 'colorPrimario',
+  colorAcento: 'colorAcento',
+  colorFondo: 'colorFondo',
+  colorSuperficie: 'colorSuperficie',
+  colorTexto: 'colorTexto',
+  colorTextoSuave: 'colorTextoSuave',
+  colorTextoSobrePrimario: 'colorTextoSobrePrimario'
 };
 
 exports.Prisma.PlanFinanciacionOrderByRelevanceFieldEnum = {

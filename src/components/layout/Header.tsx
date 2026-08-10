@@ -69,14 +69,14 @@ export function Header({ session, configuracion }: HeaderProps) {
               className="h-8 w-auto object-contain"
             />
           ) : (
-            <Car className="text-[#c2410c] w-6 h-6 shrink-0" />
+            <Car className="text-[hsl(var(--primary))] w-6 h-6 shrink-0" />
           )}
           <div className="flex items-center min-w-0">
-            <span className="font-extrabold text-[#1a1c1e] uppercase tracking-tighter text-sm truncate">
+            <span className="font-extrabold text-[hsl(var(--foreground))] uppercase tracking-tighter text-sm truncate">
               {firstWord}
             </span>
             {restWords && (
-              <span className="font-extrabold text-[#c2410c] uppercase tracking-tighter text-sm ml-1 truncate">
+              <span className="font-extrabold text-[hsl(var(--primary))] uppercase tracking-tighter text-sm ml-1 truncate">
                 {restWords}
               </span>
             )}
@@ -89,19 +89,19 @@ export function Header({ session, configuracion }: HeaderProps) {
             <Link
               key={link.href}
               href={link.href}
-              className="text-[#1a1c1e]/60 hover:text-[#1a1c1e] font-medium transition-colors text-sm"
+              className="text-[hsl(var(--foreground))]/60 hover:text-[hsl(var(--foreground))] font-medium transition-colors text-sm"
             >
               {link.label}
             </Link>
           ))}
           {session?.user?.role === "ADMIN" && (
-            <Link href="/dashboard" className="text-[#1a1c1e]/60 hover:text-[#1a1c1e] font-medium transition-colors text-sm">
+            <Link href="/dashboard" className="text-[hsl(var(--foreground))]/60 hover:text-[hsl(var(--foreground))] font-medium transition-colors text-sm">
               Administrador
             </Link>
           )}
           <Link
             href="/catalogo"
-            className="bg-gradient-to-br from-[#c2410c] to-[#ea580c] hover:from-[#9a3412] hover:to-[#c2410c] text-white px-5 py-2.5 rounded text-xs font-black uppercase tracking-widest transition-all shadow-md"
+            className="bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--accent))] hover:brightness-90 text-[hsl(var(--primary-foreground))] px-5 py-2.5 rounded text-xs font-black uppercase tracking-widest transition-all shadow-md"
           >
             Ver Vehículos
           </Link>
@@ -111,7 +111,7 @@ export function Header({ session, configuracion }: HeaderProps) {
         <div className="hidden md:block">
           {session ? (
             <div className="flex items-center gap-4">
-              <span className="font-bold text-[#1a1c1e] text-sm">
+              <span className="font-bold text-[hsl(var(--foreground))] text-sm">
                 {session.user?.name}
               </span>
               <form action={handleSignOut}>
@@ -126,7 +126,7 @@ export function Header({ session, configuracion }: HeaderProps) {
           ) : (
             <Link
               href="/login"
-              className="flex items-center gap-2 bg-gradient-to-br from-[#c2410c] to-[#ea580c] hover:from-[#9a3412] hover:to-[#c2410c] text-white px-4 py-2.5 rounded text-sm font-bold transition-all shadow-md"
+              className="flex items-center gap-2 bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--accent))] hover:brightness-90 text-[hsl(var(--primary-foreground))] px-4 py-2.5 rounded text-sm font-bold transition-all shadow-md"
             >
               <DoorOpen className="w-4 h-4" />
               <span>Iniciar Sesión</span>
@@ -141,7 +141,7 @@ export function Header({ session, configuracion }: HeaderProps) {
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "Cerrar menú" : "Abrir menú"}
-          className="md:hidden flex items-center justify-center w-10 h-10 -mr-2 rounded text-[#1a1c1e] hover:bg-black/5 transition-colors"
+          className="md:hidden flex items-center justify-center w-10 h-10 -mr-2 rounded text-[hsl(var(--foreground))] hover:bg-black/5 transition-colors"
         >
           {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -158,7 +158,7 @@ export function Header({ session, configuracion }: HeaderProps) {
           />
           <div
             id="mobile-menu"
-            className="md:hidden bg-white border-t border-black/5 shadow-lg animate-slide-down"
+            className="md:hidden bg-[hsl(var(--card))] border-t border-black/5 shadow-lg animate-slide-down"
           >
             <nav className="flex flex-col px-4 py-3 max-h-[calc(100vh-var(--header-h))] overflow-y-auto">
               {NAV_LINKS.map((link) => (
@@ -166,7 +166,7 @@ export function Header({ session, configuracion }: HeaderProps) {
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className="py-3 text-[#1a1c1e] font-semibold border-b border-black/5"
+                  className="py-3 text-[hsl(var(--foreground))] font-semibold border-b border-black/5"
                 >
                   {link.label}
                 </Link>
@@ -175,7 +175,7 @@ export function Header({ session, configuracion }: HeaderProps) {
                 <Link
                   href="/dashboard"
                   onClick={() => setOpen(false)}
-                  className="py-3 text-[#1a1c1e] font-semibold border-b border-black/5"
+                  className="py-3 text-[hsl(var(--foreground))] font-semibold border-b border-black/5"
                 >
                   Administrador
                 </Link>
@@ -184,14 +184,14 @@ export function Header({ session, configuracion }: HeaderProps) {
               <Link
                 href="/catalogo"
                 onClick={() => setOpen(false)}
-                className="mt-4 text-center bg-gradient-to-br from-[#c2410c] to-[#ea580c] text-white px-5 py-3 rounded text-xs font-black uppercase tracking-widest shadow-md"
+                className="mt-4 text-center bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--accent))] text-[hsl(var(--primary-foreground))] px-5 py-3 rounded text-xs font-black uppercase tracking-widest shadow-md"
               >
                 Ver Vehículos
               </Link>
 
               {session ? (
                 <div className="mt-4 pt-4 border-t border-black/5 flex items-center justify-between gap-3">
-                  <span className="font-bold text-[#1a1c1e] text-sm truncate">
+                  <span className="font-bold text-[hsl(var(--foreground))] text-sm truncate">
                     {session.user?.name}
                   </span>
                   <form action={handleSignOut}>
@@ -207,7 +207,7 @@ export function Header({ session, configuracion }: HeaderProps) {
                 <Link
                   href="/login"
                   onClick={() => setOpen(false)}
-                  className="mt-4 flex items-center justify-center gap-2 bg-[#1a1c1e] text-white px-4 py-3 rounded text-sm font-bold"
+                  className="mt-4 flex items-center justify-center gap-2 bg-[hsl(var(--foreground))] text-[hsl(var(--background))] px-4 py-3 rounded text-sm font-bold"
                 >
                   <DoorOpen className="w-4 h-4" />
                   <span>Iniciar Sesión</span>

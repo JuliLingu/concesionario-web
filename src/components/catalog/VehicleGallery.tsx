@@ -101,7 +101,7 @@ export const VehicleGallery = ({ images, altText }: VehicleGalleryProps) => {
               onClick={() => setCurrentIndex(index)}
               className={`relative shrink-0 w-20 md:w-24 aspect-[4/3] rounded overflow-hidden transition-all duration-300 p-0 cursor-pointer ${
                 currentIndex === index
-                  ? "ring-2 ring-[#b5000b] opacity-100"
+                  ? "ring-2 ring-[hsl(var(--primary))] opacity-100"
                   : "ring-1 ring-black/10 opacity-50 hover:opacity-100"
               }`}
             >

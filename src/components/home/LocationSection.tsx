@@ -12,7 +12,7 @@ export function LocationSection({ configuracion }: LocationSectionProps) {
   return (
     <section id="ubicacion" className="py-24 bg-[hsl(var(--surface-low))]">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
-        <div className="flex flex-col lg:flex-row shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] rounded-lg overflow-hidden bg-white">
+        <div className="flex flex-col lg:flex-row shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] rounded-lg overflow-hidden bg-[hsl(var(--card))]">
 
           {/* Info Column */}
           <div className="w-full lg:w-1/2 p-12 md:p-20 flex flex-col justify-center">
@@ -22,7 +22,7 @@ export function LocationSection({ configuracion }: LocationSectionProps) {
 
             <div className="flex flex-col gap-10">
               <div className="flex gap-5">
-                <div className="w-px h-12 bg-[#b5000b]/30 shrink-0" />
+                <div className="w-px h-12 bg-[hsl(var(--primary))]/30 shrink-0" />
                 <div>
                   <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] mb-1">Ubicación</div>
                   <div className="text-[hsl(var(--foreground))] font-bold text-lg">{address}</div>
@@ -30,7 +30,7 @@ export function LocationSection({ configuracion }: LocationSectionProps) {
               </div>
 
               <div className="flex gap-5">
-                <div className="w-px h-12 bg-[#b5000b]/30 shrink-0" />
+                <div className="w-px h-12 bg-[hsl(var(--primary))]/30 shrink-0" />
                 <div>
                   <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] mb-1">Contacto</div>
                   <div className="text-[hsl(var(--foreground))] font-bold text-sm uppercase tracking-[0.1em]">
@@ -43,7 +43,7 @@ export function LocationSection({ configuracion }: LocationSectionProps) {
               </div>
 
               <div className="flex gap-5">
-                <div className="w-px h-12 bg-[#b5000b]/30 shrink-0" />
+                <div className="w-px h-12 bg-[hsl(var(--primary))]/30 shrink-0" />
                 <div>
                   <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] mb-1">Horarios</div>
                   <div className="text-[hsl(var(--foreground))] font-bold text-sm uppercase tracking-[0.1em] whitespace-pre-line">

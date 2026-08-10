@@ -5,7 +5,12 @@
 ========================= */
 
 :root {
-  /* The Kinetic Gallery Palette */
+  /* The Kinetic Gallery Palette.
+     Ojo: estos valores son solo el punto de partida. La paleta real la inyecta
+     el layout como estilo inline en <html> a partir de lo que el administrador
+     cargue en /dashboard/settings → pestaña Colores (ver src/lib/colores.ts).
+     Si se cambia un color acá, hay que cambiar su equivalente hex en
+     COLORES_DEFAULTS para que ambas fuentes sigan coincidiendo. */
   --background: 240 14% 98%;    /* #f9f9fc */
   --foreground: 210 10% 11%;    /* #1a1c1e */
 
@@ -46,10 +51,10 @@
   --surface-lowest: 0 0% 100%;  /* #ffffff */
   
   /* Racing Gradients */
-  --gradient-racing: linear-gradient(135deg, #b5000b 0%, #e30613 100%);
-  
+  --gradient-racing: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+
   /* Shadows */
-  --shadow-premium: 0 20px 40px rgba(26, 28, 30, 0.06);
+  --shadow-premium: 0 20px 40px hsl(var(--foreground) / 0.06);
 }
 
 .dark {
@@ -125,15 +130,15 @@ body {
   }
 
   .glass-nav {
-    background: rgba(255, 255, 255, 0.7);
+    background: hsl(var(--surface-lowest) / 0.7);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid hsl(var(--foreground) / 0.05);
+    box-shadow: 0 4px 30px hsl(var(--foreground) / 0.03);
   }
-  
+
   .ghost-border {
-    outline: 1px solid rgba(181, 0, 11, 0.15); /* Primary at 15% opacity */
+    outline: 1px solid hsl(var(--primary) / 0.15); /* Primary at 15% opacity */
   }
 
   .bg-racing {

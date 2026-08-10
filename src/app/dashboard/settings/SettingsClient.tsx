@@ -17,10 +17,19 @@ import {
   Type,
   MessageCircle,
   ArrowLeft,
+  Palette,
+  Baseline,
+  RotateCcw,
 } from "lucide-react";
 import { ImageDropzone } from "@/components/dashboard/ImageDropzone";
 import { updateConfiguracion } from "@/actions/configuracion";
 import type { SiteConfig } from "@/lib/configuracion-defaults";
+import {
+  CAMPOS_COLOR,
+  COLORES_DEFAULTS,
+  COLOR_HEX_REGEX,
+  type CampoColor,
+} from "@/lib/colores";
 import { FEATURE_FINANCIACION } from "@/lib/features";
 import Link from "next/link";
 
@@ -230,6 +239,177 @@ function ImageUploadField({
   );
 }
 
+type Paleta = Record<CampoColor, string>;
+
+/** Devuelve el color solo si es un hex válido; si no, el valor por defecto. */
+function colorSeguro(paleta: Paleta, campo: CampoColor) {
+  const valor = paleta[campo];
+  return COLOR_HEX_REGEX.test(valor) ? valor : COLORES_DEFAULTS[campo];
+}
+
+interface ColorFieldProps {
+  label: string;
+  name: CampoColor;
+  paleta: Paleta;
+  onChange: (campo: CampoColor, valor: string) => void;
+  helperText?: string;
+}
+
+/**
+ * Selector de color: la muestra abre el selector nativo y el campo de texto
+ * permite pegar un hex exacto (el de la marca, por ejemplo). Ambos escriben en
+ * el mismo estado; el que viaja en el FormData es el de texto.
+ */
+function ColorField({
+  label,
+  name,
+  paleta,
+  onChange,
+  helperText,
+}: ColorFieldProps) {
+  const valor = paleta[name];
+  const esValido = COLOR_HEX_REGEX.test(valor);
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label
+        htmlFor={name}
+        className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]"
+      >
+        {label}
+      </label>
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          aria-label={`Selector de color para ${label}`}
+          value={colorSeguro(paleta, name)}
+          onChange={(e) => onChange(name, e.target.value)}
+          className="h-10 w-12 shrink-0 cursor-pointer rounded border border-[hsl(var(--border))] bg-transparent p-1"
+        />
+        <input
+          id={name}
+          name={name}
+          value={valor}
+          onChange={(e) => onChange(name, e.target.value)}
+          spellCheck={false}
+          placeholder={COLORES_DEFAULTS[name]}
+          className={`w-full bg-[hsl(var(--input))] text-sm font-mono uppercase rounded px-3 py-2.5 focus:outline-none focus:ring-1 ${
+            esValido
+              ? "focus:ring-[hsl(var(--primary))]/20"
+              : "ring-1 ring-red-500"
+          }`}
+        />
+      </div>
+      {!esValido && (
+        <p className="text-xs text-red-600">
+          Formato inválido. Se espera un hex de 6 dígitos, ej. #b5000b
+        </p>
+      )}
+      {helperText && (
+        <p className="text-xs text-[hsl(var(--muted-foreground))]">
+          {helperText}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Muestra la paleta aplicada a una maqueta del sitio, sin necesidad de guardar
+ * ni de salir del panel. Va con estilos inline porque los colores cambian con
+ * cada pulsación y todavía no son variables CSS.
+ */
+function VistaPreviaColores({ paleta }: { paleta: Paleta }) {
+  const primario = colorSeguro(paleta, "colorPrimario");
+  const acento = colorSeguro(paleta, "colorAcento");
+  const fondo = colorSeguro(paleta, "colorFondo");
+  const superficie = colorSeguro(paleta, "colorSuperficie");
+  const texto = colorSeguro(paleta, "colorTexto");
+  const textoSuave = colorSeguro(paleta, "colorTextoSuave");
+  const sobrePrimario = colorSeguro(paleta, "colorTextoSobrePrimario");
+
+  return (
+    <div
+      className="rounded-lg overflow-hidden border border-[hsl(var(--border))]"
+      style={{ backgroundColor: fondo }}
+    >
+      {/* Encabezado */}
+      <div
+        className="flex items-center justify-between gap-3 px-5 py-3"
+        style={{ backgroundColor: superficie }}
+      >
+        <span
+          className="font-extrabold uppercase tracking-tighter text-sm"
+          style={{ color: texto }}
+        >
+          Conce<span style={{ color: primario }}>sionaria</span>
+        </span>
+        <span
+          className="px-3 py-1.5 rounded text-[9px] font-black uppercase tracking-widest"
+          style={{
+            background: `linear-gradient(135deg, ${primario} 0%, ${acento} 100%)`,
+            color: sobrePrimario,
+          }}
+        >
+          Ver Vehículos
+        </span>
+      </div>
+
+      {/* Cuerpo */}
+      <div className="px-5 py-6 flex flex-col gap-4">
+        <div>
+          <p
+            className="text-[10px] font-black uppercase tracking-[0.2em] mb-1"
+            style={{ color: primario }}
+          >
+            Destacados
+          </p>
+          <h3
+            className="text-2xl font-black uppercase tracking-tight"
+            style={{ color: texto }}
+          >
+            Así se ve tu sitio
+          </h3>
+          <p className="text-sm mt-2" style={{ color: textoSuave }}>
+            Los textos secundarios y las aclaraciones usan este tono más suave.
+          </p>
+        </div>
+
+        <div
+          className="rounded-lg p-4 flex items-center justify-between gap-4"
+          style={{ backgroundColor: superficie }}
+        >
+          <div>
+            <p
+              className="text-[10px] font-black uppercase tracking-[0.2em]"
+              style={{ color: textoSuave }}
+            >
+              Ficha de vehículo
+            </p>
+            <p className="text-xl font-black" style={{ color: primario }}>
+              USD 25.000
+            </p>
+          </div>
+          <span
+            className="px-4 py-2.5 rounded text-[10px] font-black uppercase tracking-widest"
+            style={{ backgroundColor: primario, color: sobrePrimario }}
+          >
+            Consultar
+          </span>
+        </div>
+      </div>
+
+      {/* Pie: usa el color de texto como fondo, invertido */}
+      <div
+        className="px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em]"
+        style={{ backgroundColor: texto, color: fondo }}
+      >
+        Pie de página
+      </div>
+    </div>
+  );
+}
+
 function Card({
   title,
   icon,
@@ -253,6 +433,7 @@ function Card({
 const TABS = [
   { id: "general", label: "General" },
   { id: "marca", label: "Marca" },
+  { id: "colores", label: "Colores" },
   { id: "portada", label: "Portada" },
   { id: "nosotros", label: "Nosotros" },
   { id: "financiacion", label: "Financiación" },
@@ -277,6 +458,11 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
   );
   const [logoUrl, setLogoUrl] = useState(configuracion.logoUrl);
   const [faviconUrl, setFaviconUrl] = useState(configuracion.faviconUrl);
+  const [paleta, setPaleta] = useState<Paleta>(() =>
+    Object.fromEntries(
+      CAMPOS_COLOR.map((campo) => [campo, configuracion[campo]]),
+    ) as Paleta,
+  );
   const [status, setStatus] = useState<{
     type: "success" | "error" | null;
     message: string;
@@ -284,6 +470,11 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
     type: null,
     message: "",
   });
+
+  const cambiarColor = (campo: CampoColor, valor: string) =>
+    setPaleta((actual) => ({ ...actual, [campo]: valor }));
+
+  const restaurarColores = () => setPaleta({ ...COLORES_DEFAULTS });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -482,6 +673,101 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
                 helperText="Es el icono de la pestaña del navegador. Se recomienda una imagen cuadrada de 512x512px. Puede tardar en verse: los navegadores lo cachean de forma agresiva."
               />
             </Card>
+          </div>
+
+          {/* ── Colores ─────────────────────────────────────────────── */}
+          <div
+            className={
+              tab === "colores"
+                ? "grid grid-cols-1 lg:grid-cols-2 gap-6"
+                : "hidden"
+            }
+          >
+            <div className="flex flex-col gap-6">
+              <Card
+                title="Colores Generales"
+                icon={<Palette size={18} color="#b5000b" />}
+              >
+                <ColorField
+                  label="Color Principal"
+                  name="colorPrimario"
+                  paleta={paleta}
+                  onChange={cambiarColor}
+                  helperText="Es el color de la marca: botones, precios, iconos y detalles destacados."
+                />
+                <ColorField
+                  label="Color de Acento"
+                  name="colorAcento"
+                  paleta={paleta}
+                  onChange={cambiarColor}
+                  helperText="Cierra los degradados de los botones. Conviene una variante del color principal."
+                />
+                <ColorField
+                  label="Color de Fondo"
+                  name="colorFondo"
+                  paleta={paleta}
+                  onChange={cambiarColor}
+                  helperText="El fondo general de todas las páginas."
+                />
+                <ColorField
+                  label="Color de Tarjetas"
+                  name="colorSuperficie"
+                  paleta={paleta}
+                  onChange={cambiarColor}
+                  helperText="Fondo de las tarjetas, la barra superior y los formularios. Los bordes y los campos se derivan solos de este color."
+                />
+              </Card>
+
+              <Card
+                title="Colores de Texto"
+                icon={<Baseline size={18} color="#b5000b" />}
+              >
+                <ColorField
+                  label="Color de Texto"
+                  name="colorTexto"
+                  paleta={paleta}
+                  onChange={cambiarColor}
+                  helperText="Títulos y textos principales. También es el fondo del pie de página."
+                />
+                <ColorField
+                  label="Color de Texto Secundario"
+                  name="colorTextoSuave"
+                  paleta={paleta}
+                  onChange={cambiarColor}
+                  helperText="Descripciones, etiquetas y aclaraciones. Debe leerse pero pesar menos que el principal."
+                />
+                <ColorField
+                  label="Color de Texto sobre Botones"
+                  name="colorTextoSobrePrimario"
+                  paleta={paleta}
+                  onChange={cambiarColor}
+                  helperText="Se usa arriba del color principal y del de acento. Casi siempre blanco."
+                />
+
+                <button
+                  type="button"
+                  onClick={restaurarColores}
+                  className="self-start flex items-center gap-2 px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.1em] border border-[hsl(var(--border))] rounded text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--surface-low))] transition"
+                >
+                  <RotateCcw size={14} />
+                  Restaurar colores por defecto
+                </button>
+              </Card>
+            </div>
+
+            <div className="flex flex-col gap-6">
+              <Card
+                title="Vista Previa"
+                icon={<Palette size={18} color="#b5000b" />}
+              >
+                <VistaPreviaColores paleta={paleta} />
+                <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                  La vista previa se actualiza al instante, pero los cambios
+                  recién se aplican al sitio cuando guardás. Revisá que los
+                  textos se lean bien sobre los fondos elegidos.
+                </p>
+              </Card>
+            </div>
           </div>
 
           {/* ── Portada ─────────────────────────────────────────────── */}

@@ -45,7 +45,7 @@ export const FinancingSimulator = ({ vehiculoId, precioArs, planes }: FinancingS
     <div className="bg-[hsl(var(--surface-low))] border border-black/5 rounded-lg overflow-hidden">
       <div className="p-6 md:p-8">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-10 h-10 rounded bg-[#b5000b]/10 text-[#b5000b] flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] flex items-center justify-center shrink-0">
             <Calculator size={20} />
           </div>
           <h2 className="text-2xl font-black uppercase tracking-[-0.02em] text-[hsl(var(--foreground))]">
@@ -70,7 +70,7 @@ export const FinancingSimulator = ({ vehiculoId, precioArs, planes }: FinancingS
               step={5}
               value={anticipoPercent}
               onChange={(e) => setAnticipoPercent(Number(e.target.value))}
-              className="w-full h-2 bg-black/10 rounded-lg appearance-none cursor-pointer accent-[#b5000b]"
+              className="w-full h-2 bg-black/10 rounded-lg appearance-none cursor-pointer accent-[hsl(var(--primary))]"
             />
           </div>
 
@@ -85,7 +85,7 @@ export const FinancingSimulator = ({ vehiculoId, precioArs, planes }: FinancingS
                   onClick={() => setSelectedPlanId(plan.id)}
                   className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.1em] rounded-full transition-colors ${
                     selectedPlanId === plan.id
-                      ? "bg-[hsl(var(--foreground))] text-white"
+                      ? "bg-[hsl(var(--foreground))] text-[hsl(var(--background))]"
                       : "border border-black/10 text-[hsl(var(--muted-foreground))] hover:border-black/30 hover:text-[hsl(var(--foreground))]"
                   }`}
                 >
@@ -95,8 +95,8 @@ export const FinancingSimulator = ({ vehiculoId, precioArs, planes }: FinancingS
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg border border-black/5 text-center shadow-[0_4px_20px_rgba(26,28,30,0.04)]">
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#b5000b] mb-2">
+          <div className="bg-[hsl(var(--card))] p-6 rounded-lg border border-black/5 text-center shadow-[0_4px_20px_rgba(26,28,30,0.04)]">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--primary))] mb-2">
               Cuota Fija Mensual
             </div>
             <div className="text-5xl font-black tracking-[-0.05em] text-[hsl(var(--foreground))] leading-none">
@@ -110,7 +110,7 @@ export const FinancingSimulator = ({ vehiculoId, precioArs, planes }: FinancingS
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}
-              className="w-full bg-[#b5000b] hover:bg-red-800 text-white py-4 text-sm font-black uppercase tracking-[0.1em] transition-colors rounded"
+              className="w-full bg-[hsl(var(--primary))] hover:brightness-90 text-[hsl(var(--primary-foreground))] py-4 text-sm font-black uppercase tracking-[0.1em] transition-colors rounded"
             >
               Solicitar este crédito
             </button>
@@ -119,7 +119,7 @@ export const FinancingSimulator = ({ vehiculoId, precioArs, planes }: FinancingS
       </div>
 
       {showForm && (
-        <div className="p-6 md:p-8 bg-white border-t border-black/5">
+        <div className="p-6 md:p-8 bg-[hsl(var(--card))] border-t border-black/5">
           <div className="text-sm font-bold text-[hsl(var(--foreground))] uppercase tracking-[0.1em] mb-6">
             Completá tus datos
           </div>
