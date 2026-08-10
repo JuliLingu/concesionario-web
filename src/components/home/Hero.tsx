@@ -30,7 +30,7 @@ export function Hero({ configuracion }: HeroProps) {
         </p>
         <Link
           href={configuracion.heroCtaUrl}
-          className="bg-racing text-white px-10 py-4 text-base font-bold tracking-[0.1em] hover:-translate-y-0.5 hover:shadow-[0_20px_40px_rgba(181,0,11,0.4)] transition-all duration-300"
+          className="bg-racing text-[hsl(var(--primary-foreground))] px-10 py-4 text-base font-bold tracking-[0.1em] hover:-translate-y-0.5 hover:shadow-[0_20px_40px_hsl(var(--primary)/0.4)] transition-all duration-300"
         >
           {configuracion.heroCtaTexto}
         </Link>

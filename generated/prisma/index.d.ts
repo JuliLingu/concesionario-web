@@ -10033,6 +10033,13 @@ export namespace Prisma {
     footerTexto: string | null
     terminosUrl: string | null
     privacidadUrl: string | null
+    colorPrimario: string | null
+    colorAcento: string | null
+    colorFondo: string | null
+    colorSuperficie: string | null
+    colorTexto: string | null
+    colorTextoSuave: string | null
+    colorTextoSobrePrimario: string | null
   }
 
   export type ConfiguracionMaxAggregateOutputType = {
@@ -10076,6 +10083,13 @@ export namespace Prisma {
     footerTexto: string | null
     terminosUrl: string | null
     privacidadUrl: string | null
+    colorPrimario: string | null
+    colorAcento: string | null
+    colorFondo: string | null
+    colorSuperficie: string | null
+    colorTexto: string | null
+    colorTextoSuave: string | null
+    colorTextoSobrePrimario: string | null
   }
 
   export type ConfiguracionCountAggregateOutputType = {
@@ -10119,6 +10133,13 @@ export namespace Prisma {
     footerTexto: number
     terminosUrl: number
     privacidadUrl: number
+    colorPrimario: number
+    colorAcento: number
+    colorFondo: number
+    colorSuperficie: number
+    colorTexto: number
+    colorTextoSuave: number
+    colorTextoSobrePrimario: number
     _all: number
   }
 
@@ -10176,6 +10197,13 @@ export namespace Prisma {
     footerTexto?: true
     terminosUrl?: true
     privacidadUrl?: true
+    colorPrimario?: true
+    colorAcento?: true
+    colorFondo?: true
+    colorSuperficie?: true
+    colorTexto?: true
+    colorTextoSuave?: true
+    colorTextoSobrePrimario?: true
   }
 
   export type ConfiguracionMaxAggregateInputType = {
@@ -10219,6 +10247,13 @@ export namespace Prisma {
     footerTexto?: true
     terminosUrl?: true
     privacidadUrl?: true
+    colorPrimario?: true
+    colorAcento?: true
+    colorFondo?: true
+    colorSuperficie?: true
+    colorTexto?: true
+    colorTextoSuave?: true
+    colorTextoSobrePrimario?: true
   }
 
   export type ConfiguracionCountAggregateInputType = {
@@ -10262,6 +10297,13 @@ export namespace Prisma {
     footerTexto?: true
     terminosUrl?: true
     privacidadUrl?: true
+    colorPrimario?: true
+    colorAcento?: true
+    colorFondo?: true
+    colorSuperficie?: true
+    colorTexto?: true
+    colorTextoSuave?: true
+    colorTextoSobrePrimario?: true
     _all?: true
   }
 
@@ -10392,6 +10434,13 @@ export namespace Prisma {
     footerTexto: string | null
     terminosUrl: string | null
     privacidadUrl: string | null
+    colorPrimario: string | null
+    colorAcento: string | null
+    colorFondo: string | null
+    colorSuperficie: string | null
+    colorTexto: string | null
+    colorTextoSuave: string | null
+    colorTextoSobrePrimario: string | null
     _count: ConfiguracionCountAggregateOutputType | null
     _avg: ConfiguracionAvgAggregateOutputType | null
     _sum: ConfiguracionSumAggregateOutputType | null
@@ -10454,6 +10503,13 @@ export namespace Prisma {
     footerTexto?: boolean
     terminosUrl?: boolean
     privacidadUrl?: boolean
+    colorPrimario?: boolean
+    colorAcento?: boolean
+    colorFondo?: boolean
+    colorSuperficie?: boolean
+    colorTexto?: boolean
+    colorTextoSuave?: boolean
+    colorTextoSobrePrimario?: boolean
   }, ExtArgs["result"]["configuracion"]>
 
 
@@ -10499,9 +10555,16 @@ export namespace Prisma {
     footerTexto?: boolean
     terminosUrl?: boolean
     privacidadUrl?: boolean
+    colorPrimario?: boolean
+    colorAcento?: boolean
+    colorFondo?: boolean
+    colorSuperficie?: boolean
+    colorTexto?: boolean
+    colorTextoSuave?: boolean
+    colorTextoSobrePrimario?: boolean
   }
 
-  export type ConfiguracionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombreConcesionaria" | "telefono" | "email" | "direccion" | "facebookUrl" | "instagramUrl" | "horariosAtencion" | "updatedAt" | "cotizacionDolar" | "logoUrl" | "faviconUrl" | "siteTitle" | "siteDescription" | "heroTitulo" | "heroSubtitulo" | "heroCtaTexto" | "heroCtaUrl" | "heroImagenUrl" | "nosotrosTitulo" | "nosotrosTexto" | "nosotrosMetrica1Valor" | "nosotrosMetrica1Sufijo" | "nosotrosMetrica1Label" | "nosotrosMetrica2Valor" | "nosotrosMetrica2Sufijo" | "nosotrosMetrica2Label" | "finanEyebrow" | "finanTitulo" | "finanTexto" | "finanTasaAnual" | "finanEntregaMinima" | "finanCtaTexto" | "contactoEyebrow" | "contactoTitulo" | "contactoTexto" | "contactoWhatsappTexto" | "footerTexto" | "terminosUrl" | "privacidadUrl", ExtArgs["result"]["configuracion"]>
+  export type ConfiguracionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombreConcesionaria" | "telefono" | "email" | "direccion" | "facebookUrl" | "instagramUrl" | "horariosAtencion" | "updatedAt" | "cotizacionDolar" | "logoUrl" | "faviconUrl" | "siteTitle" | "siteDescription" | "heroTitulo" | "heroSubtitulo" | "heroCtaTexto" | "heroCtaUrl" | "heroImagenUrl" | "nosotrosTitulo" | "nosotrosTexto" | "nosotrosMetrica1Valor" | "nosotrosMetrica1Sufijo" | "nosotrosMetrica1Label" | "nosotrosMetrica2Valor" | "nosotrosMetrica2Sufijo" | "nosotrosMetrica2Label" | "finanEyebrow" | "finanTitulo" | "finanTexto" | "finanTasaAnual" | "finanEntregaMinima" | "finanCtaTexto" | "contactoEyebrow" | "contactoTitulo" | "contactoTexto" | "contactoWhatsappTexto" | "footerTexto" | "terminosUrl" | "privacidadUrl" | "colorPrimario" | "colorAcento" | "colorFondo" | "colorSuperficie" | "colorTexto" | "colorTextoSuave" | "colorTextoSobrePrimario", ExtArgs["result"]["configuracion"]>
 
   export type $ConfiguracionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Configuracion"
@@ -10547,6 +10610,13 @@ export namespace Prisma {
       footerTexto: string | null
       terminosUrl: string | null
       privacidadUrl: string | null
+      colorPrimario: string | null
+      colorAcento: string | null
+      colorFondo: string | null
+      colorSuperficie: string | null
+      colorTexto: string | null
+      colorTextoSuave: string | null
+      colorTextoSobrePrimario: string | null
     }, ExtArgs["result"]["configuracion"]>
     composites: {}
   }
@@ -10956,6 +11026,13 @@ export namespace Prisma {
     readonly footerTexto: FieldRef<"Configuracion", 'String'>
     readonly terminosUrl: FieldRef<"Configuracion", 'String'>
     readonly privacidadUrl: FieldRef<"Configuracion", 'String'>
+    readonly colorPrimario: FieldRef<"Configuracion", 'String'>
+    readonly colorAcento: FieldRef<"Configuracion", 'String'>
+    readonly colorFondo: FieldRef<"Configuracion", 'String'>
+    readonly colorSuperficie: FieldRef<"Configuracion", 'String'>
+    readonly colorTexto: FieldRef<"Configuracion", 'String'>
+    readonly colorTextoSuave: FieldRef<"Configuracion", 'String'>
+    readonly colorTextoSobrePrimario: FieldRef<"Configuracion", 'String'>
   }
     
 
@@ -13493,7 +13570,14 @@ export namespace Prisma {
     contactoWhatsappTexto: 'contactoWhatsappTexto',
     footerTexto: 'footerTexto',
     terminosUrl: 'terminosUrl',
-    privacidadUrl: 'privacidadUrl'
+    privacidadUrl: 'privacidadUrl',
+    colorPrimario: 'colorPrimario',
+    colorAcento: 'colorAcento',
+    colorFondo: 'colorFondo',
+    colorSuperficie: 'colorSuperficie',
+    colorTexto: 'colorTexto',
+    colorTextoSuave: 'colorTextoSuave',
+    colorTextoSobrePrimario: 'colorTextoSobrePrimario'
   };
 
   export type ConfiguracionScalarFieldEnum = (typeof ConfiguracionScalarFieldEnum)[keyof typeof ConfiguracionScalarFieldEnum]
@@ -13674,7 +13758,14 @@ export namespace Prisma {
     contactoWhatsappTexto: 'contactoWhatsappTexto',
     footerTexto: 'footerTexto',
     terminosUrl: 'terminosUrl',
-    privacidadUrl: 'privacidadUrl'
+    privacidadUrl: 'privacidadUrl',
+    colorPrimario: 'colorPrimario',
+    colorAcento: 'colorAcento',
+    colorFondo: 'colorFondo',
+    colorSuperficie: 'colorSuperficie',
+    colorTexto: 'colorTexto',
+    colorTextoSuave: 'colorTextoSuave',
+    colorTextoSobrePrimario: 'colorTextoSobrePrimario'
   };
 
   export type ConfiguracionOrderByRelevanceFieldEnum = (typeof ConfiguracionOrderByRelevanceFieldEnum)[keyof typeof ConfiguracionOrderByRelevanceFieldEnum]
@@ -14450,6 +14541,13 @@ export namespace Prisma {
     footerTexto?: StringNullableFilter<"Configuracion"> | string | null
     terminosUrl?: StringNullableFilter<"Configuracion"> | string | null
     privacidadUrl?: StringNullableFilter<"Configuracion"> | string | null
+    colorPrimario?: StringNullableFilter<"Configuracion"> | string | null
+    colorAcento?: StringNullableFilter<"Configuracion"> | string | null
+    colorFondo?: StringNullableFilter<"Configuracion"> | string | null
+    colorSuperficie?: StringNullableFilter<"Configuracion"> | string | null
+    colorTexto?: StringNullableFilter<"Configuracion"> | string | null
+    colorTextoSuave?: StringNullableFilter<"Configuracion"> | string | null
+    colorTextoSobrePrimario?: StringNullableFilter<"Configuracion"> | string | null
   }
 
   export type ConfiguracionOrderByWithRelationInput = {
@@ -14493,6 +14591,13 @@ export namespace Prisma {
     footerTexto?: SortOrderInput | SortOrder
     terminosUrl?: SortOrderInput | SortOrder
     privacidadUrl?: SortOrderInput | SortOrder
+    colorPrimario?: SortOrderInput | SortOrder
+    colorAcento?: SortOrderInput | SortOrder
+    colorFondo?: SortOrderInput | SortOrder
+    colorSuperficie?: SortOrderInput | SortOrder
+    colorTexto?: SortOrderInput | SortOrder
+    colorTextoSuave?: SortOrderInput | SortOrder
+    colorTextoSobrePrimario?: SortOrderInput | SortOrder
     _relevance?: ConfiguracionOrderByRelevanceInput
   }
 
@@ -14540,6 +14645,13 @@ export namespace Prisma {
     footerTexto?: StringNullableFilter<"Configuracion"> | string | null
     terminosUrl?: StringNullableFilter<"Configuracion"> | string | null
     privacidadUrl?: StringNullableFilter<"Configuracion"> | string | null
+    colorPrimario?: StringNullableFilter<"Configuracion"> | string | null
+    colorAcento?: StringNullableFilter<"Configuracion"> | string | null
+    colorFondo?: StringNullableFilter<"Configuracion"> | string | null
+    colorSuperficie?: StringNullableFilter<"Configuracion"> | string | null
+    colorTexto?: StringNullableFilter<"Configuracion"> | string | null
+    colorTextoSuave?: StringNullableFilter<"Configuracion"> | string | null
+    colorTextoSobrePrimario?: StringNullableFilter<"Configuracion"> | string | null
   }, "id">
 
   export type ConfiguracionOrderByWithAggregationInput = {
@@ -14583,6 +14695,13 @@ export namespace Prisma {
     footerTexto?: SortOrderInput | SortOrder
     terminosUrl?: SortOrderInput | SortOrder
     privacidadUrl?: SortOrderInput | SortOrder
+    colorPrimario?: SortOrderInput | SortOrder
+    colorAcento?: SortOrderInput | SortOrder
+    colorFondo?: SortOrderInput | SortOrder
+    colorSuperficie?: SortOrderInput | SortOrder
+    colorTexto?: SortOrderInput | SortOrder
+    colorTextoSuave?: SortOrderInput | SortOrder
+    colorTextoSobrePrimario?: SortOrderInput | SortOrder
     _count?: ConfiguracionCountOrderByAggregateInput
     _avg?: ConfiguracionAvgOrderByAggregateInput
     _max?: ConfiguracionMaxOrderByAggregateInput
@@ -14634,6 +14753,13 @@ export namespace Prisma {
     footerTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
     terminosUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
     privacidadUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorPrimario?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorAcento?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorFondo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorSuperficie?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorTextoSuave?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorTextoSobrePrimario?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
   }
 
   export type PlanFinanciacionWhereInput = {
@@ -15508,6 +15634,13 @@ export namespace Prisma {
     footerTexto?: string | null
     terminosUrl?: string | null
     privacidadUrl?: string | null
+    colorPrimario?: string | null
+    colorAcento?: string | null
+    colorFondo?: string | null
+    colorSuperficie?: string | null
+    colorTexto?: string | null
+    colorTextoSuave?: string | null
+    colorTextoSobrePrimario?: string | null
   }
 
   export type ConfiguracionUncheckedCreateInput = {
@@ -15551,6 +15684,13 @@ export namespace Prisma {
     footerTexto?: string | null
     terminosUrl?: string | null
     privacidadUrl?: string | null
+    colorPrimario?: string | null
+    colorAcento?: string | null
+    colorFondo?: string | null
+    colorSuperficie?: string | null
+    colorTexto?: string | null
+    colorTextoSuave?: string | null
+    colorTextoSobrePrimario?: string | null
   }
 
   export type ConfiguracionUpdateInput = {
@@ -15594,6 +15734,13 @@ export namespace Prisma {
     footerTexto?: NullableStringFieldUpdateOperationsInput | string | null
     terminosUrl?: NullableStringFieldUpdateOperationsInput | string | null
     privacidadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    colorPrimario?: NullableStringFieldUpdateOperationsInput | string | null
+    colorAcento?: NullableStringFieldUpdateOperationsInput | string | null
+    colorFondo?: NullableStringFieldUpdateOperationsInput | string | null
+    colorSuperficie?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSuave?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSobrePrimario?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ConfiguracionUncheckedUpdateInput = {
@@ -15637,6 +15784,13 @@ export namespace Prisma {
     footerTexto?: NullableStringFieldUpdateOperationsInput | string | null
     terminosUrl?: NullableStringFieldUpdateOperationsInput | string | null
     privacidadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    colorPrimario?: NullableStringFieldUpdateOperationsInput | string | null
+    colorAcento?: NullableStringFieldUpdateOperationsInput | string | null
+    colorFondo?: NullableStringFieldUpdateOperationsInput | string | null
+    colorSuperficie?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSuave?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSobrePrimario?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ConfiguracionCreateManyInput = {
@@ -15680,6 +15834,13 @@ export namespace Prisma {
     footerTexto?: string | null
     terminosUrl?: string | null
     privacidadUrl?: string | null
+    colorPrimario?: string | null
+    colorAcento?: string | null
+    colorFondo?: string | null
+    colorSuperficie?: string | null
+    colorTexto?: string | null
+    colorTextoSuave?: string | null
+    colorTextoSobrePrimario?: string | null
   }
 
   export type ConfiguracionUpdateManyMutationInput = {
@@ -15723,6 +15884,13 @@ export namespace Prisma {
     footerTexto?: NullableStringFieldUpdateOperationsInput | string | null
     terminosUrl?: NullableStringFieldUpdateOperationsInput | string | null
     privacidadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    colorPrimario?: NullableStringFieldUpdateOperationsInput | string | null
+    colorAcento?: NullableStringFieldUpdateOperationsInput | string | null
+    colorFondo?: NullableStringFieldUpdateOperationsInput | string | null
+    colorSuperficie?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSuave?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSobrePrimario?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ConfiguracionUncheckedUpdateManyInput = {
@@ -15766,6 +15934,13 @@ export namespace Prisma {
     footerTexto?: NullableStringFieldUpdateOperationsInput | string | null
     terminosUrl?: NullableStringFieldUpdateOperationsInput | string | null
     privacidadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    colorPrimario?: NullableStringFieldUpdateOperationsInput | string | null
+    colorAcento?: NullableStringFieldUpdateOperationsInput | string | null
+    colorFondo?: NullableStringFieldUpdateOperationsInput | string | null
+    colorSuperficie?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSuave?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSobrePrimario?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PlanFinanciacionCreateInput = {
@@ -16794,6 +16969,13 @@ export namespace Prisma {
     footerTexto?: SortOrder
     terminosUrl?: SortOrder
     privacidadUrl?: SortOrder
+    colorPrimario?: SortOrder
+    colorAcento?: SortOrder
+    colorFondo?: SortOrder
+    colorSuperficie?: SortOrder
+    colorTexto?: SortOrder
+    colorTextoSuave?: SortOrder
+    colorTextoSobrePrimario?: SortOrder
   }
 
   export type ConfiguracionAvgOrderByAggregateInput = {
@@ -16843,6 +17025,13 @@ export namespace Prisma {
     footerTexto?: SortOrder
     terminosUrl?: SortOrder
     privacidadUrl?: SortOrder
+    colorPrimario?: SortOrder
+    colorAcento?: SortOrder
+    colorFondo?: SortOrder
+    colorSuperficie?: SortOrder
+    colorTexto?: SortOrder
+    colorTextoSuave?: SortOrder
+    colorTextoSobrePrimario?: SortOrder
   }
 
   export type ConfiguracionMinOrderByAggregateInput = {
@@ -16886,6 +17075,13 @@ export namespace Prisma {
     footerTexto?: SortOrder
     terminosUrl?: SortOrder
     privacidadUrl?: SortOrder
+    colorPrimario?: SortOrder
+    colorAcento?: SortOrder
+    colorFondo?: SortOrder
+    colorSuperficie?: SortOrder
+    colorTexto?: SortOrder
+    colorTextoSuave?: SortOrder
+    colorTextoSobrePrimario?: SortOrder
   }
 
   export type ConfiguracionSumOrderByAggregateInput = {

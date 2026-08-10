@@ -43,7 +43,7 @@ export function CompanyInfo({ configuracion }: CompanyInfoProps) {
                 <div key={metrica.label}>
                   <div className="text-5xl font-bold text-[hsl(var(--foreground))] mb-3 leading-none">
                     {metrica.valor}
-                    <span className="text-[#b5000b] italic">{metrica.sufijo}</span>
+                    <span className="text-[hsl(var(--primary))] italic">{metrica.sufijo}</span>
                   </div>
                   <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
                     {metrica.label}
@@ -74,7 +74,7 @@ export function CompanyInfo({ configuracion }: CompanyInfoProps) {
               )}
             </div>
             {/* Decorative elements */}
-            <div className="absolute -top-12 -right-12 w-64 h-64 bg-[#b5000b]/5 rounded-full blur-3xl" />
+            <div className="absolute -top-12 -right-12 w-64 h-64 bg-[hsl(var(--primary))]/5 rounded-full blur-3xl" />
             <div className="absolute -bottom-8 -left-12 w-48 h-48 border-[20px] border-[hsl(var(--surface-low))] z-0" />
           </div>
 

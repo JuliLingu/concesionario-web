@@ -56,7 +56,7 @@ export const ImageLightbox = ({
         type="button"
         onClick={onCerrar}
         aria-label="Cerrar visor"
-        className="absolute right-3 top-3 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-[#b5000b]"
+        className="absolute right-3 top-3 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-[hsl(var(--primary))]"
       >
         <X size={22} />
       </button>

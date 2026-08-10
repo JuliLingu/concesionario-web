@@ -192,6 +192,15 @@ model Configuracion {
   terminosUrl   String?
   privacidadUrl String?
 
+  // Paleta del sitio (hex #rrggbb). Null = se usa el color por defecto.
+  colorPrimario           String? @db.VarChar(7)
+  colorAcento             String? @db.VarChar(7)
+  colorFondo              String? @db.VarChar(7)
+  colorSuperficie         String? @db.VarChar(7)
+  colorTexto              String? @db.VarChar(7)
+  colorTextoSuave         String? @db.VarChar(7)
+  colorTextoSobrePrimario String? @db.VarChar(7)
+
   @@map("configuraciones")
 }
 

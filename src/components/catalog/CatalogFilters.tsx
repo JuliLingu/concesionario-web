@@ -84,19 +84,19 @@ export const CatalogFilters = ({ filtros }: CatalogFiltersProps) => {
 
   return (
     <div
-      className={`w-full bg-white p-6 border border-black/5 transition-opacity duration-200 shadow-[0_20px_40px_rgba(26,28,30,0.06)] rounded ${
+      className={`w-full bg-[hsl(var(--card))] p-6 border border-black/5 transition-opacity duration-200 shadow-[0_20px_40px_rgba(26,28,30,0.06)] rounded ${
         isPending ? "opacity-60 pointer-events-none" : "opacity-100 pointer-events-auto"
       }`}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-2">
-          <SlidersHorizontal size={14} className="text-[#b5000b]" />
+          <SlidersHorizontal size={14} className="text-[hsl(var(--primary))]" />
           <span className="font-black uppercase text-sm tracking-[0.1em] text-[hsl(var(--foreground))]">
             Filtros
           </span>
           {hasFilters && (
-            <div className="w-5 h-5 rounded-full bg-[#b5000b] text-white text-[9px] font-black flex items-center justify-center">
+            <div className="w-5 h-5 rounded-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] text-[9px] font-black flex items-center justify-center">
               {cantidadFiltros}
             </div>
           )}
@@ -104,7 +104,7 @@ export const CatalogFilters = ({ filtros }: CatalogFiltersProps) => {
         {hasFilters && (
           <button
             onClick={() => navigate("")}
-            className="flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.1em] text-[#b5000b] hover:text-[hsl(var(--foreground))] transition-colors p-1"
+            className="flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--primary))] hover:text-[hsl(var(--foreground))] transition-colors p-1"
           >
             <X size={11} />
             Limpiar todo
@@ -193,7 +193,7 @@ export const CatalogFilters = ({ filtros }: CatalogFiltersProps) => {
             <select
               value={currentAnioDesde}
               onChange={(e) => navigate(buildParams({ anioDesde: e.target.value || null }))}
-              className="bg-[hsl(var(--input))] text-xs font-medium px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 text-[hsl(var(--foreground))] w-full appearance-none cursor-pointer"
+              className="bg-[hsl(var(--input))] text-xs font-medium px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 text-[hsl(var(--foreground))] w-full appearance-none cursor-pointer"
             >
               <option value="">Todos</option>
               {anios.map((y) => (
@@ -208,7 +208,7 @@ export const CatalogFilters = ({ filtros }: CatalogFiltersProps) => {
             <select
               value={currentAnioHasta}
               onChange={(e) => navigate(buildParams({ anioHasta: e.target.value || null }))}
-              className="bg-[hsl(var(--input))] text-xs font-medium px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 text-[hsl(var(--foreground))] w-full appearance-none cursor-pointer"
+              className="bg-[hsl(var(--input))] text-xs font-medium px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 text-[hsl(var(--foreground))] w-full appearance-none cursor-pointer"
             >
               <option value="">Todos</option>
               {anios.map((y) => (
@@ -256,7 +256,7 @@ const CheckItem = ({
       type="checkbox"
       checked={checked}
       onChange={onChange}
-      className="w-4 h-4 rounded-sm border-gray-300 accent-[#b5000b] cursor-pointer"
+      className="w-4 h-4 rounded-sm border-gray-300 accent-[hsl(var(--primary))] cursor-pointer"
     />
     <span className={`text-[13px] transition-colors group-hover:text-[hsl(var(--foreground))] ${checked ? 'font-bold text-[hsl(var(--foreground))]' : 'font-medium text-[hsl(var(--muted-foreground))]'}`}>
       {label}

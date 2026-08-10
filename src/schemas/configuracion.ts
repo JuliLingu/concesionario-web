@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { COLOR_HEX_REGEX } from "@/lib/colores";
 
 /** Campo de texto opcional: la cadena vacía se normaliza a null. */
 const textoOpcional = z
@@ -36,6 +37,18 @@ const imagenOpcional = textoOpcional.refine(
     !valor || valor.startsWith("/") || valor.startsWith("https://res.cloudinary.com/"),
   { message: "La imagen debe subirse desde el panel o ser una ruta local" },
 );
+
+/**
+ * Color del sitio: hex de 6 dígitos, el formato que devuelve <input type="color">.
+ *
+ * Se normaliza a minúsculas para que el mismo color no se guarde de dos formas
+ * distintas según el navegador que lo haya cargado.
+ */
+const colorOpcional = textoOpcional
+  .refine((valor) => !valor || COLOR_HEX_REGEX.test(valor), {
+    message: "El color debe tener el formato #rrggbb",
+  })
+  .transform((valor) => (valor ? valor.toLowerCase() : null));
 
 export const ConfiguracionSchema = z.object({
   nombreConcesionaria: z.string().trim().min(1, "El nombre es obligatorio"),
@@ -93,6 +106,15 @@ export const ConfiguracionSchema = z.object({
   footerTexto: textoOpcional,
   terminosUrl: urlOpcional,
   privacidadUrl: urlOpcional,
+
+  // Paleta del sitio
+  colorPrimario: colorOpcional,
+  colorAcento: colorOpcional,
+  colorFondo: colorOpcional,
+  colorSuperficie: colorOpcional,
+  colorTexto: colorOpcional,
+  colorTextoSuave: colorOpcional,
+  colorTextoSobrePrimario: colorOpcional,
 });
 
 export type ConfiguracionInput = z.input<typeof ConfiguracionSchema>;

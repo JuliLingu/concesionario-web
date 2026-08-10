@@ -20,11 +20,11 @@ export const EditModal = ({ isOpen, onClose, vehiculo, categorias, cotizacionDol
         className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
         onClick={onClose} 
       />
-      <div className="relative bg-white rounded-lg shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] flex flex-col">
+      <div className="relative bg-[hsl(var(--card))] rounded-lg shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] flex flex-col">
         {/* Close Button */}
         <button 
           onClick={onClose}
-          className="absolute right-4 top-4 z-10 p-2 bg-black/5 text-[hsl(var(--muted-foreground))] hover:bg-[#b5000b] hover:text-white rounded-full transition-colors"
+          className="absolute right-4 top-4 z-10 p-2 bg-black/5 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--primary))] hover:text-[hsl(var(--primary-foreground))] rounded-full transition-colors"
         >
           <X size={20} />
         </button>

@@ -12,7 +12,7 @@ export function RecentVehiclesUI({
   cotizacionDolar?: number | null;
 }) {
   return (
-    <section className="bg-white py-32">
+    <section className="bg-[hsl(var(--card))] py-32">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="flex flex-col md:flex-row gap-8 mb-24 md:items-end justify-between">
           <div className="max-w-xl">
@@ -22,7 +22,7 @@ export function RecentVehiclesUI({
           </div>
           <Link
             href="/catalogo"
-            className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(var(--foreground))] no-underline pb-2 border-b-2 border-[#b5000b]/20 hover:text-[#b5000b] hover:border-[#b5000b] transition-all duration-300"
+            className="group flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(var(--foreground))] no-underline pb-2 border-b-2 border-[hsl(var(--primary))]/20 hover:text-[hsl(var(--primary))] hover:border-[hsl(var(--primary))] transition-all duration-300"
           >
             Ver Catálogo Completo
             <span className="flex transition-transform duration-300 group-hover:translate-x-2">
