@@ -1,5 +1,3 @@
-// prisma/schema.prisma
-
 generator client {
   provider     = "prisma-client-js"
   output       = "../generated/prisma"
@@ -11,23 +9,18 @@ datasource db {
   relationMode = "prisma"
 }
 
-// ─────────────────────────────────────────
-// AUTENTICACIÓN (requerido por Auth.js)
-// ─────────────────────────────────────────
-
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  password      String? // null si se registró con Google
+  password      String?
   role          Role      @default(USER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-
-  accounts Account[]
-  sessions Session[]
+  accounts      Account[]
+  sessions      Session[]
 
   @@map("users")
 }
@@ -45,8 +38,7 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -57,8 +49,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
@@ -72,9 +63,146 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-// ─────────────────────────────────────────
-// CATÁLOGO DE VEHÍCULOS
-// ─────────────────────────────────────────
+model Categoria {
+  id        String     @id @default(cuid())
+  nombre    String     @unique
+  slug      String     @unique
+  createdAt DateTime   @default(now())
+  vehiculos Vehiculo[]
+
+  @@map("categorias")
+}
+
+model Vehiculo {
+  id                      String                  @id @default(cuid())
+  categoriaId             String
+  marca                   String
+  modelo                  String
+  anio                    Int
+  version                 String?
+  estado                  EstadoVehiculo          @default(USADO)
+  precio                  Decimal                 @db.Decimal(12, 2)
+  moneda                  Moneda                  @default(USD)
+  kilometraje             Int                     @default(0)
+  color                   String?
+  motor                   String?
+  transmision             Transmision?
+  combustible             Combustible?
+  puertas                 Int?
+  potencia                Int?
+  descripcion             String?                 @db.Text
+  publicacion             EstadoPublicacion       @default(BORRADOR)
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+  categoria               Categoria               @relation(fields: [categoriaId], references: [id])
+  imagenes                ImagenVehiculo[]
+  consultas               Consulta[]
+  solicitudesFinanciacion SolicitudFinanciacion[]
+
+  @@index([categoriaId])
+  @@index([publicacion])
+  @@index([marca, modelo])
+  @@map("vehiculos")
+}
+
+model ImagenVehiculo {
+  id          String   @id @default(cuid())
+  vehiculoId  String
+  url         String   @db.Text
+  altText     String?
+  orden       Int      @default(0)
+  esPrincipal Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  vehiculo    Vehiculo @relation(fields: [vehiculoId], references: [id], onDelete: Cascade)
+
+  @@index([vehiculoId])
+  @@map("imagenes_vehiculos")
+}
+
+model Consulta {
+  id         String         @id @default(cuid())
+  vehiculoId String?
+  nombre     String
+  email      String
+  telefono   String?
+  mensaje    String?        @db.Text
+  estado     EstadoConsulta @default(PENDIENTE)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  vehiculo   Vehiculo?      @relation(fields: [vehiculoId], references: [id], onDelete: SetNull)
+
+  @@index([vehiculoId])
+  @@index([estado])
+  @@map("consultas")
+}
+
+model Configuracion {
+  id                  String   @id @default("1")
+  nombreConcesionaria String   @default("JBJ Automotores")
+  telefono            String?
+  email               String?
+  direccion           String?
+  facebookUrl         String?
+  instagramUrl        String?
+  horariosAtencion    String?
+  updatedAt           DateTime @updatedAt
+  cotizacionDolar     Decimal? @db.Decimal(10, 2)
+
+  // Identidad visual
+  logoUrl    String? @db.Text
+  faviconUrl String? @db.Text
+
+  // SEO / metadata del layout
+  siteTitle       String?
+  siteDescription String? @db.Text
+
+  // Portada (Hero)
+  heroTitulo    String?
+  heroSubtitulo String?
+  heroCtaTexto  String?
+  heroCtaUrl    String?
+  heroImagenUrl String? @db.Text
+
+  // Nosotros (CompanyInfo)
+  nosotrosTitulo         String? @db.Text
+  nosotrosTexto          String? @db.Text
+  nosotrosMetrica1Valor  String?
+  nosotrosMetrica1Sufijo String?
+  nosotrosMetrica1Label  String?
+  nosotrosMetrica2Valor  String?
+  nosotrosMetrica2Sufijo String?
+  nosotrosMetrica2Label  String?
+
+  // Financiación
+  finanEyebrow       String?
+  finanTitulo        String?  @db.Text
+  finanTexto         String?  @db.Text
+  finanTasaAnual     Decimal? @db.Decimal(5, 2)
+  finanEntregaMinima Decimal? @db.Decimal(5, 2)
+  finanCtaTexto      String?
+
+  // Consulta por unidad (ficha de vehículo)
+  contactoEyebrow       String?
+  contactoTitulo        String? @db.Text
+  contactoTexto         String? @db.Text
+  contactoWhatsappTexto String?
+
+  // Pie de página
+  footerTexto   String?
+  terminosUrl   String?
+  privacidadUrl String?
+
+  // Paleta del sitio (hex #rrggbb). Null = se usa el color por defecto.
+  colorPrimario           String? @db.VarChar(7)
+  colorAcento             String? @db.VarChar(7)
+  colorFondo              String? @db.VarChar(7)
+  colorSuperficie         String? @db.VarChar(7)
+  colorTexto              String? @db.VarChar(7)
+  colorTextoSuave         String? @db.VarChar(7)
+  colorTextoSobrePrimario String? @db.VarChar(7)
+
+  @@map("configuraciones")
+}
 
 enum Role {
   USER
@@ -84,6 +212,11 @@ enum Role {
 enum EstadoVehiculo {
   NUEVO
   USADO
+}
+
+enum Moneda {
+  ARS
+  USD
 }
 
 enum EstadoPublicacion {
@@ -107,79 +240,6 @@ enum Combustible {
   GNC
 }
 
-model Categoria {
-  id        String   @id @default(cuid())
-  nombre    String   @unique // "Auto", "Camioneta", "Moto", "SUV", etc.
-  slug      String   @unique
-  createdAt DateTime @default(now())
-
-  vehiculos Vehiculo[]
-
-  @@map("categorias")
-}
-
-model Vehiculo {
-  id          String @id @default(cuid())
-  categoriaId String
-
-  // Identificación
-  marca   String
-  modelo  String
-  anio    Int
-  version String? // Ej: "Sport", "Limited", "Base"
-
-  // Estado y precio
-  estado      EstadoVehiculo @default(USADO)
-  precio      Decimal        @db.Decimal(12, 2)
-  moneda      String         @default("ARS")
-  kilometraje Int            @default(0)
-
-  // Características técnicas
-  color       String?
-  motor       String? // Ej: "2.0 TDI", "1.6 16v"
-  transmision Transmision?
-  combustible Combustible?
-  puertas     Int?
-  potencia    Int? // en CV
-
-  // Descripción libre
-  descripcion String? @db.Text
-
-  // Estado de la publicación
-  publicacion EstadoPublicacion @default(BORRADOR)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  categoria Categoria        @relation(fields: [categoriaId], references: [id])
-  imagenes  ImagenVehiculo[]
-  consultas Consulta[]
-
-  @@index([categoriaId])
-  @@index([publicacion])
-  @@index([marca, modelo])
-  @@map("vehiculos")
-}
-
-model ImagenVehiculo {
-  id          String   @id @default(cuid())
-  vehiculoId  String
-  url         String   @db.Text // URL de la imagen (local o servicio externo)
-  altText     String?
-  orden       Int      @default(0) // para ordenar las fotos
-  esPrincipal Boolean  @default(false)
-  createdAt   DateTime @default(now())
-
-  vehiculo Vehiculo @relation(fields: [vehiculoId], references: [id], onDelete: Cascade)
-
-  @@index([vehiculoId])
-  @@map("imagenes_vehiculos")
-}
-
-// ─────────────────────────────────────────
-// CONSULTAS DE CLIENTES
-// ─────────────────────────────────────────
-
 enum EstadoConsulta {
   PENDIENTE
   VISTA
@@ -187,27 +247,36 @@ enum EstadoConsulta {
   CERRADA
 }
 
-model Consulta {
-  id         String  @id @default(cuid())
-  vehiculoId String? // opcional: puede ser una consulta general
-
-  // Datos del cliente
-  nombre   String
-  email    String
-  telefono String?
-
-  // Contenido
-  mensaje String? @db.Text
-
-  // Estado interno para el admin
-  estado EstadoConsulta @default(PENDIENTE)
-
+model PlanFinanciacion {
+  id        String   @id @default(cuid())
+  nombre    String
+  cuotas    Int
+  tasaAnual Decimal  @db.Decimal(5, 2)
+  activo    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  vehiculo Vehiculo? @relation(fields: [vehiculoId], references: [id], onDelete: SetNull)
+  @@map("planes_financiacion")
+}
+
+model SolicitudFinanciacion {
+  id         String         @id @default(cuid())
+  vehiculoId String?
+  nombre     String
+  apellido   String
+  dni        String
+  email      String
+  telefono   String
+  ingresos   Decimal?       @db.Decimal(12, 2)
+  anticipo   Decimal        @db.Decimal(12, 2)
+  cuotas     Int
+  estado     EstadoConsulta @default(PENDIENTE)
+  mensaje    String?        @db.Text
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  vehiculo   Vehiculo?      @relation(fields: [vehiculoId], references: [id], onDelete: SetNull)
 
   @@index([vehiculoId])
   @@index([estado])
-  @@map("consultas")
+  @@map("solicitudes_financiacion")
 }

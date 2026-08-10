@@ -53,6 +53,21 @@ export type ImagenVehiculo = $Result.DefaultSelection<Prisma.$ImagenVehiculoPayl
  * 
  */
 export type Consulta = $Result.DefaultSelection<Prisma.$ConsultaPayload>
+/**
+ * Model Configuracion
+ * 
+ */
+export type Configuracion = $Result.DefaultSelection<Prisma.$ConfiguracionPayload>
+/**
+ * Model PlanFinanciacion
+ * 
+ */
+export type PlanFinanciacion = $Result.DefaultSelection<Prisma.$PlanFinanciacionPayload>
+/**
+ * Model SolicitudFinanciacion
+ * 
+ */
+export type SolicitudFinanciacion = $Result.DefaultSelection<Prisma.$SolicitudFinanciacionPayload>
 
 /**
  * Enums
@@ -72,6 +87,14 @@ export const EstadoVehiculo: {
 };
 
 export type EstadoVehiculo = (typeof EstadoVehiculo)[keyof typeof EstadoVehiculo]
+
+
+export const Moneda: {
+  ARS: 'ARS',
+  USD: 'USD'
+};
+
+export type Moneda = (typeof Moneda)[keyof typeof Moneda]
 
 
 export const EstadoPublicacion: {
@@ -122,6 +145,10 @@ export const Role: typeof $Enums.Role
 export type EstadoVehiculo = $Enums.EstadoVehiculo
 
 export const EstadoVehiculo: typeof $Enums.EstadoVehiculo
+
+export type Moneda = $Enums.Moneda
+
+export const Moneda: typeof $Enums.Moneda
 
 export type EstadoPublicacion = $Enums.EstadoPublicacion
 
@@ -179,7 +206,7 @@ export class PrismaClient<
    * Read more in our [docs](https://pris.ly/d/client).
    */
 
-  constructor(optionsArg ?: Prisma.Subset<ClientOptions, Prisma.PrismaClientOptions>);
+  constructor(optionsArg ?: Prisma.PrismaClientConstructorArgs<ClientOptions>);
   $on<V extends U>(eventType: V, callback: (event: V extends 'query' ? Prisma.QueryEvent : Prisma.LogEvent) => void): PrismaClient;
 
   /**
@@ -252,7 +279,7 @@ export class PrismaClient<
    * 
    * Read more in our [docs](https://www.prisma.io/docs/orm/prisma-client/queries/transactions).
    */
-  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
+  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>
 
@@ -339,6 +366,36 @@ export class PrismaClient<
     * ```
     */
   get consulta(): Prisma.ConsultaDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.configuracion`: Exposes CRUD operations for the **Configuracion** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Configuracions
+    * const configuracions = await prisma.configuracion.findMany()
+    * ```
+    */
+  get configuracion(): Prisma.ConfiguracionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.planFinanciacion`: Exposes CRUD operations for the **PlanFinanciacion** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PlanFinanciacions
+    * const planFinanciacions = await prisma.planFinanciacion.findMany()
+    * ```
+    */
+  get planFinanciacion(): Prisma.PlanFinanciacionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.solicitudFinanciacion`: Exposes CRUD operations for the **SolicitudFinanciacion** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SolicitudFinanciacions
+    * const solicitudFinanciacions = await prisma.solicitudFinanciacion.findMany()
+    * ```
+    */
+  get solicitudFinanciacion(): Prisma.SolicitudFinanciacionDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -389,8 +446,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.6.0
-   * Query Engine version: 75cbdc1eb7150937890ad5465d861175c6624711
+   * Prisma Client JS version: 7.9.1
+   * Query Engine version: e922089b7d7502aff4249d5da3420f6fa55fc6ad
    */
   export type PrismaVersion = {
     client: string
@@ -525,6 +582,19 @@ export namespace Prisma {
   };
 
   /**
+   * Resolved type of the argument passed to the `PrismaClient` constructor.
+   *
+   * When called without a narrower options type (the common case), this resolves
+   * to `PrismaClientOptions` directly, which produces a clear TypeScript error
+   * message (`not assignable to parameter of type 'PrismaClientOptions'`) when
+   * the argument is missing or incomplete. When the user supplies a narrower
+   * options type (e.g. via a literal), it falls back to `Subset` to keep
+   * filtering out unknown properties.
+   */
+  export type PrismaClientConstructorArgs<Options extends PrismaClientOptions> =
+    [PrismaClientOptions] extends [Options] ? PrismaClientOptions : Subset<Options, PrismaClientOptions>;
+
+  /**
    * SelectSubset
    * @desc From `T` pick properties that exist in `U`. Simple version of Intersection.
    * Additionally, it validates, if both select and include are present. If the case, it errors.
@@ -556,7 +626,7 @@ export namespace Prisma {
   type XOR<T, U> =
     T extends object ?
     U extends object ?
-      (Without<T, U> & U) | (Without<U, T> & T)
+      ((Without<T, U> & U) | (Without<U, T> & T)) & object
     : U : T
 
 
@@ -780,7 +850,10 @@ export namespace Prisma {
     Categoria: 'Categoria',
     Vehiculo: 'Vehiculo',
     ImagenVehiculo: 'ImagenVehiculo',
-    Consulta: 'Consulta'
+    Consulta: 'Consulta',
+    Configuracion: 'Configuracion',
+    PlanFinanciacion: 'PlanFinanciacion',
+    SolicitudFinanciacion: 'SolicitudFinanciacion'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -796,7 +869,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "verificationToken" | "categoria" | "vehiculo" | "imagenVehiculo" | "consulta"
+      modelProps: "user" | "account" | "session" | "verificationToken" | "categoria" | "vehiculo" | "imagenVehiculo" | "consulta" | "configuracion" | "planFinanciacion" | "solicitudFinanciacion"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1328,6 +1401,204 @@ export namespace Prisma {
           }
         }
       }
+      Configuracion: {
+        payload: Prisma.$ConfiguracionPayload<ExtArgs>
+        fields: Prisma.ConfiguracionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ConfiguracionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ConfiguracionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionPayload>
+          }
+          findFirst: {
+            args: Prisma.ConfiguracionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ConfiguracionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionPayload>
+          }
+          findMany: {
+            args: Prisma.ConfiguracionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionPayload>[]
+          }
+          create: {
+            args: Prisma.ConfiguracionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionPayload>
+          }
+          createMany: {
+            args: Prisma.ConfiguracionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ConfiguracionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionPayload>
+          }
+          update: {
+            args: Prisma.ConfiguracionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionPayload>
+          }
+          deleteMany: {
+            args: Prisma.ConfiguracionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ConfiguracionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ConfiguracionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionPayload>
+          }
+          aggregate: {
+            args: Prisma.ConfiguracionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateConfiguracion>
+          }
+          groupBy: {
+            args: Prisma.ConfiguracionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ConfiguracionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ConfiguracionCountArgs<ExtArgs>
+            result: $Utils.Optional<ConfiguracionCountAggregateOutputType> | number
+          }
+        }
+      }
+      PlanFinanciacion: {
+        payload: Prisma.$PlanFinanciacionPayload<ExtArgs>
+        fields: Prisma.PlanFinanciacionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PlanFinanciacionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlanFinanciacionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PlanFinanciacionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlanFinanciacionPayload>
+          }
+          findFirst: {
+            args: Prisma.PlanFinanciacionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlanFinanciacionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PlanFinanciacionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlanFinanciacionPayload>
+          }
+          findMany: {
+            args: Prisma.PlanFinanciacionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlanFinanciacionPayload>[]
+          }
+          create: {
+            args: Prisma.PlanFinanciacionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlanFinanciacionPayload>
+          }
+          createMany: {
+            args: Prisma.PlanFinanciacionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.PlanFinanciacionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlanFinanciacionPayload>
+          }
+          update: {
+            args: Prisma.PlanFinanciacionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlanFinanciacionPayload>
+          }
+          deleteMany: {
+            args: Prisma.PlanFinanciacionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PlanFinanciacionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.PlanFinanciacionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlanFinanciacionPayload>
+          }
+          aggregate: {
+            args: Prisma.PlanFinanciacionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePlanFinanciacion>
+          }
+          groupBy: {
+            args: Prisma.PlanFinanciacionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PlanFinanciacionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PlanFinanciacionCountArgs<ExtArgs>
+            result: $Utils.Optional<PlanFinanciacionCountAggregateOutputType> | number
+          }
+        }
+      }
+      SolicitudFinanciacion: {
+        payload: Prisma.$SolicitudFinanciacionPayload<ExtArgs>
+        fields: Prisma.SolicitudFinanciacionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SolicitudFinanciacionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolicitudFinanciacionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SolicitudFinanciacionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolicitudFinanciacionPayload>
+          }
+          findFirst: {
+            args: Prisma.SolicitudFinanciacionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolicitudFinanciacionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SolicitudFinanciacionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolicitudFinanciacionPayload>
+          }
+          findMany: {
+            args: Prisma.SolicitudFinanciacionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolicitudFinanciacionPayload>[]
+          }
+          create: {
+            args: Prisma.SolicitudFinanciacionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolicitudFinanciacionPayload>
+          }
+          createMany: {
+            args: Prisma.SolicitudFinanciacionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.SolicitudFinanciacionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolicitudFinanciacionPayload>
+          }
+          update: {
+            args: Prisma.SolicitudFinanciacionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolicitudFinanciacionPayload>
+          }
+          deleteMany: {
+            args: Prisma.SolicitudFinanciacionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SolicitudFinanciacionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.SolicitudFinanciacionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolicitudFinanciacionPayload>
+          }
+          aggregate: {
+            args: Prisma.SolicitudFinanciacionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSolicitudFinanciacion>
+          }
+          groupBy: {
+            args: Prisma.SolicitudFinanciacionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SolicitudFinanciacionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SolicitudFinanciacionCountArgs<ExtArgs>
+            result: $Utils.Optional<SolicitudFinanciacionCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1396,11 +1667,26 @@ export namespace Prisma {
       isolationLevel?: Prisma.TransactionIsolationLevel
     }
     /**
-     * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
+     * A driver adapter that PrismaClient uses to connect to your database, such as the ones provided by `@prisma/adapter-pg`, `@prisma/adapter-libsql`, `@prisma/adapter-planetscale`, etc.
+     * 
+     * A driver adapter is **required** unless you connect to your database through Prisma Accelerate (in which case use `accelerateUrl` instead).
+     * 
+     * Learn more: https://pris.ly/d/driver-adapters
+     * 
+     * @example
+     * ```ts
+     * import { PrismaPg } from '@prisma/adapter-pg'
+     * import { PrismaClient } from './generated/prisma/client'
+     * 
+     * const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+     * const prisma = new PrismaClient({ adapter })
+     * ```
      */
     adapter?: runtime.SqlDriverAdapterFactory
     /**
-     * Prisma Accelerate URL allowing the client to connect through Accelerate instead of a direct database.
+     * The Prisma Accelerate connection URL. Use this option to connect to your database through Prisma Accelerate instead of using a driver adapter to connect directly.
+     * 
+     * Learn more: https://pris.ly/d/accelerate
      */
     accelerateUrl?: string
     /**
@@ -1444,6 +1730,9 @@ export namespace Prisma {
     vehiculo?: VehiculoOmit
     imagenVehiculo?: ImagenVehiculoOmit
     consulta?: ConsultaOmit
+    configuracion?: ConfiguracionOmit
+    planFinanciacion?: PlanFinanciacionOmit
+    solicitudFinanciacion?: SolicitudFinanciacionOmit
   }
 
   /* Types for Logging */
@@ -1597,11 +1886,13 @@ export namespace Prisma {
   export type VehiculoCountOutputType = {
     imagenes: number
     consultas: number
+    solicitudesFinanciacion: number
   }
 
   export type VehiculoCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     imagenes?: boolean | VehiculoCountOutputTypeCountImagenesArgs
     consultas?: boolean | VehiculoCountOutputTypeCountConsultasArgs
+    solicitudesFinanciacion?: boolean | VehiculoCountOutputTypeCountSolicitudesFinanciacionArgs
   }
 
   // Custom InputTypes
@@ -1627,6 +1918,13 @@ export namespace Prisma {
    */
   export type VehiculoCountOutputTypeCountConsultasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ConsultaWhereInput
+  }
+
+  /**
+   * VehiculoCountOutputType without action
+   */
+  export type VehiculoCountOutputTypeCountSolicitudesFinanciacionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SolicitudFinanciacionWhereInput
   }
 
 
@@ -6485,7 +6783,7 @@ export namespace Prisma {
     version: string | null
     estado: $Enums.EstadoVehiculo | null
     precio: Decimal | null
-    moneda: string | null
+    moneda: $Enums.Moneda | null
     kilometraje: number | null
     color: string | null
     motor: string | null
@@ -6508,7 +6806,7 @@ export namespace Prisma {
     version: string | null
     estado: $Enums.EstadoVehiculo | null
     precio: Decimal | null
-    moneda: string | null
+    moneda: $Enums.Moneda | null
     kilometraje: number | null
     color: string | null
     motor: string | null
@@ -6728,7 +7026,7 @@ export namespace Prisma {
     version: string | null
     estado: $Enums.EstadoVehiculo
     precio: Decimal
-    moneda: string
+    moneda: $Enums.Moneda
     kilometraje: number
     color: string | null
     motor: string | null
@@ -6785,6 +7083,7 @@ export namespace Prisma {
     categoria?: boolean | CategoriaDefaultArgs<ExtArgs>
     imagenes?: boolean | Vehiculo$imagenesArgs<ExtArgs>
     consultas?: boolean | Vehiculo$consultasArgs<ExtArgs>
+    solicitudesFinanciacion?: boolean | Vehiculo$solicitudesFinanciacionArgs<ExtArgs>
     _count?: boolean | VehiculoCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["vehiculo"]>
 
@@ -6818,6 +7117,7 @@ export namespace Prisma {
     categoria?: boolean | CategoriaDefaultArgs<ExtArgs>
     imagenes?: boolean | Vehiculo$imagenesArgs<ExtArgs>
     consultas?: boolean | Vehiculo$consultasArgs<ExtArgs>
+    solicitudesFinanciacion?: boolean | Vehiculo$solicitudesFinanciacionArgs<ExtArgs>
     _count?: boolean | VehiculoCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -6827,6 +7127,7 @@ export namespace Prisma {
       categoria: Prisma.$CategoriaPayload<ExtArgs>
       imagenes: Prisma.$ImagenVehiculoPayload<ExtArgs>[]
       consultas: Prisma.$ConsultaPayload<ExtArgs>[]
+      solicitudesFinanciacion: Prisma.$SolicitudFinanciacionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6837,7 +7138,7 @@ export namespace Prisma {
       version: string | null
       estado: $Enums.EstadoVehiculo
       precio: Prisma.Decimal
-      moneda: string
+      moneda: $Enums.Moneda
       kilometraje: number
       color: string | null
       motor: string | null
@@ -7192,6 +7493,7 @@ export namespace Prisma {
     categoria<T extends CategoriaDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CategoriaDefaultArgs<ExtArgs>>): Prisma__CategoriaClient<$Result.GetResult<Prisma.$CategoriaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     imagenes<T extends Vehiculo$imagenesArgs<ExtArgs> = {}>(args?: Subset<T, Vehiculo$imagenesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImagenVehiculoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     consultas<T extends Vehiculo$consultasArgs<ExtArgs> = {}>(args?: Subset<T, Vehiculo$consultasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConsultaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    solicitudesFinanciacion<T extends Vehiculo$solicitudesFinanciacionArgs<ExtArgs> = {}>(args?: Subset<T, Vehiculo$solicitudesFinanciacionArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SolicitudFinanciacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7229,7 +7531,7 @@ export namespace Prisma {
     readonly version: FieldRef<"Vehiculo", 'String'>
     readonly estado: FieldRef<"Vehiculo", 'EstadoVehiculo'>
     readonly precio: FieldRef<"Vehiculo", 'Decimal'>
-    readonly moneda: FieldRef<"Vehiculo", 'String'>
+    readonly moneda: FieldRef<"Vehiculo", 'Moneda'>
     readonly kilometraje: FieldRef<"Vehiculo", 'Int'>
     readonly color: FieldRef<"Vehiculo", 'String'>
     readonly motor: FieldRef<"Vehiculo", 'String'>
@@ -7634,6 +7936,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ConsultaScalarFieldEnum | ConsultaScalarFieldEnum[]
+  }
+
+  /**
+   * Vehiculo.solicitudesFinanciacion
+   */
+  export type Vehiculo$solicitudesFinanciacionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolicitudFinanciacion
+     */
+    select?: SolicitudFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolicitudFinanciacion
+     */
+    omit?: SolicitudFinanciacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolicitudFinanciacionInclude<ExtArgs> | null
+    where?: SolicitudFinanciacionWhereInput
+    orderBy?: SolicitudFinanciacionOrderByWithRelationInput | SolicitudFinanciacionOrderByWithRelationInput[]
+    cursor?: SolicitudFinanciacionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SolicitudFinanciacionScalarFieldEnum | SolicitudFinanciacionScalarFieldEnum[]
   }
 
   /**
@@ -9643,6 +9969,3438 @@ export namespace Prisma {
 
 
   /**
+   * Model Configuracion
+   */
+
+  export type AggregateConfiguracion = {
+    _count: ConfiguracionCountAggregateOutputType | null
+    _avg: ConfiguracionAvgAggregateOutputType | null
+    _sum: ConfiguracionSumAggregateOutputType | null
+    _min: ConfiguracionMinAggregateOutputType | null
+    _max: ConfiguracionMaxAggregateOutputType | null
+  }
+
+  export type ConfiguracionAvgAggregateOutputType = {
+    cotizacionDolar: Decimal | null
+    finanTasaAnual: Decimal | null
+    finanEntregaMinima: Decimal | null
+  }
+
+  export type ConfiguracionSumAggregateOutputType = {
+    cotizacionDolar: Decimal | null
+    finanTasaAnual: Decimal | null
+    finanEntregaMinima: Decimal | null
+  }
+
+  export type ConfiguracionMinAggregateOutputType = {
+    id: string | null
+    nombreConcesionaria: string | null
+    telefono: string | null
+    email: string | null
+    direccion: string | null
+    facebookUrl: string | null
+    instagramUrl: string | null
+    horariosAtencion: string | null
+    updatedAt: Date | null
+    cotizacionDolar: Decimal | null
+    logoUrl: string | null
+    faviconUrl: string | null
+    siteTitle: string | null
+    siteDescription: string | null
+    heroTitulo: string | null
+    heroSubtitulo: string | null
+    heroCtaTexto: string | null
+    heroCtaUrl: string | null
+    heroImagenUrl: string | null
+    nosotrosTitulo: string | null
+    nosotrosTexto: string | null
+    nosotrosMetrica1Valor: string | null
+    nosotrosMetrica1Sufijo: string | null
+    nosotrosMetrica1Label: string | null
+    nosotrosMetrica2Valor: string | null
+    nosotrosMetrica2Sufijo: string | null
+    nosotrosMetrica2Label: string | null
+    finanEyebrow: string | null
+    finanTitulo: string | null
+    finanTexto: string | null
+    finanTasaAnual: Decimal | null
+    finanEntregaMinima: Decimal | null
+    finanCtaTexto: string | null
+    contactoEyebrow: string | null
+    contactoTitulo: string | null
+    contactoTexto: string | null
+    contactoWhatsappTexto: string | null
+    footerTexto: string | null
+    terminosUrl: string | null
+    privacidadUrl: string | null
+    colorPrimario: string | null
+    colorAcento: string | null
+    colorFondo: string | null
+    colorSuperficie: string | null
+    colorTexto: string | null
+    colorTextoSuave: string | null
+    colorTextoSobrePrimario: string | null
+  }
+
+  export type ConfiguracionMaxAggregateOutputType = {
+    id: string | null
+    nombreConcesionaria: string | null
+    telefono: string | null
+    email: string | null
+    direccion: string | null
+    facebookUrl: string | null
+    instagramUrl: string | null
+    horariosAtencion: string | null
+    updatedAt: Date | null
+    cotizacionDolar: Decimal | null
+    logoUrl: string | null
+    faviconUrl: string | null
+    siteTitle: string | null
+    siteDescription: string | null
+    heroTitulo: string | null
+    heroSubtitulo: string | null
+    heroCtaTexto: string | null
+    heroCtaUrl: string | null
+    heroImagenUrl: string | null
+    nosotrosTitulo: string | null
+    nosotrosTexto: string | null
+    nosotrosMetrica1Valor: string | null
+    nosotrosMetrica1Sufijo: string | null
+    nosotrosMetrica1Label: string | null
+    nosotrosMetrica2Valor: string | null
+    nosotrosMetrica2Sufijo: string | null
+    nosotrosMetrica2Label: string | null
+    finanEyebrow: string | null
+    finanTitulo: string | null
+    finanTexto: string | null
+    finanTasaAnual: Decimal | null
+    finanEntregaMinima: Decimal | null
+    finanCtaTexto: string | null
+    contactoEyebrow: string | null
+    contactoTitulo: string | null
+    contactoTexto: string | null
+    contactoWhatsappTexto: string | null
+    footerTexto: string | null
+    terminosUrl: string | null
+    privacidadUrl: string | null
+    colorPrimario: string | null
+    colorAcento: string | null
+    colorFondo: string | null
+    colorSuperficie: string | null
+    colorTexto: string | null
+    colorTextoSuave: string | null
+    colorTextoSobrePrimario: string | null
+  }
+
+  export type ConfiguracionCountAggregateOutputType = {
+    id: number
+    nombreConcesionaria: number
+    telefono: number
+    email: number
+    direccion: number
+    facebookUrl: number
+    instagramUrl: number
+    horariosAtencion: number
+    updatedAt: number
+    cotizacionDolar: number
+    logoUrl: number
+    faviconUrl: number
+    siteTitle: number
+    siteDescription: number
+    heroTitulo: number
+    heroSubtitulo: number
+    heroCtaTexto: number
+    heroCtaUrl: number
+    heroImagenUrl: number
+    nosotrosTitulo: number
+    nosotrosTexto: number
+    nosotrosMetrica1Valor: number
+    nosotrosMetrica1Sufijo: number
+    nosotrosMetrica1Label: number
+    nosotrosMetrica2Valor: number
+    nosotrosMetrica2Sufijo: number
+    nosotrosMetrica2Label: number
+    finanEyebrow: number
+    finanTitulo: number
+    finanTexto: number
+    finanTasaAnual: number
+    finanEntregaMinima: number
+    finanCtaTexto: number
+    contactoEyebrow: number
+    contactoTitulo: number
+    contactoTexto: number
+    contactoWhatsappTexto: number
+    footerTexto: number
+    terminosUrl: number
+    privacidadUrl: number
+    colorPrimario: number
+    colorAcento: number
+    colorFondo: number
+    colorSuperficie: number
+    colorTexto: number
+    colorTextoSuave: number
+    colorTextoSobrePrimario: number
+    _all: number
+  }
+
+
+  export type ConfiguracionAvgAggregateInputType = {
+    cotizacionDolar?: true
+    finanTasaAnual?: true
+    finanEntregaMinima?: true
+  }
+
+  export type ConfiguracionSumAggregateInputType = {
+    cotizacionDolar?: true
+    finanTasaAnual?: true
+    finanEntregaMinima?: true
+  }
+
+  export type ConfiguracionMinAggregateInputType = {
+    id?: true
+    nombreConcesionaria?: true
+    telefono?: true
+    email?: true
+    direccion?: true
+    facebookUrl?: true
+    instagramUrl?: true
+    horariosAtencion?: true
+    updatedAt?: true
+    cotizacionDolar?: true
+    logoUrl?: true
+    faviconUrl?: true
+    siteTitle?: true
+    siteDescription?: true
+    heroTitulo?: true
+    heroSubtitulo?: true
+    heroCtaTexto?: true
+    heroCtaUrl?: true
+    heroImagenUrl?: true
+    nosotrosTitulo?: true
+    nosotrosTexto?: true
+    nosotrosMetrica1Valor?: true
+    nosotrosMetrica1Sufijo?: true
+    nosotrosMetrica1Label?: true
+    nosotrosMetrica2Valor?: true
+    nosotrosMetrica2Sufijo?: true
+    nosotrosMetrica2Label?: true
+    finanEyebrow?: true
+    finanTitulo?: true
+    finanTexto?: true
+    finanTasaAnual?: true
+    finanEntregaMinima?: true
+    finanCtaTexto?: true
+    contactoEyebrow?: true
+    contactoTitulo?: true
+    contactoTexto?: true
+    contactoWhatsappTexto?: true
+    footerTexto?: true
+    terminosUrl?: true
+    privacidadUrl?: true
+    colorPrimario?: true
+    colorAcento?: true
+    colorFondo?: true
+    colorSuperficie?: true
+    colorTexto?: true
+    colorTextoSuave?: true
+    colorTextoSobrePrimario?: true
+  }
+
+  export type ConfiguracionMaxAggregateInputType = {
+    id?: true
+    nombreConcesionaria?: true
+    telefono?: true
+    email?: true
+    direccion?: true
+    facebookUrl?: true
+    instagramUrl?: true
+    horariosAtencion?: true
+    updatedAt?: true
+    cotizacionDolar?: true
+    logoUrl?: true
+    faviconUrl?: true
+    siteTitle?: true
+    siteDescription?: true
+    heroTitulo?: true
+    heroSubtitulo?: true
+    heroCtaTexto?: true
+    heroCtaUrl?: true
+    heroImagenUrl?: true
+    nosotrosTitulo?: true
+    nosotrosTexto?: true
+    nosotrosMetrica1Valor?: true
+    nosotrosMetrica1Sufijo?: true
+    nosotrosMetrica1Label?: true
+    nosotrosMetrica2Valor?: true
+    nosotrosMetrica2Sufijo?: true
+    nosotrosMetrica2Label?: true
+    finanEyebrow?: true
+    finanTitulo?: true
+    finanTexto?: true
+    finanTasaAnual?: true
+    finanEntregaMinima?: true
+    finanCtaTexto?: true
+    contactoEyebrow?: true
+    contactoTitulo?: true
+    contactoTexto?: true
+    contactoWhatsappTexto?: true
+    footerTexto?: true
+    terminosUrl?: true
+    privacidadUrl?: true
+    colorPrimario?: true
+    colorAcento?: true
+    colorFondo?: true
+    colorSuperficie?: true
+    colorTexto?: true
+    colorTextoSuave?: true
+    colorTextoSobrePrimario?: true
+  }
+
+  export type ConfiguracionCountAggregateInputType = {
+    id?: true
+    nombreConcesionaria?: true
+    telefono?: true
+    email?: true
+    direccion?: true
+    facebookUrl?: true
+    instagramUrl?: true
+    horariosAtencion?: true
+    updatedAt?: true
+    cotizacionDolar?: true
+    logoUrl?: true
+    faviconUrl?: true
+    siteTitle?: true
+    siteDescription?: true
+    heroTitulo?: true
+    heroSubtitulo?: true
+    heroCtaTexto?: true
+    heroCtaUrl?: true
+    heroImagenUrl?: true
+    nosotrosTitulo?: true
+    nosotrosTexto?: true
+    nosotrosMetrica1Valor?: true
+    nosotrosMetrica1Sufijo?: true
+    nosotrosMetrica1Label?: true
+    nosotrosMetrica2Valor?: true
+    nosotrosMetrica2Sufijo?: true
+    nosotrosMetrica2Label?: true
+    finanEyebrow?: true
+    finanTitulo?: true
+    finanTexto?: true
+    finanTasaAnual?: true
+    finanEntregaMinima?: true
+    finanCtaTexto?: true
+    contactoEyebrow?: true
+    contactoTitulo?: true
+    contactoTexto?: true
+    contactoWhatsappTexto?: true
+    footerTexto?: true
+    terminosUrl?: true
+    privacidadUrl?: true
+    colorPrimario?: true
+    colorAcento?: true
+    colorFondo?: true
+    colorSuperficie?: true
+    colorTexto?: true
+    colorTextoSuave?: true
+    colorTextoSobrePrimario?: true
+    _all?: true
+  }
+
+  export type ConfiguracionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Configuracion to aggregate.
+     */
+    where?: ConfiguracionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Configuracions to fetch.
+     */
+    orderBy?: ConfiguracionOrderByWithRelationInput | ConfiguracionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ConfiguracionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Configuracions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Configuracions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Configuracions
+    **/
+    _count?: true | ConfiguracionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ConfiguracionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ConfiguracionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ConfiguracionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ConfiguracionMaxAggregateInputType
+  }
+
+  export type GetConfiguracionAggregateType<T extends ConfiguracionAggregateArgs> = {
+        [P in keyof T & keyof AggregateConfiguracion]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateConfiguracion[P]>
+      : GetScalarType<T[P], AggregateConfiguracion[P]>
+  }
+
+
+
+
+  export type ConfiguracionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ConfiguracionWhereInput
+    orderBy?: ConfiguracionOrderByWithAggregationInput | ConfiguracionOrderByWithAggregationInput[]
+    by: ConfiguracionScalarFieldEnum[] | ConfiguracionScalarFieldEnum
+    having?: ConfiguracionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ConfiguracionCountAggregateInputType | true
+    _avg?: ConfiguracionAvgAggregateInputType
+    _sum?: ConfiguracionSumAggregateInputType
+    _min?: ConfiguracionMinAggregateInputType
+    _max?: ConfiguracionMaxAggregateInputType
+  }
+
+  export type ConfiguracionGroupByOutputType = {
+    id: string
+    nombreConcesionaria: string
+    telefono: string | null
+    email: string | null
+    direccion: string | null
+    facebookUrl: string | null
+    instagramUrl: string | null
+    horariosAtencion: string | null
+    updatedAt: Date
+    cotizacionDolar: Decimal | null
+    logoUrl: string | null
+    faviconUrl: string | null
+    siteTitle: string | null
+    siteDescription: string | null
+    heroTitulo: string | null
+    heroSubtitulo: string | null
+    heroCtaTexto: string | null
+    heroCtaUrl: string | null
+    heroImagenUrl: string | null
+    nosotrosTitulo: string | null
+    nosotrosTexto: string | null
+    nosotrosMetrica1Valor: string | null
+    nosotrosMetrica1Sufijo: string | null
+    nosotrosMetrica1Label: string | null
+    nosotrosMetrica2Valor: string | null
+    nosotrosMetrica2Sufijo: string | null
+    nosotrosMetrica2Label: string | null
+    finanEyebrow: string | null
+    finanTitulo: string | null
+    finanTexto: string | null
+    finanTasaAnual: Decimal | null
+    finanEntregaMinima: Decimal | null
+    finanCtaTexto: string | null
+    contactoEyebrow: string | null
+    contactoTitulo: string | null
+    contactoTexto: string | null
+    contactoWhatsappTexto: string | null
+    footerTexto: string | null
+    terminosUrl: string | null
+    privacidadUrl: string | null
+    colorPrimario: string | null
+    colorAcento: string | null
+    colorFondo: string | null
+    colorSuperficie: string | null
+    colorTexto: string | null
+    colorTextoSuave: string | null
+    colorTextoSobrePrimario: string | null
+    _count: ConfiguracionCountAggregateOutputType | null
+    _avg: ConfiguracionAvgAggregateOutputType | null
+    _sum: ConfiguracionSumAggregateOutputType | null
+    _min: ConfiguracionMinAggregateOutputType | null
+    _max: ConfiguracionMaxAggregateOutputType | null
+  }
+
+  type GetConfiguracionGroupByPayload<T extends ConfiguracionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ConfiguracionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ConfiguracionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ConfiguracionGroupByOutputType[P]>
+            : GetScalarType<T[P], ConfiguracionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ConfiguracionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    nombreConcesionaria?: boolean
+    telefono?: boolean
+    email?: boolean
+    direccion?: boolean
+    facebookUrl?: boolean
+    instagramUrl?: boolean
+    horariosAtencion?: boolean
+    updatedAt?: boolean
+    cotizacionDolar?: boolean
+    logoUrl?: boolean
+    faviconUrl?: boolean
+    siteTitle?: boolean
+    siteDescription?: boolean
+    heroTitulo?: boolean
+    heroSubtitulo?: boolean
+    heroCtaTexto?: boolean
+    heroCtaUrl?: boolean
+    heroImagenUrl?: boolean
+    nosotrosTitulo?: boolean
+    nosotrosTexto?: boolean
+    nosotrosMetrica1Valor?: boolean
+    nosotrosMetrica1Sufijo?: boolean
+    nosotrosMetrica1Label?: boolean
+    nosotrosMetrica2Valor?: boolean
+    nosotrosMetrica2Sufijo?: boolean
+    nosotrosMetrica2Label?: boolean
+    finanEyebrow?: boolean
+    finanTitulo?: boolean
+    finanTexto?: boolean
+    finanTasaAnual?: boolean
+    finanEntregaMinima?: boolean
+    finanCtaTexto?: boolean
+    contactoEyebrow?: boolean
+    contactoTitulo?: boolean
+    contactoTexto?: boolean
+    contactoWhatsappTexto?: boolean
+    footerTexto?: boolean
+    terminosUrl?: boolean
+    privacidadUrl?: boolean
+    colorPrimario?: boolean
+    colorAcento?: boolean
+    colorFondo?: boolean
+    colorSuperficie?: boolean
+    colorTexto?: boolean
+    colorTextoSuave?: boolean
+    colorTextoSobrePrimario?: boolean
+  }, ExtArgs["result"]["configuracion"]>
+
+
+
+  export type ConfiguracionSelectScalar = {
+    id?: boolean
+    nombreConcesionaria?: boolean
+    telefono?: boolean
+    email?: boolean
+    direccion?: boolean
+    facebookUrl?: boolean
+    instagramUrl?: boolean
+    horariosAtencion?: boolean
+    updatedAt?: boolean
+    cotizacionDolar?: boolean
+    logoUrl?: boolean
+    faviconUrl?: boolean
+    siteTitle?: boolean
+    siteDescription?: boolean
+    heroTitulo?: boolean
+    heroSubtitulo?: boolean
+    heroCtaTexto?: boolean
+    heroCtaUrl?: boolean
+    heroImagenUrl?: boolean
+    nosotrosTitulo?: boolean
+    nosotrosTexto?: boolean
+    nosotrosMetrica1Valor?: boolean
+    nosotrosMetrica1Sufijo?: boolean
+    nosotrosMetrica1Label?: boolean
+    nosotrosMetrica2Valor?: boolean
+    nosotrosMetrica2Sufijo?: boolean
+    nosotrosMetrica2Label?: boolean
+    finanEyebrow?: boolean
+    finanTitulo?: boolean
+    finanTexto?: boolean
+    finanTasaAnual?: boolean
+    finanEntregaMinima?: boolean
+    finanCtaTexto?: boolean
+    contactoEyebrow?: boolean
+    contactoTitulo?: boolean
+    contactoTexto?: boolean
+    contactoWhatsappTexto?: boolean
+    footerTexto?: boolean
+    terminosUrl?: boolean
+    privacidadUrl?: boolean
+    colorPrimario?: boolean
+    colorAcento?: boolean
+    colorFondo?: boolean
+    colorSuperficie?: boolean
+    colorTexto?: boolean
+    colorTextoSuave?: boolean
+    colorTextoSobrePrimario?: boolean
+  }
+
+  export type ConfiguracionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombreConcesionaria" | "telefono" | "email" | "direccion" | "facebookUrl" | "instagramUrl" | "horariosAtencion" | "updatedAt" | "cotizacionDolar" | "logoUrl" | "faviconUrl" | "siteTitle" | "siteDescription" | "heroTitulo" | "heroSubtitulo" | "heroCtaTexto" | "heroCtaUrl" | "heroImagenUrl" | "nosotrosTitulo" | "nosotrosTexto" | "nosotrosMetrica1Valor" | "nosotrosMetrica1Sufijo" | "nosotrosMetrica1Label" | "nosotrosMetrica2Valor" | "nosotrosMetrica2Sufijo" | "nosotrosMetrica2Label" | "finanEyebrow" | "finanTitulo" | "finanTexto" | "finanTasaAnual" | "finanEntregaMinima" | "finanCtaTexto" | "contactoEyebrow" | "contactoTitulo" | "contactoTexto" | "contactoWhatsappTexto" | "footerTexto" | "terminosUrl" | "privacidadUrl" | "colorPrimario" | "colorAcento" | "colorFondo" | "colorSuperficie" | "colorTexto" | "colorTextoSuave" | "colorTextoSobrePrimario", ExtArgs["result"]["configuracion"]>
+
+  export type $ConfiguracionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Configuracion"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      nombreConcesionaria: string
+      telefono: string | null
+      email: string | null
+      direccion: string | null
+      facebookUrl: string | null
+      instagramUrl: string | null
+      horariosAtencion: string | null
+      updatedAt: Date
+      cotizacionDolar: Prisma.Decimal | null
+      logoUrl: string | null
+      faviconUrl: string | null
+      siteTitle: string | null
+      siteDescription: string | null
+      heroTitulo: string | null
+      heroSubtitulo: string | null
+      heroCtaTexto: string | null
+      heroCtaUrl: string | null
+      heroImagenUrl: string | null
+      nosotrosTitulo: string | null
+      nosotrosTexto: string | null
+      nosotrosMetrica1Valor: string | null
+      nosotrosMetrica1Sufijo: string | null
+      nosotrosMetrica1Label: string | null
+      nosotrosMetrica2Valor: string | null
+      nosotrosMetrica2Sufijo: string | null
+      nosotrosMetrica2Label: string | null
+      finanEyebrow: string | null
+      finanTitulo: string | null
+      finanTexto: string | null
+      finanTasaAnual: Prisma.Decimal | null
+      finanEntregaMinima: Prisma.Decimal | null
+      finanCtaTexto: string | null
+      contactoEyebrow: string | null
+      contactoTitulo: string | null
+      contactoTexto: string | null
+      contactoWhatsappTexto: string | null
+      footerTexto: string | null
+      terminosUrl: string | null
+      privacidadUrl: string | null
+      colorPrimario: string | null
+      colorAcento: string | null
+      colorFondo: string | null
+      colorSuperficie: string | null
+      colorTexto: string | null
+      colorTextoSuave: string | null
+      colorTextoSobrePrimario: string | null
+    }, ExtArgs["result"]["configuracion"]>
+    composites: {}
+  }
+
+  type ConfiguracionGetPayload<S extends boolean | null | undefined | ConfiguracionDefaultArgs> = $Result.GetResult<Prisma.$ConfiguracionPayload, S>
+
+  type ConfiguracionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ConfiguracionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ConfiguracionCountAggregateInputType | true
+    }
+
+  export interface ConfiguracionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Configuracion'], meta: { name: 'Configuracion' } }
+    /**
+     * Find zero or one Configuracion that matches the filter.
+     * @param {ConfiguracionFindUniqueArgs} args - Arguments to find a Configuracion
+     * @example
+     * // Get one Configuracion
+     * const configuracion = await prisma.configuracion.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ConfiguracionFindUniqueArgs>(args: SelectSubset<T, ConfiguracionFindUniqueArgs<ExtArgs>>): Prisma__ConfiguracionClient<$Result.GetResult<Prisma.$ConfiguracionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Configuracion that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ConfiguracionFindUniqueOrThrowArgs} args - Arguments to find a Configuracion
+     * @example
+     * // Get one Configuracion
+     * const configuracion = await prisma.configuracion.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ConfiguracionFindUniqueOrThrowArgs>(args: SelectSubset<T, ConfiguracionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ConfiguracionClient<$Result.GetResult<Prisma.$ConfiguracionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Configuracion that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionFindFirstArgs} args - Arguments to find a Configuracion
+     * @example
+     * // Get one Configuracion
+     * const configuracion = await prisma.configuracion.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ConfiguracionFindFirstArgs>(args?: SelectSubset<T, ConfiguracionFindFirstArgs<ExtArgs>>): Prisma__ConfiguracionClient<$Result.GetResult<Prisma.$ConfiguracionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Configuracion that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionFindFirstOrThrowArgs} args - Arguments to find a Configuracion
+     * @example
+     * // Get one Configuracion
+     * const configuracion = await prisma.configuracion.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ConfiguracionFindFirstOrThrowArgs>(args?: SelectSubset<T, ConfiguracionFindFirstOrThrowArgs<ExtArgs>>): Prisma__ConfiguracionClient<$Result.GetResult<Prisma.$ConfiguracionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Configuracions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Configuracions
+     * const configuracions = await prisma.configuracion.findMany()
+     * 
+     * // Get first 10 Configuracions
+     * const configuracions = await prisma.configuracion.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const configuracionWithIdOnly = await prisma.configuracion.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ConfiguracionFindManyArgs>(args?: SelectSubset<T, ConfiguracionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConfiguracionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Configuracion.
+     * @param {ConfiguracionCreateArgs} args - Arguments to create a Configuracion.
+     * @example
+     * // Create one Configuracion
+     * const Configuracion = await prisma.configuracion.create({
+     *   data: {
+     *     // ... data to create a Configuracion
+     *   }
+     * })
+     * 
+     */
+    create<T extends ConfiguracionCreateArgs>(args: SelectSubset<T, ConfiguracionCreateArgs<ExtArgs>>): Prisma__ConfiguracionClient<$Result.GetResult<Prisma.$ConfiguracionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Configuracions.
+     * @param {ConfiguracionCreateManyArgs} args - Arguments to create many Configuracions.
+     * @example
+     * // Create many Configuracions
+     * const configuracion = await prisma.configuracion.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ConfiguracionCreateManyArgs>(args?: SelectSubset<T, ConfiguracionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Configuracion.
+     * @param {ConfiguracionDeleteArgs} args - Arguments to delete one Configuracion.
+     * @example
+     * // Delete one Configuracion
+     * const Configuracion = await prisma.configuracion.delete({
+     *   where: {
+     *     // ... filter to delete one Configuracion
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ConfiguracionDeleteArgs>(args: SelectSubset<T, ConfiguracionDeleteArgs<ExtArgs>>): Prisma__ConfiguracionClient<$Result.GetResult<Prisma.$ConfiguracionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Configuracion.
+     * @param {ConfiguracionUpdateArgs} args - Arguments to update one Configuracion.
+     * @example
+     * // Update one Configuracion
+     * const configuracion = await prisma.configuracion.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ConfiguracionUpdateArgs>(args: SelectSubset<T, ConfiguracionUpdateArgs<ExtArgs>>): Prisma__ConfiguracionClient<$Result.GetResult<Prisma.$ConfiguracionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Configuracions.
+     * @param {ConfiguracionDeleteManyArgs} args - Arguments to filter Configuracions to delete.
+     * @example
+     * // Delete a few Configuracions
+     * const { count } = await prisma.configuracion.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ConfiguracionDeleteManyArgs>(args?: SelectSubset<T, ConfiguracionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Configuracions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Configuracions
+     * const configuracion = await prisma.configuracion.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ConfiguracionUpdateManyArgs>(args: SelectSubset<T, ConfiguracionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Configuracion.
+     * @param {ConfiguracionUpsertArgs} args - Arguments to update or create a Configuracion.
+     * @example
+     * // Update or create a Configuracion
+     * const configuracion = await prisma.configuracion.upsert({
+     *   create: {
+     *     // ... data to create a Configuracion
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Configuracion we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ConfiguracionUpsertArgs>(args: SelectSubset<T, ConfiguracionUpsertArgs<ExtArgs>>): Prisma__ConfiguracionClient<$Result.GetResult<Prisma.$ConfiguracionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Configuracions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionCountArgs} args - Arguments to filter Configuracions to count.
+     * @example
+     * // Count the number of Configuracions
+     * const count = await prisma.configuracion.count({
+     *   where: {
+     *     // ... the filter for the Configuracions we want to count
+     *   }
+     * })
+    **/
+    count<T extends ConfiguracionCountArgs>(
+      args?: Subset<T, ConfiguracionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ConfiguracionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Configuracion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ConfiguracionAggregateArgs>(args: Subset<T, ConfiguracionAggregateArgs>): Prisma.PrismaPromise<GetConfiguracionAggregateType<T>>
+
+    /**
+     * Group by Configuracion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ConfiguracionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ConfiguracionGroupByArgs['orderBy'] }
+        : { orderBy?: ConfiguracionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ConfiguracionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetConfiguracionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Configuracion model
+   */
+  readonly fields: ConfiguracionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Configuracion.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ConfiguracionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Configuracion model
+   */
+  interface ConfiguracionFieldRefs {
+    readonly id: FieldRef<"Configuracion", 'String'>
+    readonly nombreConcesionaria: FieldRef<"Configuracion", 'String'>
+    readonly telefono: FieldRef<"Configuracion", 'String'>
+    readonly email: FieldRef<"Configuracion", 'String'>
+    readonly direccion: FieldRef<"Configuracion", 'String'>
+    readonly facebookUrl: FieldRef<"Configuracion", 'String'>
+    readonly instagramUrl: FieldRef<"Configuracion", 'String'>
+    readonly horariosAtencion: FieldRef<"Configuracion", 'String'>
+    readonly updatedAt: FieldRef<"Configuracion", 'DateTime'>
+    readonly cotizacionDolar: FieldRef<"Configuracion", 'Decimal'>
+    readonly logoUrl: FieldRef<"Configuracion", 'String'>
+    readonly faviconUrl: FieldRef<"Configuracion", 'String'>
+    readonly siteTitle: FieldRef<"Configuracion", 'String'>
+    readonly siteDescription: FieldRef<"Configuracion", 'String'>
+    readonly heroTitulo: FieldRef<"Configuracion", 'String'>
+    readonly heroSubtitulo: FieldRef<"Configuracion", 'String'>
+    readonly heroCtaTexto: FieldRef<"Configuracion", 'String'>
+    readonly heroCtaUrl: FieldRef<"Configuracion", 'String'>
+    readonly heroImagenUrl: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosTitulo: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosTexto: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosMetrica1Valor: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosMetrica1Sufijo: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosMetrica1Label: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosMetrica2Valor: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosMetrica2Sufijo: FieldRef<"Configuracion", 'String'>
+    readonly nosotrosMetrica2Label: FieldRef<"Configuracion", 'String'>
+    readonly finanEyebrow: FieldRef<"Configuracion", 'String'>
+    readonly finanTitulo: FieldRef<"Configuracion", 'String'>
+    readonly finanTexto: FieldRef<"Configuracion", 'String'>
+    readonly finanTasaAnual: FieldRef<"Configuracion", 'Decimal'>
+    readonly finanEntregaMinima: FieldRef<"Configuracion", 'Decimal'>
+    readonly finanCtaTexto: FieldRef<"Configuracion", 'String'>
+    readonly contactoEyebrow: FieldRef<"Configuracion", 'String'>
+    readonly contactoTitulo: FieldRef<"Configuracion", 'String'>
+    readonly contactoTexto: FieldRef<"Configuracion", 'String'>
+    readonly contactoWhatsappTexto: FieldRef<"Configuracion", 'String'>
+    readonly footerTexto: FieldRef<"Configuracion", 'String'>
+    readonly terminosUrl: FieldRef<"Configuracion", 'String'>
+    readonly privacidadUrl: FieldRef<"Configuracion", 'String'>
+    readonly colorPrimario: FieldRef<"Configuracion", 'String'>
+    readonly colorAcento: FieldRef<"Configuracion", 'String'>
+    readonly colorFondo: FieldRef<"Configuracion", 'String'>
+    readonly colorSuperficie: FieldRef<"Configuracion", 'String'>
+    readonly colorTexto: FieldRef<"Configuracion", 'String'>
+    readonly colorTextoSuave: FieldRef<"Configuracion", 'String'>
+    readonly colorTextoSobrePrimario: FieldRef<"Configuracion", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Configuracion findUnique
+   */
+  export type ConfiguracionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Configuracion
+     */
+    select?: ConfiguracionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Configuracion
+     */
+    omit?: ConfiguracionOmit<ExtArgs> | null
+    /**
+     * Filter, which Configuracion to fetch.
+     */
+    where: ConfiguracionWhereUniqueInput
+  }
+
+  /**
+   * Configuracion findUniqueOrThrow
+   */
+  export type ConfiguracionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Configuracion
+     */
+    select?: ConfiguracionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Configuracion
+     */
+    omit?: ConfiguracionOmit<ExtArgs> | null
+    /**
+     * Filter, which Configuracion to fetch.
+     */
+    where: ConfiguracionWhereUniqueInput
+  }
+
+  /**
+   * Configuracion findFirst
+   */
+  export type ConfiguracionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Configuracion
+     */
+    select?: ConfiguracionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Configuracion
+     */
+    omit?: ConfiguracionOmit<ExtArgs> | null
+    /**
+     * Filter, which Configuracion to fetch.
+     */
+    where?: ConfiguracionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Configuracions to fetch.
+     */
+    orderBy?: ConfiguracionOrderByWithRelationInput | ConfiguracionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Configuracions.
+     */
+    cursor?: ConfiguracionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Configuracions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Configuracions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Configuracions.
+     */
+    distinct?: ConfiguracionScalarFieldEnum | ConfiguracionScalarFieldEnum[]
+  }
+
+  /**
+   * Configuracion findFirstOrThrow
+   */
+  export type ConfiguracionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Configuracion
+     */
+    select?: ConfiguracionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Configuracion
+     */
+    omit?: ConfiguracionOmit<ExtArgs> | null
+    /**
+     * Filter, which Configuracion to fetch.
+     */
+    where?: ConfiguracionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Configuracions to fetch.
+     */
+    orderBy?: ConfiguracionOrderByWithRelationInput | ConfiguracionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Configuracions.
+     */
+    cursor?: ConfiguracionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Configuracions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Configuracions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Configuracions.
+     */
+    distinct?: ConfiguracionScalarFieldEnum | ConfiguracionScalarFieldEnum[]
+  }
+
+  /**
+   * Configuracion findMany
+   */
+  export type ConfiguracionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Configuracion
+     */
+    select?: ConfiguracionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Configuracion
+     */
+    omit?: ConfiguracionOmit<ExtArgs> | null
+    /**
+     * Filter, which Configuracions to fetch.
+     */
+    where?: ConfiguracionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Configuracions to fetch.
+     */
+    orderBy?: ConfiguracionOrderByWithRelationInput | ConfiguracionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Configuracions.
+     */
+    cursor?: ConfiguracionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Configuracions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Configuracions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Configuracions.
+     */
+    distinct?: ConfiguracionScalarFieldEnum | ConfiguracionScalarFieldEnum[]
+  }
+
+  /**
+   * Configuracion create
+   */
+  export type ConfiguracionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Configuracion
+     */
+    select?: ConfiguracionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Configuracion
+     */
+    omit?: ConfiguracionOmit<ExtArgs> | null
+    /**
+     * The data needed to create a Configuracion.
+     */
+    data: XOR<ConfiguracionCreateInput, ConfiguracionUncheckedCreateInput>
+  }
+
+  /**
+   * Configuracion createMany
+   */
+  export type ConfiguracionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Configuracions.
+     */
+    data: ConfiguracionCreateManyInput | ConfiguracionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Configuracion update
+   */
+  export type ConfiguracionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Configuracion
+     */
+    select?: ConfiguracionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Configuracion
+     */
+    omit?: ConfiguracionOmit<ExtArgs> | null
+    /**
+     * The data needed to update a Configuracion.
+     */
+    data: XOR<ConfiguracionUpdateInput, ConfiguracionUncheckedUpdateInput>
+    /**
+     * Choose, which Configuracion to update.
+     */
+    where: ConfiguracionWhereUniqueInput
+  }
+
+  /**
+   * Configuracion updateMany
+   */
+  export type ConfiguracionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Configuracions.
+     */
+    data: XOR<ConfiguracionUpdateManyMutationInput, ConfiguracionUncheckedUpdateManyInput>
+    /**
+     * Filter which Configuracions to update
+     */
+    where?: ConfiguracionWhereInput
+    /**
+     * Limit how many Configuracions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Configuracion upsert
+   */
+  export type ConfiguracionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Configuracion
+     */
+    select?: ConfiguracionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Configuracion
+     */
+    omit?: ConfiguracionOmit<ExtArgs> | null
+    /**
+     * The filter to search for the Configuracion to update in case it exists.
+     */
+    where: ConfiguracionWhereUniqueInput
+    /**
+     * In case the Configuracion found by the `where` argument doesn't exist, create a new Configuracion with this data.
+     */
+    create: XOR<ConfiguracionCreateInput, ConfiguracionUncheckedCreateInput>
+    /**
+     * In case the Configuracion was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ConfiguracionUpdateInput, ConfiguracionUncheckedUpdateInput>
+  }
+
+  /**
+   * Configuracion delete
+   */
+  export type ConfiguracionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Configuracion
+     */
+    select?: ConfiguracionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Configuracion
+     */
+    omit?: ConfiguracionOmit<ExtArgs> | null
+    /**
+     * Filter which Configuracion to delete.
+     */
+    where: ConfiguracionWhereUniqueInput
+  }
+
+  /**
+   * Configuracion deleteMany
+   */
+  export type ConfiguracionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Configuracions to delete
+     */
+    where?: ConfiguracionWhereInput
+    /**
+     * Limit how many Configuracions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Configuracion without action
+   */
+  export type ConfiguracionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Configuracion
+     */
+    select?: ConfiguracionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Configuracion
+     */
+    omit?: ConfiguracionOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PlanFinanciacion
+   */
+
+  export type AggregatePlanFinanciacion = {
+    _count: PlanFinanciacionCountAggregateOutputType | null
+    _avg: PlanFinanciacionAvgAggregateOutputType | null
+    _sum: PlanFinanciacionSumAggregateOutputType | null
+    _min: PlanFinanciacionMinAggregateOutputType | null
+    _max: PlanFinanciacionMaxAggregateOutputType | null
+  }
+
+  export type PlanFinanciacionAvgAggregateOutputType = {
+    cuotas: number | null
+    tasaAnual: Decimal | null
+  }
+
+  export type PlanFinanciacionSumAggregateOutputType = {
+    cuotas: number | null
+    tasaAnual: Decimal | null
+  }
+
+  export type PlanFinanciacionMinAggregateOutputType = {
+    id: string | null
+    nombre: string | null
+    cuotas: number | null
+    tasaAnual: Decimal | null
+    activo: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PlanFinanciacionMaxAggregateOutputType = {
+    id: string | null
+    nombre: string | null
+    cuotas: number | null
+    tasaAnual: Decimal | null
+    activo: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PlanFinanciacionCountAggregateOutputType = {
+    id: number
+    nombre: number
+    cuotas: number
+    tasaAnual: number
+    activo: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PlanFinanciacionAvgAggregateInputType = {
+    cuotas?: true
+    tasaAnual?: true
+  }
+
+  export type PlanFinanciacionSumAggregateInputType = {
+    cuotas?: true
+    tasaAnual?: true
+  }
+
+  export type PlanFinanciacionMinAggregateInputType = {
+    id?: true
+    nombre?: true
+    cuotas?: true
+    tasaAnual?: true
+    activo?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PlanFinanciacionMaxAggregateInputType = {
+    id?: true
+    nombre?: true
+    cuotas?: true
+    tasaAnual?: true
+    activo?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PlanFinanciacionCountAggregateInputType = {
+    id?: true
+    nombre?: true
+    cuotas?: true
+    tasaAnual?: true
+    activo?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PlanFinanciacionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlanFinanciacion to aggregate.
+     */
+    where?: PlanFinanciacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlanFinanciacions to fetch.
+     */
+    orderBy?: PlanFinanciacionOrderByWithRelationInput | PlanFinanciacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PlanFinanciacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlanFinanciacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlanFinanciacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PlanFinanciacions
+    **/
+    _count?: true | PlanFinanciacionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PlanFinanciacionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PlanFinanciacionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PlanFinanciacionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PlanFinanciacionMaxAggregateInputType
+  }
+
+  export type GetPlanFinanciacionAggregateType<T extends PlanFinanciacionAggregateArgs> = {
+        [P in keyof T & keyof AggregatePlanFinanciacion]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePlanFinanciacion[P]>
+      : GetScalarType<T[P], AggregatePlanFinanciacion[P]>
+  }
+
+
+
+
+  export type PlanFinanciacionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlanFinanciacionWhereInput
+    orderBy?: PlanFinanciacionOrderByWithAggregationInput | PlanFinanciacionOrderByWithAggregationInput[]
+    by: PlanFinanciacionScalarFieldEnum[] | PlanFinanciacionScalarFieldEnum
+    having?: PlanFinanciacionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PlanFinanciacionCountAggregateInputType | true
+    _avg?: PlanFinanciacionAvgAggregateInputType
+    _sum?: PlanFinanciacionSumAggregateInputType
+    _min?: PlanFinanciacionMinAggregateInputType
+    _max?: PlanFinanciacionMaxAggregateInputType
+  }
+
+  export type PlanFinanciacionGroupByOutputType = {
+    id: string
+    nombre: string
+    cuotas: number
+    tasaAnual: Decimal
+    activo: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: PlanFinanciacionCountAggregateOutputType | null
+    _avg: PlanFinanciacionAvgAggregateOutputType | null
+    _sum: PlanFinanciacionSumAggregateOutputType | null
+    _min: PlanFinanciacionMinAggregateOutputType | null
+    _max: PlanFinanciacionMaxAggregateOutputType | null
+  }
+
+  type GetPlanFinanciacionGroupByPayload<T extends PlanFinanciacionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PlanFinanciacionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PlanFinanciacionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PlanFinanciacionGroupByOutputType[P]>
+            : GetScalarType<T[P], PlanFinanciacionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PlanFinanciacionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    nombre?: boolean
+    cuotas?: boolean
+    tasaAnual?: boolean
+    activo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["planFinanciacion"]>
+
+
+
+  export type PlanFinanciacionSelectScalar = {
+    id?: boolean
+    nombre?: boolean
+    cuotas?: boolean
+    tasaAnual?: boolean
+    activo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PlanFinanciacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombre" | "cuotas" | "tasaAnual" | "activo" | "createdAt" | "updatedAt", ExtArgs["result"]["planFinanciacion"]>
+
+  export type $PlanFinanciacionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PlanFinanciacion"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      nombre: string
+      cuotas: number
+      tasaAnual: Prisma.Decimal
+      activo: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["planFinanciacion"]>
+    composites: {}
+  }
+
+  type PlanFinanciacionGetPayload<S extends boolean | null | undefined | PlanFinanciacionDefaultArgs> = $Result.GetResult<Prisma.$PlanFinanciacionPayload, S>
+
+  type PlanFinanciacionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PlanFinanciacionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PlanFinanciacionCountAggregateInputType | true
+    }
+
+  export interface PlanFinanciacionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PlanFinanciacion'], meta: { name: 'PlanFinanciacion' } }
+    /**
+     * Find zero or one PlanFinanciacion that matches the filter.
+     * @param {PlanFinanciacionFindUniqueArgs} args - Arguments to find a PlanFinanciacion
+     * @example
+     * // Get one PlanFinanciacion
+     * const planFinanciacion = await prisma.planFinanciacion.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PlanFinanciacionFindUniqueArgs>(args: SelectSubset<T, PlanFinanciacionFindUniqueArgs<ExtArgs>>): Prisma__PlanFinanciacionClient<$Result.GetResult<Prisma.$PlanFinanciacionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PlanFinanciacion that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PlanFinanciacionFindUniqueOrThrowArgs} args - Arguments to find a PlanFinanciacion
+     * @example
+     * // Get one PlanFinanciacion
+     * const planFinanciacion = await prisma.planFinanciacion.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PlanFinanciacionFindUniqueOrThrowArgs>(args: SelectSubset<T, PlanFinanciacionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PlanFinanciacionClient<$Result.GetResult<Prisma.$PlanFinanciacionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PlanFinanciacion that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlanFinanciacionFindFirstArgs} args - Arguments to find a PlanFinanciacion
+     * @example
+     * // Get one PlanFinanciacion
+     * const planFinanciacion = await prisma.planFinanciacion.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PlanFinanciacionFindFirstArgs>(args?: SelectSubset<T, PlanFinanciacionFindFirstArgs<ExtArgs>>): Prisma__PlanFinanciacionClient<$Result.GetResult<Prisma.$PlanFinanciacionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PlanFinanciacion that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlanFinanciacionFindFirstOrThrowArgs} args - Arguments to find a PlanFinanciacion
+     * @example
+     * // Get one PlanFinanciacion
+     * const planFinanciacion = await prisma.planFinanciacion.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PlanFinanciacionFindFirstOrThrowArgs>(args?: SelectSubset<T, PlanFinanciacionFindFirstOrThrowArgs<ExtArgs>>): Prisma__PlanFinanciacionClient<$Result.GetResult<Prisma.$PlanFinanciacionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PlanFinanciacions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlanFinanciacionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PlanFinanciacions
+     * const planFinanciacions = await prisma.planFinanciacion.findMany()
+     * 
+     * // Get first 10 PlanFinanciacions
+     * const planFinanciacions = await prisma.planFinanciacion.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const planFinanciacionWithIdOnly = await prisma.planFinanciacion.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PlanFinanciacionFindManyArgs>(args?: SelectSubset<T, PlanFinanciacionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlanFinanciacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PlanFinanciacion.
+     * @param {PlanFinanciacionCreateArgs} args - Arguments to create a PlanFinanciacion.
+     * @example
+     * // Create one PlanFinanciacion
+     * const PlanFinanciacion = await prisma.planFinanciacion.create({
+     *   data: {
+     *     // ... data to create a PlanFinanciacion
+     *   }
+     * })
+     * 
+     */
+    create<T extends PlanFinanciacionCreateArgs>(args: SelectSubset<T, PlanFinanciacionCreateArgs<ExtArgs>>): Prisma__PlanFinanciacionClient<$Result.GetResult<Prisma.$PlanFinanciacionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PlanFinanciacions.
+     * @param {PlanFinanciacionCreateManyArgs} args - Arguments to create many PlanFinanciacions.
+     * @example
+     * // Create many PlanFinanciacions
+     * const planFinanciacion = await prisma.planFinanciacion.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PlanFinanciacionCreateManyArgs>(args?: SelectSubset<T, PlanFinanciacionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a PlanFinanciacion.
+     * @param {PlanFinanciacionDeleteArgs} args - Arguments to delete one PlanFinanciacion.
+     * @example
+     * // Delete one PlanFinanciacion
+     * const PlanFinanciacion = await prisma.planFinanciacion.delete({
+     *   where: {
+     *     // ... filter to delete one PlanFinanciacion
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PlanFinanciacionDeleteArgs>(args: SelectSubset<T, PlanFinanciacionDeleteArgs<ExtArgs>>): Prisma__PlanFinanciacionClient<$Result.GetResult<Prisma.$PlanFinanciacionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PlanFinanciacion.
+     * @param {PlanFinanciacionUpdateArgs} args - Arguments to update one PlanFinanciacion.
+     * @example
+     * // Update one PlanFinanciacion
+     * const planFinanciacion = await prisma.planFinanciacion.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PlanFinanciacionUpdateArgs>(args: SelectSubset<T, PlanFinanciacionUpdateArgs<ExtArgs>>): Prisma__PlanFinanciacionClient<$Result.GetResult<Prisma.$PlanFinanciacionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PlanFinanciacions.
+     * @param {PlanFinanciacionDeleteManyArgs} args - Arguments to filter PlanFinanciacions to delete.
+     * @example
+     * // Delete a few PlanFinanciacions
+     * const { count } = await prisma.planFinanciacion.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PlanFinanciacionDeleteManyArgs>(args?: SelectSubset<T, PlanFinanciacionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PlanFinanciacions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlanFinanciacionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PlanFinanciacions
+     * const planFinanciacion = await prisma.planFinanciacion.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PlanFinanciacionUpdateManyArgs>(args: SelectSubset<T, PlanFinanciacionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one PlanFinanciacion.
+     * @param {PlanFinanciacionUpsertArgs} args - Arguments to update or create a PlanFinanciacion.
+     * @example
+     * // Update or create a PlanFinanciacion
+     * const planFinanciacion = await prisma.planFinanciacion.upsert({
+     *   create: {
+     *     // ... data to create a PlanFinanciacion
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PlanFinanciacion we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PlanFinanciacionUpsertArgs>(args: SelectSubset<T, PlanFinanciacionUpsertArgs<ExtArgs>>): Prisma__PlanFinanciacionClient<$Result.GetResult<Prisma.$PlanFinanciacionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PlanFinanciacions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlanFinanciacionCountArgs} args - Arguments to filter PlanFinanciacions to count.
+     * @example
+     * // Count the number of PlanFinanciacions
+     * const count = await prisma.planFinanciacion.count({
+     *   where: {
+     *     // ... the filter for the PlanFinanciacions we want to count
+     *   }
+     * })
+    **/
+    count<T extends PlanFinanciacionCountArgs>(
+      args?: Subset<T, PlanFinanciacionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PlanFinanciacionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PlanFinanciacion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlanFinanciacionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PlanFinanciacionAggregateArgs>(args: Subset<T, PlanFinanciacionAggregateArgs>): Prisma.PrismaPromise<GetPlanFinanciacionAggregateType<T>>
+
+    /**
+     * Group by PlanFinanciacion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlanFinanciacionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PlanFinanciacionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PlanFinanciacionGroupByArgs['orderBy'] }
+        : { orderBy?: PlanFinanciacionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PlanFinanciacionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPlanFinanciacionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PlanFinanciacion model
+   */
+  readonly fields: PlanFinanciacionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PlanFinanciacion.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PlanFinanciacionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PlanFinanciacion model
+   */
+  interface PlanFinanciacionFieldRefs {
+    readonly id: FieldRef<"PlanFinanciacion", 'String'>
+    readonly nombre: FieldRef<"PlanFinanciacion", 'String'>
+    readonly cuotas: FieldRef<"PlanFinanciacion", 'Int'>
+    readonly tasaAnual: FieldRef<"PlanFinanciacion", 'Decimal'>
+    readonly activo: FieldRef<"PlanFinanciacion", 'Boolean'>
+    readonly createdAt: FieldRef<"PlanFinanciacion", 'DateTime'>
+    readonly updatedAt: FieldRef<"PlanFinanciacion", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PlanFinanciacion findUnique
+   */
+  export type PlanFinanciacionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlanFinanciacion
+     */
+    select?: PlanFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlanFinanciacion
+     */
+    omit?: PlanFinanciacionOmit<ExtArgs> | null
+    /**
+     * Filter, which PlanFinanciacion to fetch.
+     */
+    where: PlanFinanciacionWhereUniqueInput
+  }
+
+  /**
+   * PlanFinanciacion findUniqueOrThrow
+   */
+  export type PlanFinanciacionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlanFinanciacion
+     */
+    select?: PlanFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlanFinanciacion
+     */
+    omit?: PlanFinanciacionOmit<ExtArgs> | null
+    /**
+     * Filter, which PlanFinanciacion to fetch.
+     */
+    where: PlanFinanciacionWhereUniqueInput
+  }
+
+  /**
+   * PlanFinanciacion findFirst
+   */
+  export type PlanFinanciacionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlanFinanciacion
+     */
+    select?: PlanFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlanFinanciacion
+     */
+    omit?: PlanFinanciacionOmit<ExtArgs> | null
+    /**
+     * Filter, which PlanFinanciacion to fetch.
+     */
+    where?: PlanFinanciacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlanFinanciacions to fetch.
+     */
+    orderBy?: PlanFinanciacionOrderByWithRelationInput | PlanFinanciacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlanFinanciacions.
+     */
+    cursor?: PlanFinanciacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlanFinanciacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlanFinanciacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlanFinanciacions.
+     */
+    distinct?: PlanFinanciacionScalarFieldEnum | PlanFinanciacionScalarFieldEnum[]
+  }
+
+  /**
+   * PlanFinanciacion findFirstOrThrow
+   */
+  export type PlanFinanciacionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlanFinanciacion
+     */
+    select?: PlanFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlanFinanciacion
+     */
+    omit?: PlanFinanciacionOmit<ExtArgs> | null
+    /**
+     * Filter, which PlanFinanciacion to fetch.
+     */
+    where?: PlanFinanciacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlanFinanciacions to fetch.
+     */
+    orderBy?: PlanFinanciacionOrderByWithRelationInput | PlanFinanciacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlanFinanciacions.
+     */
+    cursor?: PlanFinanciacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlanFinanciacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlanFinanciacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlanFinanciacions.
+     */
+    distinct?: PlanFinanciacionScalarFieldEnum | PlanFinanciacionScalarFieldEnum[]
+  }
+
+  /**
+   * PlanFinanciacion findMany
+   */
+  export type PlanFinanciacionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlanFinanciacion
+     */
+    select?: PlanFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlanFinanciacion
+     */
+    omit?: PlanFinanciacionOmit<ExtArgs> | null
+    /**
+     * Filter, which PlanFinanciacions to fetch.
+     */
+    where?: PlanFinanciacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlanFinanciacions to fetch.
+     */
+    orderBy?: PlanFinanciacionOrderByWithRelationInput | PlanFinanciacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PlanFinanciacions.
+     */
+    cursor?: PlanFinanciacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlanFinanciacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlanFinanciacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlanFinanciacions.
+     */
+    distinct?: PlanFinanciacionScalarFieldEnum | PlanFinanciacionScalarFieldEnum[]
+  }
+
+  /**
+   * PlanFinanciacion create
+   */
+  export type PlanFinanciacionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlanFinanciacion
+     */
+    select?: PlanFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlanFinanciacion
+     */
+    omit?: PlanFinanciacionOmit<ExtArgs> | null
+    /**
+     * The data needed to create a PlanFinanciacion.
+     */
+    data: XOR<PlanFinanciacionCreateInput, PlanFinanciacionUncheckedCreateInput>
+  }
+
+  /**
+   * PlanFinanciacion createMany
+   */
+  export type PlanFinanciacionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PlanFinanciacions.
+     */
+    data: PlanFinanciacionCreateManyInput | PlanFinanciacionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PlanFinanciacion update
+   */
+  export type PlanFinanciacionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlanFinanciacion
+     */
+    select?: PlanFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlanFinanciacion
+     */
+    omit?: PlanFinanciacionOmit<ExtArgs> | null
+    /**
+     * The data needed to update a PlanFinanciacion.
+     */
+    data: XOR<PlanFinanciacionUpdateInput, PlanFinanciacionUncheckedUpdateInput>
+    /**
+     * Choose, which PlanFinanciacion to update.
+     */
+    where: PlanFinanciacionWhereUniqueInput
+  }
+
+  /**
+   * PlanFinanciacion updateMany
+   */
+  export type PlanFinanciacionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PlanFinanciacions.
+     */
+    data: XOR<PlanFinanciacionUpdateManyMutationInput, PlanFinanciacionUncheckedUpdateManyInput>
+    /**
+     * Filter which PlanFinanciacions to update
+     */
+    where?: PlanFinanciacionWhereInput
+    /**
+     * Limit how many PlanFinanciacions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PlanFinanciacion upsert
+   */
+  export type PlanFinanciacionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlanFinanciacion
+     */
+    select?: PlanFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlanFinanciacion
+     */
+    omit?: PlanFinanciacionOmit<ExtArgs> | null
+    /**
+     * The filter to search for the PlanFinanciacion to update in case it exists.
+     */
+    where: PlanFinanciacionWhereUniqueInput
+    /**
+     * In case the PlanFinanciacion found by the `where` argument doesn't exist, create a new PlanFinanciacion with this data.
+     */
+    create: XOR<PlanFinanciacionCreateInput, PlanFinanciacionUncheckedCreateInput>
+    /**
+     * In case the PlanFinanciacion was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PlanFinanciacionUpdateInput, PlanFinanciacionUncheckedUpdateInput>
+  }
+
+  /**
+   * PlanFinanciacion delete
+   */
+  export type PlanFinanciacionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlanFinanciacion
+     */
+    select?: PlanFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlanFinanciacion
+     */
+    omit?: PlanFinanciacionOmit<ExtArgs> | null
+    /**
+     * Filter which PlanFinanciacion to delete.
+     */
+    where: PlanFinanciacionWhereUniqueInput
+  }
+
+  /**
+   * PlanFinanciacion deleteMany
+   */
+  export type PlanFinanciacionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlanFinanciacions to delete
+     */
+    where?: PlanFinanciacionWhereInput
+    /**
+     * Limit how many PlanFinanciacions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PlanFinanciacion without action
+   */
+  export type PlanFinanciacionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlanFinanciacion
+     */
+    select?: PlanFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlanFinanciacion
+     */
+    omit?: PlanFinanciacionOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SolicitudFinanciacion
+   */
+
+  export type AggregateSolicitudFinanciacion = {
+    _count: SolicitudFinanciacionCountAggregateOutputType | null
+    _avg: SolicitudFinanciacionAvgAggregateOutputType | null
+    _sum: SolicitudFinanciacionSumAggregateOutputType | null
+    _min: SolicitudFinanciacionMinAggregateOutputType | null
+    _max: SolicitudFinanciacionMaxAggregateOutputType | null
+  }
+
+  export type SolicitudFinanciacionAvgAggregateOutputType = {
+    ingresos: Decimal | null
+    anticipo: Decimal | null
+    cuotas: number | null
+  }
+
+  export type SolicitudFinanciacionSumAggregateOutputType = {
+    ingresos: Decimal | null
+    anticipo: Decimal | null
+    cuotas: number | null
+  }
+
+  export type SolicitudFinanciacionMinAggregateOutputType = {
+    id: string | null
+    vehiculoId: string | null
+    nombre: string | null
+    apellido: string | null
+    dni: string | null
+    email: string | null
+    telefono: string | null
+    ingresos: Decimal | null
+    anticipo: Decimal | null
+    cuotas: number | null
+    estado: $Enums.EstadoConsulta | null
+    mensaje: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SolicitudFinanciacionMaxAggregateOutputType = {
+    id: string | null
+    vehiculoId: string | null
+    nombre: string | null
+    apellido: string | null
+    dni: string | null
+    email: string | null
+    telefono: string | null
+    ingresos: Decimal | null
+    anticipo: Decimal | null
+    cuotas: number | null
+    estado: $Enums.EstadoConsulta | null
+    mensaje: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SolicitudFinanciacionCountAggregateOutputType = {
+    id: number
+    vehiculoId: number
+    nombre: number
+    apellido: number
+    dni: number
+    email: number
+    telefono: number
+    ingresos: number
+    anticipo: number
+    cuotas: number
+    estado: number
+    mensaje: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SolicitudFinanciacionAvgAggregateInputType = {
+    ingresos?: true
+    anticipo?: true
+    cuotas?: true
+  }
+
+  export type SolicitudFinanciacionSumAggregateInputType = {
+    ingresos?: true
+    anticipo?: true
+    cuotas?: true
+  }
+
+  export type SolicitudFinanciacionMinAggregateInputType = {
+    id?: true
+    vehiculoId?: true
+    nombre?: true
+    apellido?: true
+    dni?: true
+    email?: true
+    telefono?: true
+    ingresos?: true
+    anticipo?: true
+    cuotas?: true
+    estado?: true
+    mensaje?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SolicitudFinanciacionMaxAggregateInputType = {
+    id?: true
+    vehiculoId?: true
+    nombre?: true
+    apellido?: true
+    dni?: true
+    email?: true
+    telefono?: true
+    ingresos?: true
+    anticipo?: true
+    cuotas?: true
+    estado?: true
+    mensaje?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SolicitudFinanciacionCountAggregateInputType = {
+    id?: true
+    vehiculoId?: true
+    nombre?: true
+    apellido?: true
+    dni?: true
+    email?: true
+    telefono?: true
+    ingresos?: true
+    anticipo?: true
+    cuotas?: true
+    estado?: true
+    mensaje?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SolicitudFinanciacionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SolicitudFinanciacion to aggregate.
+     */
+    where?: SolicitudFinanciacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SolicitudFinanciacions to fetch.
+     */
+    orderBy?: SolicitudFinanciacionOrderByWithRelationInput | SolicitudFinanciacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SolicitudFinanciacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SolicitudFinanciacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SolicitudFinanciacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SolicitudFinanciacions
+    **/
+    _count?: true | SolicitudFinanciacionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SolicitudFinanciacionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SolicitudFinanciacionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SolicitudFinanciacionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SolicitudFinanciacionMaxAggregateInputType
+  }
+
+  export type GetSolicitudFinanciacionAggregateType<T extends SolicitudFinanciacionAggregateArgs> = {
+        [P in keyof T & keyof AggregateSolicitudFinanciacion]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSolicitudFinanciacion[P]>
+      : GetScalarType<T[P], AggregateSolicitudFinanciacion[P]>
+  }
+
+
+
+
+  export type SolicitudFinanciacionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SolicitudFinanciacionWhereInput
+    orderBy?: SolicitudFinanciacionOrderByWithAggregationInput | SolicitudFinanciacionOrderByWithAggregationInput[]
+    by: SolicitudFinanciacionScalarFieldEnum[] | SolicitudFinanciacionScalarFieldEnum
+    having?: SolicitudFinanciacionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SolicitudFinanciacionCountAggregateInputType | true
+    _avg?: SolicitudFinanciacionAvgAggregateInputType
+    _sum?: SolicitudFinanciacionSumAggregateInputType
+    _min?: SolicitudFinanciacionMinAggregateInputType
+    _max?: SolicitudFinanciacionMaxAggregateInputType
+  }
+
+  export type SolicitudFinanciacionGroupByOutputType = {
+    id: string
+    vehiculoId: string | null
+    nombre: string
+    apellido: string
+    dni: string
+    email: string
+    telefono: string
+    ingresos: Decimal | null
+    anticipo: Decimal
+    cuotas: number
+    estado: $Enums.EstadoConsulta
+    mensaje: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SolicitudFinanciacionCountAggregateOutputType | null
+    _avg: SolicitudFinanciacionAvgAggregateOutputType | null
+    _sum: SolicitudFinanciacionSumAggregateOutputType | null
+    _min: SolicitudFinanciacionMinAggregateOutputType | null
+    _max: SolicitudFinanciacionMaxAggregateOutputType | null
+  }
+
+  type GetSolicitudFinanciacionGroupByPayload<T extends SolicitudFinanciacionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SolicitudFinanciacionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SolicitudFinanciacionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SolicitudFinanciacionGroupByOutputType[P]>
+            : GetScalarType<T[P], SolicitudFinanciacionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SolicitudFinanciacionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    vehiculoId?: boolean
+    nombre?: boolean
+    apellido?: boolean
+    dni?: boolean
+    email?: boolean
+    telefono?: boolean
+    ingresos?: boolean
+    anticipo?: boolean
+    cuotas?: boolean
+    estado?: boolean
+    mensaje?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    vehiculo?: boolean | SolicitudFinanciacion$vehiculoArgs<ExtArgs>
+  }, ExtArgs["result"]["solicitudFinanciacion"]>
+
+
+
+  export type SolicitudFinanciacionSelectScalar = {
+    id?: boolean
+    vehiculoId?: boolean
+    nombre?: boolean
+    apellido?: boolean
+    dni?: boolean
+    email?: boolean
+    telefono?: boolean
+    ingresos?: boolean
+    anticipo?: boolean
+    cuotas?: boolean
+    estado?: boolean
+    mensaje?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SolicitudFinanciacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "vehiculoId" | "nombre" | "apellido" | "dni" | "email" | "telefono" | "ingresos" | "anticipo" | "cuotas" | "estado" | "mensaje" | "createdAt" | "updatedAt", ExtArgs["result"]["solicitudFinanciacion"]>
+  export type SolicitudFinanciacionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    vehiculo?: boolean | SolicitudFinanciacion$vehiculoArgs<ExtArgs>
+  }
+
+  export type $SolicitudFinanciacionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SolicitudFinanciacion"
+    objects: {
+      vehiculo: Prisma.$VehiculoPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      vehiculoId: string | null
+      nombre: string
+      apellido: string
+      dni: string
+      email: string
+      telefono: string
+      ingresos: Prisma.Decimal | null
+      anticipo: Prisma.Decimal
+      cuotas: number
+      estado: $Enums.EstadoConsulta
+      mensaje: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["solicitudFinanciacion"]>
+    composites: {}
+  }
+
+  type SolicitudFinanciacionGetPayload<S extends boolean | null | undefined | SolicitudFinanciacionDefaultArgs> = $Result.GetResult<Prisma.$SolicitudFinanciacionPayload, S>
+
+  type SolicitudFinanciacionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SolicitudFinanciacionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SolicitudFinanciacionCountAggregateInputType | true
+    }
+
+  export interface SolicitudFinanciacionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SolicitudFinanciacion'], meta: { name: 'SolicitudFinanciacion' } }
+    /**
+     * Find zero or one SolicitudFinanciacion that matches the filter.
+     * @param {SolicitudFinanciacionFindUniqueArgs} args - Arguments to find a SolicitudFinanciacion
+     * @example
+     * // Get one SolicitudFinanciacion
+     * const solicitudFinanciacion = await prisma.solicitudFinanciacion.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SolicitudFinanciacionFindUniqueArgs>(args: SelectSubset<T, SolicitudFinanciacionFindUniqueArgs<ExtArgs>>): Prisma__SolicitudFinanciacionClient<$Result.GetResult<Prisma.$SolicitudFinanciacionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SolicitudFinanciacion that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SolicitudFinanciacionFindUniqueOrThrowArgs} args - Arguments to find a SolicitudFinanciacion
+     * @example
+     * // Get one SolicitudFinanciacion
+     * const solicitudFinanciacion = await prisma.solicitudFinanciacion.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SolicitudFinanciacionFindUniqueOrThrowArgs>(args: SelectSubset<T, SolicitudFinanciacionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SolicitudFinanciacionClient<$Result.GetResult<Prisma.$SolicitudFinanciacionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SolicitudFinanciacion that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolicitudFinanciacionFindFirstArgs} args - Arguments to find a SolicitudFinanciacion
+     * @example
+     * // Get one SolicitudFinanciacion
+     * const solicitudFinanciacion = await prisma.solicitudFinanciacion.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SolicitudFinanciacionFindFirstArgs>(args?: SelectSubset<T, SolicitudFinanciacionFindFirstArgs<ExtArgs>>): Prisma__SolicitudFinanciacionClient<$Result.GetResult<Prisma.$SolicitudFinanciacionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SolicitudFinanciacion that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolicitudFinanciacionFindFirstOrThrowArgs} args - Arguments to find a SolicitudFinanciacion
+     * @example
+     * // Get one SolicitudFinanciacion
+     * const solicitudFinanciacion = await prisma.solicitudFinanciacion.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SolicitudFinanciacionFindFirstOrThrowArgs>(args?: SelectSubset<T, SolicitudFinanciacionFindFirstOrThrowArgs<ExtArgs>>): Prisma__SolicitudFinanciacionClient<$Result.GetResult<Prisma.$SolicitudFinanciacionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SolicitudFinanciacions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolicitudFinanciacionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SolicitudFinanciacions
+     * const solicitudFinanciacions = await prisma.solicitudFinanciacion.findMany()
+     * 
+     * // Get first 10 SolicitudFinanciacions
+     * const solicitudFinanciacions = await prisma.solicitudFinanciacion.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const solicitudFinanciacionWithIdOnly = await prisma.solicitudFinanciacion.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SolicitudFinanciacionFindManyArgs>(args?: SelectSubset<T, SolicitudFinanciacionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SolicitudFinanciacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SolicitudFinanciacion.
+     * @param {SolicitudFinanciacionCreateArgs} args - Arguments to create a SolicitudFinanciacion.
+     * @example
+     * // Create one SolicitudFinanciacion
+     * const SolicitudFinanciacion = await prisma.solicitudFinanciacion.create({
+     *   data: {
+     *     // ... data to create a SolicitudFinanciacion
+     *   }
+     * })
+     * 
+     */
+    create<T extends SolicitudFinanciacionCreateArgs>(args: SelectSubset<T, SolicitudFinanciacionCreateArgs<ExtArgs>>): Prisma__SolicitudFinanciacionClient<$Result.GetResult<Prisma.$SolicitudFinanciacionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SolicitudFinanciacions.
+     * @param {SolicitudFinanciacionCreateManyArgs} args - Arguments to create many SolicitudFinanciacions.
+     * @example
+     * // Create many SolicitudFinanciacions
+     * const solicitudFinanciacion = await prisma.solicitudFinanciacion.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SolicitudFinanciacionCreateManyArgs>(args?: SelectSubset<T, SolicitudFinanciacionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a SolicitudFinanciacion.
+     * @param {SolicitudFinanciacionDeleteArgs} args - Arguments to delete one SolicitudFinanciacion.
+     * @example
+     * // Delete one SolicitudFinanciacion
+     * const SolicitudFinanciacion = await prisma.solicitudFinanciacion.delete({
+     *   where: {
+     *     // ... filter to delete one SolicitudFinanciacion
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SolicitudFinanciacionDeleteArgs>(args: SelectSubset<T, SolicitudFinanciacionDeleteArgs<ExtArgs>>): Prisma__SolicitudFinanciacionClient<$Result.GetResult<Prisma.$SolicitudFinanciacionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SolicitudFinanciacion.
+     * @param {SolicitudFinanciacionUpdateArgs} args - Arguments to update one SolicitudFinanciacion.
+     * @example
+     * // Update one SolicitudFinanciacion
+     * const solicitudFinanciacion = await prisma.solicitudFinanciacion.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SolicitudFinanciacionUpdateArgs>(args: SelectSubset<T, SolicitudFinanciacionUpdateArgs<ExtArgs>>): Prisma__SolicitudFinanciacionClient<$Result.GetResult<Prisma.$SolicitudFinanciacionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SolicitudFinanciacions.
+     * @param {SolicitudFinanciacionDeleteManyArgs} args - Arguments to filter SolicitudFinanciacions to delete.
+     * @example
+     * // Delete a few SolicitudFinanciacions
+     * const { count } = await prisma.solicitudFinanciacion.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SolicitudFinanciacionDeleteManyArgs>(args?: SelectSubset<T, SolicitudFinanciacionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SolicitudFinanciacions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolicitudFinanciacionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SolicitudFinanciacions
+     * const solicitudFinanciacion = await prisma.solicitudFinanciacion.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SolicitudFinanciacionUpdateManyArgs>(args: SelectSubset<T, SolicitudFinanciacionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one SolicitudFinanciacion.
+     * @param {SolicitudFinanciacionUpsertArgs} args - Arguments to update or create a SolicitudFinanciacion.
+     * @example
+     * // Update or create a SolicitudFinanciacion
+     * const solicitudFinanciacion = await prisma.solicitudFinanciacion.upsert({
+     *   create: {
+     *     // ... data to create a SolicitudFinanciacion
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SolicitudFinanciacion we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SolicitudFinanciacionUpsertArgs>(args: SelectSubset<T, SolicitudFinanciacionUpsertArgs<ExtArgs>>): Prisma__SolicitudFinanciacionClient<$Result.GetResult<Prisma.$SolicitudFinanciacionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SolicitudFinanciacions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolicitudFinanciacionCountArgs} args - Arguments to filter SolicitudFinanciacions to count.
+     * @example
+     * // Count the number of SolicitudFinanciacions
+     * const count = await prisma.solicitudFinanciacion.count({
+     *   where: {
+     *     // ... the filter for the SolicitudFinanciacions we want to count
+     *   }
+     * })
+    **/
+    count<T extends SolicitudFinanciacionCountArgs>(
+      args?: Subset<T, SolicitudFinanciacionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SolicitudFinanciacionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SolicitudFinanciacion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolicitudFinanciacionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SolicitudFinanciacionAggregateArgs>(args: Subset<T, SolicitudFinanciacionAggregateArgs>): Prisma.PrismaPromise<GetSolicitudFinanciacionAggregateType<T>>
+
+    /**
+     * Group by SolicitudFinanciacion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolicitudFinanciacionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SolicitudFinanciacionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SolicitudFinanciacionGroupByArgs['orderBy'] }
+        : { orderBy?: SolicitudFinanciacionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SolicitudFinanciacionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSolicitudFinanciacionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SolicitudFinanciacion model
+   */
+  readonly fields: SolicitudFinanciacionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SolicitudFinanciacion.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SolicitudFinanciacionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    vehiculo<T extends SolicitudFinanciacion$vehiculoArgs<ExtArgs> = {}>(args?: Subset<T, SolicitudFinanciacion$vehiculoArgs<ExtArgs>>): Prisma__VehiculoClient<$Result.GetResult<Prisma.$VehiculoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SolicitudFinanciacion model
+   */
+  interface SolicitudFinanciacionFieldRefs {
+    readonly id: FieldRef<"SolicitudFinanciacion", 'String'>
+    readonly vehiculoId: FieldRef<"SolicitudFinanciacion", 'String'>
+    readonly nombre: FieldRef<"SolicitudFinanciacion", 'String'>
+    readonly apellido: FieldRef<"SolicitudFinanciacion", 'String'>
+    readonly dni: FieldRef<"SolicitudFinanciacion", 'String'>
+    readonly email: FieldRef<"SolicitudFinanciacion", 'String'>
+    readonly telefono: FieldRef<"SolicitudFinanciacion", 'String'>
+    readonly ingresos: FieldRef<"SolicitudFinanciacion", 'Decimal'>
+    readonly anticipo: FieldRef<"SolicitudFinanciacion", 'Decimal'>
+    readonly cuotas: FieldRef<"SolicitudFinanciacion", 'Int'>
+    readonly estado: FieldRef<"SolicitudFinanciacion", 'EstadoConsulta'>
+    readonly mensaje: FieldRef<"SolicitudFinanciacion", 'String'>
+    readonly createdAt: FieldRef<"SolicitudFinanciacion", 'DateTime'>
+    readonly updatedAt: FieldRef<"SolicitudFinanciacion", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SolicitudFinanciacion findUnique
+   */
+  export type SolicitudFinanciacionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolicitudFinanciacion
+     */
+    select?: SolicitudFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolicitudFinanciacion
+     */
+    omit?: SolicitudFinanciacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolicitudFinanciacionInclude<ExtArgs> | null
+    /**
+     * Filter, which SolicitudFinanciacion to fetch.
+     */
+    where: SolicitudFinanciacionWhereUniqueInput
+  }
+
+  /**
+   * SolicitudFinanciacion findUniqueOrThrow
+   */
+  export type SolicitudFinanciacionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolicitudFinanciacion
+     */
+    select?: SolicitudFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolicitudFinanciacion
+     */
+    omit?: SolicitudFinanciacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolicitudFinanciacionInclude<ExtArgs> | null
+    /**
+     * Filter, which SolicitudFinanciacion to fetch.
+     */
+    where: SolicitudFinanciacionWhereUniqueInput
+  }
+
+  /**
+   * SolicitudFinanciacion findFirst
+   */
+  export type SolicitudFinanciacionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolicitudFinanciacion
+     */
+    select?: SolicitudFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolicitudFinanciacion
+     */
+    omit?: SolicitudFinanciacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolicitudFinanciacionInclude<ExtArgs> | null
+    /**
+     * Filter, which SolicitudFinanciacion to fetch.
+     */
+    where?: SolicitudFinanciacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SolicitudFinanciacions to fetch.
+     */
+    orderBy?: SolicitudFinanciacionOrderByWithRelationInput | SolicitudFinanciacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SolicitudFinanciacions.
+     */
+    cursor?: SolicitudFinanciacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SolicitudFinanciacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SolicitudFinanciacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SolicitudFinanciacions.
+     */
+    distinct?: SolicitudFinanciacionScalarFieldEnum | SolicitudFinanciacionScalarFieldEnum[]
+  }
+
+  /**
+   * SolicitudFinanciacion findFirstOrThrow
+   */
+  export type SolicitudFinanciacionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolicitudFinanciacion
+     */
+    select?: SolicitudFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolicitudFinanciacion
+     */
+    omit?: SolicitudFinanciacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolicitudFinanciacionInclude<ExtArgs> | null
+    /**
+     * Filter, which SolicitudFinanciacion to fetch.
+     */
+    where?: SolicitudFinanciacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SolicitudFinanciacions to fetch.
+     */
+    orderBy?: SolicitudFinanciacionOrderByWithRelationInput | SolicitudFinanciacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SolicitudFinanciacions.
+     */
+    cursor?: SolicitudFinanciacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SolicitudFinanciacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SolicitudFinanciacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SolicitudFinanciacions.
+     */
+    distinct?: SolicitudFinanciacionScalarFieldEnum | SolicitudFinanciacionScalarFieldEnum[]
+  }
+
+  /**
+   * SolicitudFinanciacion findMany
+   */
+  export type SolicitudFinanciacionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolicitudFinanciacion
+     */
+    select?: SolicitudFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolicitudFinanciacion
+     */
+    omit?: SolicitudFinanciacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolicitudFinanciacionInclude<ExtArgs> | null
+    /**
+     * Filter, which SolicitudFinanciacions to fetch.
+     */
+    where?: SolicitudFinanciacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SolicitudFinanciacions to fetch.
+     */
+    orderBy?: SolicitudFinanciacionOrderByWithRelationInput | SolicitudFinanciacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SolicitudFinanciacions.
+     */
+    cursor?: SolicitudFinanciacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SolicitudFinanciacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SolicitudFinanciacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SolicitudFinanciacions.
+     */
+    distinct?: SolicitudFinanciacionScalarFieldEnum | SolicitudFinanciacionScalarFieldEnum[]
+  }
+
+  /**
+   * SolicitudFinanciacion create
+   */
+  export type SolicitudFinanciacionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolicitudFinanciacion
+     */
+    select?: SolicitudFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolicitudFinanciacion
+     */
+    omit?: SolicitudFinanciacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolicitudFinanciacionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SolicitudFinanciacion.
+     */
+    data: XOR<SolicitudFinanciacionCreateInput, SolicitudFinanciacionUncheckedCreateInput>
+  }
+
+  /**
+   * SolicitudFinanciacion createMany
+   */
+  export type SolicitudFinanciacionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SolicitudFinanciacions.
+     */
+    data: SolicitudFinanciacionCreateManyInput | SolicitudFinanciacionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SolicitudFinanciacion update
+   */
+  export type SolicitudFinanciacionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolicitudFinanciacion
+     */
+    select?: SolicitudFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolicitudFinanciacion
+     */
+    omit?: SolicitudFinanciacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolicitudFinanciacionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SolicitudFinanciacion.
+     */
+    data: XOR<SolicitudFinanciacionUpdateInput, SolicitudFinanciacionUncheckedUpdateInput>
+    /**
+     * Choose, which SolicitudFinanciacion to update.
+     */
+    where: SolicitudFinanciacionWhereUniqueInput
+  }
+
+  /**
+   * SolicitudFinanciacion updateMany
+   */
+  export type SolicitudFinanciacionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SolicitudFinanciacions.
+     */
+    data: XOR<SolicitudFinanciacionUpdateManyMutationInput, SolicitudFinanciacionUncheckedUpdateManyInput>
+    /**
+     * Filter which SolicitudFinanciacions to update
+     */
+    where?: SolicitudFinanciacionWhereInput
+    /**
+     * Limit how many SolicitudFinanciacions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SolicitudFinanciacion upsert
+   */
+  export type SolicitudFinanciacionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolicitudFinanciacion
+     */
+    select?: SolicitudFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolicitudFinanciacion
+     */
+    omit?: SolicitudFinanciacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolicitudFinanciacionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SolicitudFinanciacion to update in case it exists.
+     */
+    where: SolicitudFinanciacionWhereUniqueInput
+    /**
+     * In case the SolicitudFinanciacion found by the `where` argument doesn't exist, create a new SolicitudFinanciacion with this data.
+     */
+    create: XOR<SolicitudFinanciacionCreateInput, SolicitudFinanciacionUncheckedCreateInput>
+    /**
+     * In case the SolicitudFinanciacion was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SolicitudFinanciacionUpdateInput, SolicitudFinanciacionUncheckedUpdateInput>
+  }
+
+  /**
+   * SolicitudFinanciacion delete
+   */
+  export type SolicitudFinanciacionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolicitudFinanciacion
+     */
+    select?: SolicitudFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolicitudFinanciacion
+     */
+    omit?: SolicitudFinanciacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolicitudFinanciacionInclude<ExtArgs> | null
+    /**
+     * Filter which SolicitudFinanciacion to delete.
+     */
+    where: SolicitudFinanciacionWhereUniqueInput
+  }
+
+  /**
+   * SolicitudFinanciacion deleteMany
+   */
+  export type SolicitudFinanciacionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SolicitudFinanciacions to delete
+     */
+    where?: SolicitudFinanciacionWhereInput
+    /**
+     * Limit how many SolicitudFinanciacions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SolicitudFinanciacion.vehiculo
+   */
+  export type SolicitudFinanciacion$vehiculoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Vehiculo
+     */
+    select?: VehiculoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Vehiculo
+     */
+    omit?: VehiculoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: VehiculoInclude<ExtArgs> | null
+    where?: VehiculoWhereInput
+  }
+
+  /**
+   * SolicitudFinanciacion without action
+   */
+  export type SolicitudFinanciacionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolicitudFinanciacion
+     */
+    select?: SolicitudFinanciacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolicitudFinanciacion
+     */
+    omit?: SolicitudFinanciacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolicitudFinanciacionInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -9772,6 +13530,92 @@ export namespace Prisma {
   export type ConsultaScalarFieldEnum = (typeof ConsultaScalarFieldEnum)[keyof typeof ConsultaScalarFieldEnum]
 
 
+  export const ConfiguracionScalarFieldEnum: {
+    id: 'id',
+    nombreConcesionaria: 'nombreConcesionaria',
+    telefono: 'telefono',
+    email: 'email',
+    direccion: 'direccion',
+    facebookUrl: 'facebookUrl',
+    instagramUrl: 'instagramUrl',
+    horariosAtencion: 'horariosAtencion',
+    updatedAt: 'updatedAt',
+    cotizacionDolar: 'cotizacionDolar',
+    logoUrl: 'logoUrl',
+    faviconUrl: 'faviconUrl',
+    siteTitle: 'siteTitle',
+    siteDescription: 'siteDescription',
+    heroTitulo: 'heroTitulo',
+    heroSubtitulo: 'heroSubtitulo',
+    heroCtaTexto: 'heroCtaTexto',
+    heroCtaUrl: 'heroCtaUrl',
+    heroImagenUrl: 'heroImagenUrl',
+    nosotrosTitulo: 'nosotrosTitulo',
+    nosotrosTexto: 'nosotrosTexto',
+    nosotrosMetrica1Valor: 'nosotrosMetrica1Valor',
+    nosotrosMetrica1Sufijo: 'nosotrosMetrica1Sufijo',
+    nosotrosMetrica1Label: 'nosotrosMetrica1Label',
+    nosotrosMetrica2Valor: 'nosotrosMetrica2Valor',
+    nosotrosMetrica2Sufijo: 'nosotrosMetrica2Sufijo',
+    nosotrosMetrica2Label: 'nosotrosMetrica2Label',
+    finanEyebrow: 'finanEyebrow',
+    finanTitulo: 'finanTitulo',
+    finanTexto: 'finanTexto',
+    finanTasaAnual: 'finanTasaAnual',
+    finanEntregaMinima: 'finanEntregaMinima',
+    finanCtaTexto: 'finanCtaTexto',
+    contactoEyebrow: 'contactoEyebrow',
+    contactoTitulo: 'contactoTitulo',
+    contactoTexto: 'contactoTexto',
+    contactoWhatsappTexto: 'contactoWhatsappTexto',
+    footerTexto: 'footerTexto',
+    terminosUrl: 'terminosUrl',
+    privacidadUrl: 'privacidadUrl',
+    colorPrimario: 'colorPrimario',
+    colorAcento: 'colorAcento',
+    colorFondo: 'colorFondo',
+    colorSuperficie: 'colorSuperficie',
+    colorTexto: 'colorTexto',
+    colorTextoSuave: 'colorTextoSuave',
+    colorTextoSobrePrimario: 'colorTextoSobrePrimario'
+  };
+
+  export type ConfiguracionScalarFieldEnum = (typeof ConfiguracionScalarFieldEnum)[keyof typeof ConfiguracionScalarFieldEnum]
+
+
+  export const PlanFinanciacionScalarFieldEnum: {
+    id: 'id',
+    nombre: 'nombre',
+    cuotas: 'cuotas',
+    tasaAnual: 'tasaAnual',
+    activo: 'activo',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PlanFinanciacionScalarFieldEnum = (typeof PlanFinanciacionScalarFieldEnum)[keyof typeof PlanFinanciacionScalarFieldEnum]
+
+
+  export const SolicitudFinanciacionScalarFieldEnum: {
+    id: 'id',
+    vehiculoId: 'vehiculoId',
+    nombre: 'nombre',
+    apellido: 'apellido',
+    dni: 'dni',
+    email: 'email',
+    telefono: 'telefono',
+    ingresos: 'ingresos',
+    anticipo: 'anticipo',
+    cuotas: 'cuotas',
+    estado: 'estado',
+    mensaje: 'mensaje',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SolicitudFinanciacionScalarFieldEnum = (typeof SolicitudFinanciacionScalarFieldEnum)[keyof typeof SolicitudFinanciacionScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -9848,7 +13692,6 @@ export namespace Prisma {
     marca: 'marca',
     modelo: 'modelo',
     version: 'version',
-    moneda: 'moneda',
     color: 'color',
     motor: 'motor',
     descripcion: 'descripcion'
@@ -9877,6 +13720,77 @@ export namespace Prisma {
   };
 
   export type ConsultaOrderByRelevanceFieldEnum = (typeof ConsultaOrderByRelevanceFieldEnum)[keyof typeof ConsultaOrderByRelevanceFieldEnum]
+
+
+  export const ConfiguracionOrderByRelevanceFieldEnum: {
+    id: 'id',
+    nombreConcesionaria: 'nombreConcesionaria',
+    telefono: 'telefono',
+    email: 'email',
+    direccion: 'direccion',
+    facebookUrl: 'facebookUrl',
+    instagramUrl: 'instagramUrl',
+    horariosAtencion: 'horariosAtencion',
+    logoUrl: 'logoUrl',
+    faviconUrl: 'faviconUrl',
+    siteTitle: 'siteTitle',
+    siteDescription: 'siteDescription',
+    heroTitulo: 'heroTitulo',
+    heroSubtitulo: 'heroSubtitulo',
+    heroCtaTexto: 'heroCtaTexto',
+    heroCtaUrl: 'heroCtaUrl',
+    heroImagenUrl: 'heroImagenUrl',
+    nosotrosTitulo: 'nosotrosTitulo',
+    nosotrosTexto: 'nosotrosTexto',
+    nosotrosMetrica1Valor: 'nosotrosMetrica1Valor',
+    nosotrosMetrica1Sufijo: 'nosotrosMetrica1Sufijo',
+    nosotrosMetrica1Label: 'nosotrosMetrica1Label',
+    nosotrosMetrica2Valor: 'nosotrosMetrica2Valor',
+    nosotrosMetrica2Sufijo: 'nosotrosMetrica2Sufijo',
+    nosotrosMetrica2Label: 'nosotrosMetrica2Label',
+    finanEyebrow: 'finanEyebrow',
+    finanTitulo: 'finanTitulo',
+    finanTexto: 'finanTexto',
+    finanCtaTexto: 'finanCtaTexto',
+    contactoEyebrow: 'contactoEyebrow',
+    contactoTitulo: 'contactoTitulo',
+    contactoTexto: 'contactoTexto',
+    contactoWhatsappTexto: 'contactoWhatsappTexto',
+    footerTexto: 'footerTexto',
+    terminosUrl: 'terminosUrl',
+    privacidadUrl: 'privacidadUrl',
+    colorPrimario: 'colorPrimario',
+    colorAcento: 'colorAcento',
+    colorFondo: 'colorFondo',
+    colorSuperficie: 'colorSuperficie',
+    colorTexto: 'colorTexto',
+    colorTextoSuave: 'colorTextoSuave',
+    colorTextoSobrePrimario: 'colorTextoSobrePrimario'
+  };
+
+  export type ConfiguracionOrderByRelevanceFieldEnum = (typeof ConfiguracionOrderByRelevanceFieldEnum)[keyof typeof ConfiguracionOrderByRelevanceFieldEnum]
+
+
+  export const PlanFinanciacionOrderByRelevanceFieldEnum: {
+    id: 'id',
+    nombre: 'nombre'
+  };
+
+  export type PlanFinanciacionOrderByRelevanceFieldEnum = (typeof PlanFinanciacionOrderByRelevanceFieldEnum)[keyof typeof PlanFinanciacionOrderByRelevanceFieldEnum]
+
+
+  export const SolicitudFinanciacionOrderByRelevanceFieldEnum: {
+    id: 'id',
+    vehiculoId: 'vehiculoId',
+    nombre: 'nombre',
+    apellido: 'apellido',
+    dni: 'dni',
+    email: 'email',
+    telefono: 'telefono',
+    mensaje: 'mensaje'
+  };
+
+  export type SolicitudFinanciacionOrderByRelevanceFieldEnum = (typeof SolicitudFinanciacionOrderByRelevanceFieldEnum)[keyof typeof SolicitudFinanciacionOrderByRelevanceFieldEnum]
 
 
   /**
@@ -9923,6 +13837,13 @@ export namespace Prisma {
    * Reference to a field of type 'Decimal'
    */
   export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+  /**
+   * Reference to a field of type 'Moneda'
+   */
+  export type EnumMonedaFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Moneda'>
     
 
 
@@ -10302,7 +14223,7 @@ export namespace Prisma {
     version?: StringNullableFilter<"Vehiculo"> | string | null
     estado?: EnumEstadoVehiculoFilter<"Vehiculo"> | $Enums.EstadoVehiculo
     precio?: DecimalFilter<"Vehiculo"> | Decimal | DecimalJsLike | number | string
-    moneda?: StringFilter<"Vehiculo"> | string
+    moneda?: EnumMonedaFilter<"Vehiculo"> | $Enums.Moneda
     kilometraje?: IntFilter<"Vehiculo"> | number
     color?: StringNullableFilter<"Vehiculo"> | string | null
     motor?: StringNullableFilter<"Vehiculo"> | string | null
@@ -10317,6 +14238,7 @@ export namespace Prisma {
     categoria?: XOR<CategoriaScalarRelationFilter, CategoriaWhereInput>
     imagenes?: ImagenVehiculoListRelationFilter
     consultas?: ConsultaListRelationFilter
+    solicitudesFinanciacion?: SolicitudFinanciacionListRelationFilter
   }
 
   export type VehiculoOrderByWithRelationInput = {
@@ -10343,6 +14265,7 @@ export namespace Prisma {
     categoria?: CategoriaOrderByWithRelationInput
     imagenes?: ImagenVehiculoOrderByRelationAggregateInput
     consultas?: ConsultaOrderByRelationAggregateInput
+    solicitudesFinanciacion?: SolicitudFinanciacionOrderByRelationAggregateInput
     _relevance?: VehiculoOrderByRelevanceInput
   }
 
@@ -10358,7 +14281,7 @@ export namespace Prisma {
     version?: StringNullableFilter<"Vehiculo"> | string | null
     estado?: EnumEstadoVehiculoFilter<"Vehiculo"> | $Enums.EstadoVehiculo
     precio?: DecimalFilter<"Vehiculo"> | Decimal | DecimalJsLike | number | string
-    moneda?: StringFilter<"Vehiculo"> | string
+    moneda?: EnumMonedaFilter<"Vehiculo"> | $Enums.Moneda
     kilometraje?: IntFilter<"Vehiculo"> | number
     color?: StringNullableFilter<"Vehiculo"> | string | null
     motor?: StringNullableFilter<"Vehiculo"> | string | null
@@ -10373,6 +14296,7 @@ export namespace Prisma {
     categoria?: XOR<CategoriaScalarRelationFilter, CategoriaWhereInput>
     imagenes?: ImagenVehiculoListRelationFilter
     consultas?: ConsultaListRelationFilter
+    solicitudesFinanciacion?: SolicitudFinanciacionListRelationFilter
   }, "id">
 
   export type VehiculoOrderByWithAggregationInput = {
@@ -10415,7 +14339,7 @@ export namespace Prisma {
     version?: StringNullableWithAggregatesFilter<"Vehiculo"> | string | null
     estado?: EnumEstadoVehiculoWithAggregatesFilter<"Vehiculo"> | $Enums.EstadoVehiculo
     precio?: DecimalWithAggregatesFilter<"Vehiculo"> | Decimal | DecimalJsLike | number | string
-    moneda?: StringWithAggregatesFilter<"Vehiculo"> | string
+    moneda?: EnumMonedaWithAggregatesFilter<"Vehiculo"> | $Enums.Moneda
     kilometraje?: IntWithAggregatesFilter<"Vehiculo"> | number
     color?: StringNullableWithAggregatesFilter<"Vehiculo"> | string | null
     motor?: StringNullableWithAggregatesFilter<"Vehiculo"> | string | null
@@ -10571,6 +14495,439 @@ export namespace Prisma {
     estado?: EnumEstadoConsultaWithAggregatesFilter<"Consulta"> | $Enums.EstadoConsulta
     createdAt?: DateTimeWithAggregatesFilter<"Consulta"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Consulta"> | Date | string
+  }
+
+  export type ConfiguracionWhereInput = {
+    AND?: ConfiguracionWhereInput | ConfiguracionWhereInput[]
+    OR?: ConfiguracionWhereInput[]
+    NOT?: ConfiguracionWhereInput | ConfiguracionWhereInput[]
+    id?: StringFilter<"Configuracion"> | string
+    nombreConcesionaria?: StringFilter<"Configuracion"> | string
+    telefono?: StringNullableFilter<"Configuracion"> | string | null
+    email?: StringNullableFilter<"Configuracion"> | string | null
+    direccion?: StringNullableFilter<"Configuracion"> | string | null
+    facebookUrl?: StringNullableFilter<"Configuracion"> | string | null
+    instagramUrl?: StringNullableFilter<"Configuracion"> | string | null
+    horariosAtencion?: StringNullableFilter<"Configuracion"> | string | null
+    updatedAt?: DateTimeFilter<"Configuracion"> | Date | string
+    cotizacionDolar?: DecimalNullableFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: StringNullableFilter<"Configuracion"> | string | null
+    faviconUrl?: StringNullableFilter<"Configuracion"> | string | null
+    siteTitle?: StringNullableFilter<"Configuracion"> | string | null
+    siteDescription?: StringNullableFilter<"Configuracion"> | string | null
+    heroTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    heroSubtitulo?: StringNullableFilter<"Configuracion"> | string | null
+    heroCtaTexto?: StringNullableFilter<"Configuracion"> | string | null
+    heroCtaUrl?: StringNullableFilter<"Configuracion"> | string | null
+    heroImagenUrl?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosTexto?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Valor?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Sufijo?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Label?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Valor?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Sufijo?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Label?: StringNullableFilter<"Configuracion"> | string | null
+    finanEyebrow?: StringNullableFilter<"Configuracion"> | string | null
+    finanTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    finanTexto?: StringNullableFilter<"Configuracion"> | string | null
+    finanTasaAnual?: DecimalNullableFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: DecimalNullableFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: StringNullableFilter<"Configuracion"> | string | null
+    contactoEyebrow?: StringNullableFilter<"Configuracion"> | string | null
+    contactoTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    contactoTexto?: StringNullableFilter<"Configuracion"> | string | null
+    contactoWhatsappTexto?: StringNullableFilter<"Configuracion"> | string | null
+    footerTexto?: StringNullableFilter<"Configuracion"> | string | null
+    terminosUrl?: StringNullableFilter<"Configuracion"> | string | null
+    privacidadUrl?: StringNullableFilter<"Configuracion"> | string | null
+    colorPrimario?: StringNullableFilter<"Configuracion"> | string | null
+    colorAcento?: StringNullableFilter<"Configuracion"> | string | null
+    colorFondo?: StringNullableFilter<"Configuracion"> | string | null
+    colorSuperficie?: StringNullableFilter<"Configuracion"> | string | null
+    colorTexto?: StringNullableFilter<"Configuracion"> | string | null
+    colorTextoSuave?: StringNullableFilter<"Configuracion"> | string | null
+    colorTextoSobrePrimario?: StringNullableFilter<"Configuracion"> | string | null
+  }
+
+  export type ConfiguracionOrderByWithRelationInput = {
+    id?: SortOrder
+    nombreConcesionaria?: SortOrder
+    telefono?: SortOrderInput | SortOrder
+    email?: SortOrderInput | SortOrder
+    direccion?: SortOrderInput | SortOrder
+    facebookUrl?: SortOrderInput | SortOrder
+    instagramUrl?: SortOrderInput | SortOrder
+    horariosAtencion?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    cotizacionDolar?: SortOrderInput | SortOrder
+    logoUrl?: SortOrderInput | SortOrder
+    faviconUrl?: SortOrderInput | SortOrder
+    siteTitle?: SortOrderInput | SortOrder
+    siteDescription?: SortOrderInput | SortOrder
+    heroTitulo?: SortOrderInput | SortOrder
+    heroSubtitulo?: SortOrderInput | SortOrder
+    heroCtaTexto?: SortOrderInput | SortOrder
+    heroCtaUrl?: SortOrderInput | SortOrder
+    heroImagenUrl?: SortOrderInput | SortOrder
+    nosotrosTitulo?: SortOrderInput | SortOrder
+    nosotrosTexto?: SortOrderInput | SortOrder
+    nosotrosMetrica1Valor?: SortOrderInput | SortOrder
+    nosotrosMetrica1Sufijo?: SortOrderInput | SortOrder
+    nosotrosMetrica1Label?: SortOrderInput | SortOrder
+    nosotrosMetrica2Valor?: SortOrderInput | SortOrder
+    nosotrosMetrica2Sufijo?: SortOrderInput | SortOrder
+    nosotrosMetrica2Label?: SortOrderInput | SortOrder
+    finanEyebrow?: SortOrderInput | SortOrder
+    finanTitulo?: SortOrderInput | SortOrder
+    finanTexto?: SortOrderInput | SortOrder
+    finanTasaAnual?: SortOrderInput | SortOrder
+    finanEntregaMinima?: SortOrderInput | SortOrder
+    finanCtaTexto?: SortOrderInput | SortOrder
+    contactoEyebrow?: SortOrderInput | SortOrder
+    contactoTitulo?: SortOrderInput | SortOrder
+    contactoTexto?: SortOrderInput | SortOrder
+    contactoWhatsappTexto?: SortOrderInput | SortOrder
+    footerTexto?: SortOrderInput | SortOrder
+    terminosUrl?: SortOrderInput | SortOrder
+    privacidadUrl?: SortOrderInput | SortOrder
+    colorPrimario?: SortOrderInput | SortOrder
+    colorAcento?: SortOrderInput | SortOrder
+    colorFondo?: SortOrderInput | SortOrder
+    colorSuperficie?: SortOrderInput | SortOrder
+    colorTexto?: SortOrderInput | SortOrder
+    colorTextoSuave?: SortOrderInput | SortOrder
+    colorTextoSobrePrimario?: SortOrderInput | SortOrder
+    _relevance?: ConfiguracionOrderByRelevanceInput
+  }
+
+  export type ConfiguracionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ConfiguracionWhereInput | ConfiguracionWhereInput[]
+    OR?: ConfiguracionWhereInput[]
+    NOT?: ConfiguracionWhereInput | ConfiguracionWhereInput[]
+    nombreConcesionaria?: StringFilter<"Configuracion"> | string
+    telefono?: StringNullableFilter<"Configuracion"> | string | null
+    email?: StringNullableFilter<"Configuracion"> | string | null
+    direccion?: StringNullableFilter<"Configuracion"> | string | null
+    facebookUrl?: StringNullableFilter<"Configuracion"> | string | null
+    instagramUrl?: StringNullableFilter<"Configuracion"> | string | null
+    horariosAtencion?: StringNullableFilter<"Configuracion"> | string | null
+    updatedAt?: DateTimeFilter<"Configuracion"> | Date | string
+    cotizacionDolar?: DecimalNullableFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: StringNullableFilter<"Configuracion"> | string | null
+    faviconUrl?: StringNullableFilter<"Configuracion"> | string | null
+    siteTitle?: StringNullableFilter<"Configuracion"> | string | null
+    siteDescription?: StringNullableFilter<"Configuracion"> | string | null
+    heroTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    heroSubtitulo?: StringNullableFilter<"Configuracion"> | string | null
+    heroCtaTexto?: StringNullableFilter<"Configuracion"> | string | null
+    heroCtaUrl?: StringNullableFilter<"Configuracion"> | string | null
+    heroImagenUrl?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosTexto?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Valor?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Sufijo?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Label?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Valor?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Sufijo?: StringNullableFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Label?: StringNullableFilter<"Configuracion"> | string | null
+    finanEyebrow?: StringNullableFilter<"Configuracion"> | string | null
+    finanTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    finanTexto?: StringNullableFilter<"Configuracion"> | string | null
+    finanTasaAnual?: DecimalNullableFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: DecimalNullableFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: StringNullableFilter<"Configuracion"> | string | null
+    contactoEyebrow?: StringNullableFilter<"Configuracion"> | string | null
+    contactoTitulo?: StringNullableFilter<"Configuracion"> | string | null
+    contactoTexto?: StringNullableFilter<"Configuracion"> | string | null
+    contactoWhatsappTexto?: StringNullableFilter<"Configuracion"> | string | null
+    footerTexto?: StringNullableFilter<"Configuracion"> | string | null
+    terminosUrl?: StringNullableFilter<"Configuracion"> | string | null
+    privacidadUrl?: StringNullableFilter<"Configuracion"> | string | null
+    colorPrimario?: StringNullableFilter<"Configuracion"> | string | null
+    colorAcento?: StringNullableFilter<"Configuracion"> | string | null
+    colorFondo?: StringNullableFilter<"Configuracion"> | string | null
+    colorSuperficie?: StringNullableFilter<"Configuracion"> | string | null
+    colorTexto?: StringNullableFilter<"Configuracion"> | string | null
+    colorTextoSuave?: StringNullableFilter<"Configuracion"> | string | null
+    colorTextoSobrePrimario?: StringNullableFilter<"Configuracion"> | string | null
+  }, "id">
+
+  export type ConfiguracionOrderByWithAggregationInput = {
+    id?: SortOrder
+    nombreConcesionaria?: SortOrder
+    telefono?: SortOrderInput | SortOrder
+    email?: SortOrderInput | SortOrder
+    direccion?: SortOrderInput | SortOrder
+    facebookUrl?: SortOrderInput | SortOrder
+    instagramUrl?: SortOrderInput | SortOrder
+    horariosAtencion?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    cotizacionDolar?: SortOrderInput | SortOrder
+    logoUrl?: SortOrderInput | SortOrder
+    faviconUrl?: SortOrderInput | SortOrder
+    siteTitle?: SortOrderInput | SortOrder
+    siteDescription?: SortOrderInput | SortOrder
+    heroTitulo?: SortOrderInput | SortOrder
+    heroSubtitulo?: SortOrderInput | SortOrder
+    heroCtaTexto?: SortOrderInput | SortOrder
+    heroCtaUrl?: SortOrderInput | SortOrder
+    heroImagenUrl?: SortOrderInput | SortOrder
+    nosotrosTitulo?: SortOrderInput | SortOrder
+    nosotrosTexto?: SortOrderInput | SortOrder
+    nosotrosMetrica1Valor?: SortOrderInput | SortOrder
+    nosotrosMetrica1Sufijo?: SortOrderInput | SortOrder
+    nosotrosMetrica1Label?: SortOrderInput | SortOrder
+    nosotrosMetrica2Valor?: SortOrderInput | SortOrder
+    nosotrosMetrica2Sufijo?: SortOrderInput | SortOrder
+    nosotrosMetrica2Label?: SortOrderInput | SortOrder
+    finanEyebrow?: SortOrderInput | SortOrder
+    finanTitulo?: SortOrderInput | SortOrder
+    finanTexto?: SortOrderInput | SortOrder
+    finanTasaAnual?: SortOrderInput | SortOrder
+    finanEntregaMinima?: SortOrderInput | SortOrder
+    finanCtaTexto?: SortOrderInput | SortOrder
+    contactoEyebrow?: SortOrderInput | SortOrder
+    contactoTitulo?: SortOrderInput | SortOrder
+    contactoTexto?: SortOrderInput | SortOrder
+    contactoWhatsappTexto?: SortOrderInput | SortOrder
+    footerTexto?: SortOrderInput | SortOrder
+    terminosUrl?: SortOrderInput | SortOrder
+    privacidadUrl?: SortOrderInput | SortOrder
+    colorPrimario?: SortOrderInput | SortOrder
+    colorAcento?: SortOrderInput | SortOrder
+    colorFondo?: SortOrderInput | SortOrder
+    colorSuperficie?: SortOrderInput | SortOrder
+    colorTexto?: SortOrderInput | SortOrder
+    colorTextoSuave?: SortOrderInput | SortOrder
+    colorTextoSobrePrimario?: SortOrderInput | SortOrder
+    _count?: ConfiguracionCountOrderByAggregateInput
+    _avg?: ConfiguracionAvgOrderByAggregateInput
+    _max?: ConfiguracionMaxOrderByAggregateInput
+    _min?: ConfiguracionMinOrderByAggregateInput
+    _sum?: ConfiguracionSumOrderByAggregateInput
+  }
+
+  export type ConfiguracionScalarWhereWithAggregatesInput = {
+    AND?: ConfiguracionScalarWhereWithAggregatesInput | ConfiguracionScalarWhereWithAggregatesInput[]
+    OR?: ConfiguracionScalarWhereWithAggregatesInput[]
+    NOT?: ConfiguracionScalarWhereWithAggregatesInput | ConfiguracionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Configuracion"> | string
+    nombreConcesionaria?: StringWithAggregatesFilter<"Configuracion"> | string
+    telefono?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    email?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    direccion?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    facebookUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    instagramUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    horariosAtencion?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    updatedAt?: DateTimeWithAggregatesFilter<"Configuracion"> | Date | string
+    cotizacionDolar?: DecimalNullableWithAggregatesFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    faviconUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    siteTitle?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    siteDescription?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    heroTitulo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    heroSubtitulo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    heroCtaTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    heroCtaUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    heroImagenUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosTitulo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Valor?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Sufijo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosMetrica1Label?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Valor?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Sufijo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    nosotrosMetrica2Label?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    finanEyebrow?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    finanTitulo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    finanTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    finanTasaAnual?: DecimalNullableWithAggregatesFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: DecimalNullableWithAggregatesFilter<"Configuracion"> | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    contactoEyebrow?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    contactoTitulo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    contactoTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    contactoWhatsappTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    footerTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    terminosUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    privacidadUrl?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorPrimario?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorAcento?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorFondo?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorSuperficie?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorTexto?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorTextoSuave?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+    colorTextoSobrePrimario?: StringNullableWithAggregatesFilter<"Configuracion"> | string | null
+  }
+
+  export type PlanFinanciacionWhereInput = {
+    AND?: PlanFinanciacionWhereInput | PlanFinanciacionWhereInput[]
+    OR?: PlanFinanciacionWhereInput[]
+    NOT?: PlanFinanciacionWhereInput | PlanFinanciacionWhereInput[]
+    id?: StringFilter<"PlanFinanciacion"> | string
+    nombre?: StringFilter<"PlanFinanciacion"> | string
+    cuotas?: IntFilter<"PlanFinanciacion"> | number
+    tasaAnual?: DecimalFilter<"PlanFinanciacion"> | Decimal | DecimalJsLike | number | string
+    activo?: BoolFilter<"PlanFinanciacion"> | boolean
+    createdAt?: DateTimeFilter<"PlanFinanciacion"> | Date | string
+    updatedAt?: DateTimeFilter<"PlanFinanciacion"> | Date | string
+  }
+
+  export type PlanFinanciacionOrderByWithRelationInput = {
+    id?: SortOrder
+    nombre?: SortOrder
+    cuotas?: SortOrder
+    tasaAnual?: SortOrder
+    activo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _relevance?: PlanFinanciacionOrderByRelevanceInput
+  }
+
+  export type PlanFinanciacionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: PlanFinanciacionWhereInput | PlanFinanciacionWhereInput[]
+    OR?: PlanFinanciacionWhereInput[]
+    NOT?: PlanFinanciacionWhereInput | PlanFinanciacionWhereInput[]
+    nombre?: StringFilter<"PlanFinanciacion"> | string
+    cuotas?: IntFilter<"PlanFinanciacion"> | number
+    tasaAnual?: DecimalFilter<"PlanFinanciacion"> | Decimal | DecimalJsLike | number | string
+    activo?: BoolFilter<"PlanFinanciacion"> | boolean
+    createdAt?: DateTimeFilter<"PlanFinanciacion"> | Date | string
+    updatedAt?: DateTimeFilter<"PlanFinanciacion"> | Date | string
+  }, "id">
+
+  export type PlanFinanciacionOrderByWithAggregationInput = {
+    id?: SortOrder
+    nombre?: SortOrder
+    cuotas?: SortOrder
+    tasaAnual?: SortOrder
+    activo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PlanFinanciacionCountOrderByAggregateInput
+    _avg?: PlanFinanciacionAvgOrderByAggregateInput
+    _max?: PlanFinanciacionMaxOrderByAggregateInput
+    _min?: PlanFinanciacionMinOrderByAggregateInput
+    _sum?: PlanFinanciacionSumOrderByAggregateInput
+  }
+
+  export type PlanFinanciacionScalarWhereWithAggregatesInput = {
+    AND?: PlanFinanciacionScalarWhereWithAggregatesInput | PlanFinanciacionScalarWhereWithAggregatesInput[]
+    OR?: PlanFinanciacionScalarWhereWithAggregatesInput[]
+    NOT?: PlanFinanciacionScalarWhereWithAggregatesInput | PlanFinanciacionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PlanFinanciacion"> | string
+    nombre?: StringWithAggregatesFilter<"PlanFinanciacion"> | string
+    cuotas?: IntWithAggregatesFilter<"PlanFinanciacion"> | number
+    tasaAnual?: DecimalWithAggregatesFilter<"PlanFinanciacion"> | Decimal | DecimalJsLike | number | string
+    activo?: BoolWithAggregatesFilter<"PlanFinanciacion"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"PlanFinanciacion"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PlanFinanciacion"> | Date | string
+  }
+
+  export type SolicitudFinanciacionWhereInput = {
+    AND?: SolicitudFinanciacionWhereInput | SolicitudFinanciacionWhereInput[]
+    OR?: SolicitudFinanciacionWhereInput[]
+    NOT?: SolicitudFinanciacionWhereInput | SolicitudFinanciacionWhereInput[]
+    id?: StringFilter<"SolicitudFinanciacion"> | string
+    vehiculoId?: StringNullableFilter<"SolicitudFinanciacion"> | string | null
+    nombre?: StringFilter<"SolicitudFinanciacion"> | string
+    apellido?: StringFilter<"SolicitudFinanciacion"> | string
+    dni?: StringFilter<"SolicitudFinanciacion"> | string
+    email?: StringFilter<"SolicitudFinanciacion"> | string
+    telefono?: StringFilter<"SolicitudFinanciacion"> | string
+    ingresos?: DecimalNullableFilter<"SolicitudFinanciacion"> | Decimal | DecimalJsLike | number | string | null
+    anticipo?: DecimalFilter<"SolicitudFinanciacion"> | Decimal | DecimalJsLike | number | string
+    cuotas?: IntFilter<"SolicitudFinanciacion"> | number
+    estado?: EnumEstadoConsultaFilter<"SolicitudFinanciacion"> | $Enums.EstadoConsulta
+    mensaje?: StringNullableFilter<"SolicitudFinanciacion"> | string | null
+    createdAt?: DateTimeFilter<"SolicitudFinanciacion"> | Date | string
+    updatedAt?: DateTimeFilter<"SolicitudFinanciacion"> | Date | string
+    vehiculo?: XOR<VehiculoNullableScalarRelationFilter, VehiculoWhereInput> | null
+  }
+
+  export type SolicitudFinanciacionOrderByWithRelationInput = {
+    id?: SortOrder
+    vehiculoId?: SortOrderInput | SortOrder
+    nombre?: SortOrder
+    apellido?: SortOrder
+    dni?: SortOrder
+    email?: SortOrder
+    telefono?: SortOrder
+    ingresos?: SortOrderInput | SortOrder
+    anticipo?: SortOrder
+    cuotas?: SortOrder
+    estado?: SortOrder
+    mensaje?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    vehiculo?: VehiculoOrderByWithRelationInput
+    _relevance?: SolicitudFinanciacionOrderByRelevanceInput
+  }
+
+  export type SolicitudFinanciacionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SolicitudFinanciacionWhereInput | SolicitudFinanciacionWhereInput[]
+    OR?: SolicitudFinanciacionWhereInput[]
+    NOT?: SolicitudFinanciacionWhereInput | SolicitudFinanciacionWhereInput[]
+    vehiculoId?: StringNullableFilter<"SolicitudFinanciacion"> | string | null
+    nombre?: StringFilter<"SolicitudFinanciacion"> | string
+    apellido?: StringFilter<"SolicitudFinanciacion"> | string
+    dni?: StringFilter<"SolicitudFinanciacion"> | string
+    email?: StringFilter<"SolicitudFinanciacion"> | string
+    telefono?: StringFilter<"SolicitudFinanciacion"> | string
+    ingresos?: DecimalNullableFilter<"SolicitudFinanciacion"> | Decimal | DecimalJsLike | number | string | null
+    anticipo?: DecimalFilter<"SolicitudFinanciacion"> | Decimal | DecimalJsLike | number | string
+    cuotas?: IntFilter<"SolicitudFinanciacion"> | number
+    estado?: EnumEstadoConsultaFilter<"SolicitudFinanciacion"> | $Enums.EstadoConsulta
+    mensaje?: StringNullableFilter<"SolicitudFinanciacion"> | string | null
+    createdAt?: DateTimeFilter<"SolicitudFinanciacion"> | Date | string
+    updatedAt?: DateTimeFilter<"SolicitudFinanciacion"> | Date | string
+    vehiculo?: XOR<VehiculoNullableScalarRelationFilter, VehiculoWhereInput> | null
+  }, "id">
+
+  export type SolicitudFinanciacionOrderByWithAggregationInput = {
+    id?: SortOrder
+    vehiculoId?: SortOrderInput | SortOrder
+    nombre?: SortOrder
+    apellido?: SortOrder
+    dni?: SortOrder
+    email?: SortOrder
+    telefono?: SortOrder
+    ingresos?: SortOrderInput | SortOrder
+    anticipo?: SortOrder
+    cuotas?: SortOrder
+    estado?: SortOrder
+    mensaje?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SolicitudFinanciacionCountOrderByAggregateInput
+    _avg?: SolicitudFinanciacionAvgOrderByAggregateInput
+    _max?: SolicitudFinanciacionMaxOrderByAggregateInput
+    _min?: SolicitudFinanciacionMinOrderByAggregateInput
+    _sum?: SolicitudFinanciacionSumOrderByAggregateInput
+  }
+
+  export type SolicitudFinanciacionScalarWhereWithAggregatesInput = {
+    AND?: SolicitudFinanciacionScalarWhereWithAggregatesInput | SolicitudFinanciacionScalarWhereWithAggregatesInput[]
+    OR?: SolicitudFinanciacionScalarWhereWithAggregatesInput[]
+    NOT?: SolicitudFinanciacionScalarWhereWithAggregatesInput | SolicitudFinanciacionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SolicitudFinanciacion"> | string
+    vehiculoId?: StringNullableWithAggregatesFilter<"SolicitudFinanciacion"> | string | null
+    nombre?: StringWithAggregatesFilter<"SolicitudFinanciacion"> | string
+    apellido?: StringWithAggregatesFilter<"SolicitudFinanciacion"> | string
+    dni?: StringWithAggregatesFilter<"SolicitudFinanciacion"> | string
+    email?: StringWithAggregatesFilter<"SolicitudFinanciacion"> | string
+    telefono?: StringWithAggregatesFilter<"SolicitudFinanciacion"> | string
+    ingresos?: DecimalNullableWithAggregatesFilter<"SolicitudFinanciacion"> | Decimal | DecimalJsLike | number | string | null
+    anticipo?: DecimalWithAggregatesFilter<"SolicitudFinanciacion"> | Decimal | DecimalJsLike | number | string
+    cuotas?: IntWithAggregatesFilter<"SolicitudFinanciacion"> | number
+    estado?: EnumEstadoConsultaWithAggregatesFilter<"SolicitudFinanciacion"> | $Enums.EstadoConsulta
+    mensaje?: StringNullableWithAggregatesFilter<"SolicitudFinanciacion"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SolicitudFinanciacion"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SolicitudFinanciacion"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -10920,7 +15277,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
-    moneda?: string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -10935,6 +15292,7 @@ export namespace Prisma {
     categoria: CategoriaCreateNestedOneWithoutVehiculosInput
     imagenes?: ImagenVehiculoCreateNestedManyWithoutVehiculoInput
     consultas?: ConsultaCreateNestedManyWithoutVehiculoInput
+    solicitudesFinanciacion?: SolicitudFinanciacionCreateNestedManyWithoutVehiculoInput
   }
 
   export type VehiculoUncheckedCreateInput = {
@@ -10946,7 +15304,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
-    moneda?: string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -10960,6 +15318,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     imagenes?: ImagenVehiculoUncheckedCreateNestedManyWithoutVehiculoInput
     consultas?: ConsultaUncheckedCreateNestedManyWithoutVehiculoInput
+    solicitudesFinanciacion?: SolicitudFinanciacionUncheckedCreateNestedManyWithoutVehiculoInput
   }
 
   export type VehiculoUpdateInput = {
@@ -10970,7 +15329,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    moneda?: StringFieldUpdateOperationsInput | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10985,6 +15344,7 @@ export namespace Prisma {
     categoria?: CategoriaUpdateOneRequiredWithoutVehiculosNestedInput
     imagenes?: ImagenVehiculoUpdateManyWithoutVehiculoNestedInput
     consultas?: ConsultaUpdateManyWithoutVehiculoNestedInput
+    solicitudesFinanciacion?: SolicitudFinanciacionUpdateManyWithoutVehiculoNestedInput
   }
 
   export type VehiculoUncheckedUpdateInput = {
@@ -10996,7 +15356,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    moneda?: StringFieldUpdateOperationsInput | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11010,6 +15370,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     imagenes?: ImagenVehiculoUncheckedUpdateManyWithoutVehiculoNestedInput
     consultas?: ConsultaUncheckedUpdateManyWithoutVehiculoNestedInput
+    solicitudesFinanciacion?: SolicitudFinanciacionUncheckedUpdateManyWithoutVehiculoNestedInput
   }
 
   export type VehiculoCreateManyInput = {
@@ -11021,7 +15382,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
-    moneda?: string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -11043,7 +15404,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    moneda?: StringFieldUpdateOperationsInput | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11066,7 +15427,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    moneda?: StringFieldUpdateOperationsInput | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11228,6 +15589,544 @@ export namespace Prisma {
     telefono?: NullableStringFieldUpdateOperationsInput | string | null
     mensaje?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoConsultaFieldUpdateOperationsInput | $Enums.EstadoConsulta
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfiguracionCreateInput = {
+    id?: string
+    nombreConcesionaria?: string
+    telefono?: string | null
+    email?: string | null
+    direccion?: string | null
+    facebookUrl?: string | null
+    instagramUrl?: string | null
+    horariosAtencion?: string | null
+    updatedAt?: Date | string
+    cotizacionDolar?: Decimal | DecimalJsLike | number | string | null
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    siteTitle?: string | null
+    siteDescription?: string | null
+    heroTitulo?: string | null
+    heroSubtitulo?: string | null
+    heroCtaTexto?: string | null
+    heroCtaUrl?: string | null
+    heroImagenUrl?: string | null
+    nosotrosTitulo?: string | null
+    nosotrosTexto?: string | null
+    nosotrosMetrica1Valor?: string | null
+    nosotrosMetrica1Sufijo?: string | null
+    nosotrosMetrica1Label?: string | null
+    nosotrosMetrica2Valor?: string | null
+    nosotrosMetrica2Sufijo?: string | null
+    nosotrosMetrica2Label?: string | null
+    finanEyebrow?: string | null
+    finanTitulo?: string | null
+    finanTexto?: string | null
+    finanTasaAnual?: Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: string | null
+    contactoEyebrow?: string | null
+    contactoTitulo?: string | null
+    contactoTexto?: string | null
+    contactoWhatsappTexto?: string | null
+    footerTexto?: string | null
+    terminosUrl?: string | null
+    privacidadUrl?: string | null
+    colorPrimario?: string | null
+    colorAcento?: string | null
+    colorFondo?: string | null
+    colorSuperficie?: string | null
+    colorTexto?: string | null
+    colorTextoSuave?: string | null
+    colorTextoSobrePrimario?: string | null
+  }
+
+  export type ConfiguracionUncheckedCreateInput = {
+    id?: string
+    nombreConcesionaria?: string
+    telefono?: string | null
+    email?: string | null
+    direccion?: string | null
+    facebookUrl?: string | null
+    instagramUrl?: string | null
+    horariosAtencion?: string | null
+    updatedAt?: Date | string
+    cotizacionDolar?: Decimal | DecimalJsLike | number | string | null
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    siteTitle?: string | null
+    siteDescription?: string | null
+    heroTitulo?: string | null
+    heroSubtitulo?: string | null
+    heroCtaTexto?: string | null
+    heroCtaUrl?: string | null
+    heroImagenUrl?: string | null
+    nosotrosTitulo?: string | null
+    nosotrosTexto?: string | null
+    nosotrosMetrica1Valor?: string | null
+    nosotrosMetrica1Sufijo?: string | null
+    nosotrosMetrica1Label?: string | null
+    nosotrosMetrica2Valor?: string | null
+    nosotrosMetrica2Sufijo?: string | null
+    nosotrosMetrica2Label?: string | null
+    finanEyebrow?: string | null
+    finanTitulo?: string | null
+    finanTexto?: string | null
+    finanTasaAnual?: Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: string | null
+    contactoEyebrow?: string | null
+    contactoTitulo?: string | null
+    contactoTexto?: string | null
+    contactoWhatsappTexto?: string | null
+    footerTexto?: string | null
+    terminosUrl?: string | null
+    privacidadUrl?: string | null
+    colorPrimario?: string | null
+    colorAcento?: string | null
+    colorFondo?: string | null
+    colorSuperficie?: string | null
+    colorTexto?: string | null
+    colorTextoSuave?: string | null
+    colorTextoSobrePrimario?: string | null
+  }
+
+  export type ConfiguracionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombreConcesionaria?: StringFieldUpdateOperationsInput | string
+    telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    facebookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    instagramUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    horariosAtencion?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cotizacionDolar?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    siteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    siteDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    heroTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroSubtitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    heroImagenUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Label?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Label?: NullableStringFieldUpdateOperationsInput | string | null
+    finanEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTasaAnual?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoWhatsappTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    footerTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    terminosUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    privacidadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    colorPrimario?: NullableStringFieldUpdateOperationsInput | string | null
+    colorAcento?: NullableStringFieldUpdateOperationsInput | string | null
+    colorFondo?: NullableStringFieldUpdateOperationsInput | string | null
+    colorSuperficie?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSuave?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSobrePrimario?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ConfiguracionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombreConcesionaria?: StringFieldUpdateOperationsInput | string
+    telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    facebookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    instagramUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    horariosAtencion?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cotizacionDolar?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    siteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    siteDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    heroTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroSubtitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    heroImagenUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Label?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Label?: NullableStringFieldUpdateOperationsInput | string | null
+    finanEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTasaAnual?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoWhatsappTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    footerTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    terminosUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    privacidadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    colorPrimario?: NullableStringFieldUpdateOperationsInput | string | null
+    colorAcento?: NullableStringFieldUpdateOperationsInput | string | null
+    colorFondo?: NullableStringFieldUpdateOperationsInput | string | null
+    colorSuperficie?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSuave?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSobrePrimario?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ConfiguracionCreateManyInput = {
+    id?: string
+    nombreConcesionaria?: string
+    telefono?: string | null
+    email?: string | null
+    direccion?: string | null
+    facebookUrl?: string | null
+    instagramUrl?: string | null
+    horariosAtencion?: string | null
+    updatedAt?: Date | string
+    cotizacionDolar?: Decimal | DecimalJsLike | number | string | null
+    logoUrl?: string | null
+    faviconUrl?: string | null
+    siteTitle?: string | null
+    siteDescription?: string | null
+    heroTitulo?: string | null
+    heroSubtitulo?: string | null
+    heroCtaTexto?: string | null
+    heroCtaUrl?: string | null
+    heroImagenUrl?: string | null
+    nosotrosTitulo?: string | null
+    nosotrosTexto?: string | null
+    nosotrosMetrica1Valor?: string | null
+    nosotrosMetrica1Sufijo?: string | null
+    nosotrosMetrica1Label?: string | null
+    nosotrosMetrica2Valor?: string | null
+    nosotrosMetrica2Sufijo?: string | null
+    nosotrosMetrica2Label?: string | null
+    finanEyebrow?: string | null
+    finanTitulo?: string | null
+    finanTexto?: string | null
+    finanTasaAnual?: Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: string | null
+    contactoEyebrow?: string | null
+    contactoTitulo?: string | null
+    contactoTexto?: string | null
+    contactoWhatsappTexto?: string | null
+    footerTexto?: string | null
+    terminosUrl?: string | null
+    privacidadUrl?: string | null
+    colorPrimario?: string | null
+    colorAcento?: string | null
+    colorFondo?: string | null
+    colorSuperficie?: string | null
+    colorTexto?: string | null
+    colorTextoSuave?: string | null
+    colorTextoSobrePrimario?: string | null
+  }
+
+  export type ConfiguracionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombreConcesionaria?: StringFieldUpdateOperationsInput | string
+    telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    facebookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    instagramUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    horariosAtencion?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cotizacionDolar?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    siteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    siteDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    heroTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroSubtitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    heroImagenUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Label?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Label?: NullableStringFieldUpdateOperationsInput | string | null
+    finanEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTasaAnual?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoWhatsappTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    footerTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    terminosUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    privacidadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    colorPrimario?: NullableStringFieldUpdateOperationsInput | string | null
+    colorAcento?: NullableStringFieldUpdateOperationsInput | string | null
+    colorFondo?: NullableStringFieldUpdateOperationsInput | string | null
+    colorSuperficie?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSuave?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSobrePrimario?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ConfiguracionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombreConcesionaria?: StringFieldUpdateOperationsInput | string
+    telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion?: NullableStringFieldUpdateOperationsInput | string | null
+    facebookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    instagramUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    horariosAtencion?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cotizacionDolar?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    faviconUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    siteTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    siteDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    heroTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroSubtitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    heroCtaUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    heroImagenUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica1Label?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Valor?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Sufijo?: NullableStringFieldUpdateOperationsInput | string | null
+    nosotrosMetrica2Label?: NullableStringFieldUpdateOperationsInput | string | null
+    finanEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    finanTasaAnual?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanEntregaMinima?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    finanCtaTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoEyebrow?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTitulo?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    contactoWhatsappTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    footerTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    terminosUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    privacidadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    colorPrimario?: NullableStringFieldUpdateOperationsInput | string | null
+    colorAcento?: NullableStringFieldUpdateOperationsInput | string | null
+    colorFondo?: NullableStringFieldUpdateOperationsInput | string | null
+    colorSuperficie?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTexto?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSuave?: NullableStringFieldUpdateOperationsInput | string | null
+    colorTextoSobrePrimario?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PlanFinanciacionCreateInput = {
+    id?: string
+    nombre: string
+    cuotas: number
+    tasaAnual: Decimal | DecimalJsLike | number | string
+    activo?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlanFinanciacionUncheckedCreateInput = {
+    id?: string
+    nombre: string
+    cuotas: number
+    tasaAnual: Decimal | DecimalJsLike | number | string
+    activo?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlanFinanciacionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    cuotas?: IntFieldUpdateOperationsInput | number
+    tasaAnual?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    activo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlanFinanciacionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    cuotas?: IntFieldUpdateOperationsInput | number
+    tasaAnual?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    activo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlanFinanciacionCreateManyInput = {
+    id?: string
+    nombre: string
+    cuotas: number
+    tasaAnual: Decimal | DecimalJsLike | number | string
+    activo?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PlanFinanciacionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    cuotas?: IntFieldUpdateOperationsInput | number
+    tasaAnual?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    activo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlanFinanciacionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    cuotas?: IntFieldUpdateOperationsInput | number
+    tasaAnual?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    activo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SolicitudFinanciacionCreateInput = {
+    id?: string
+    nombre: string
+    apellido: string
+    dni: string
+    email: string
+    telefono: string
+    ingresos?: Decimal | DecimalJsLike | number | string | null
+    anticipo: Decimal | DecimalJsLike | number | string
+    cuotas: number
+    estado?: $Enums.EstadoConsulta
+    mensaje?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    vehiculo?: VehiculoCreateNestedOneWithoutSolicitudesFinanciacionInput
+  }
+
+  export type SolicitudFinanciacionUncheckedCreateInput = {
+    id?: string
+    vehiculoId?: string | null
+    nombre: string
+    apellido: string
+    dni: string
+    email: string
+    telefono: string
+    ingresos?: Decimal | DecimalJsLike | number | string | null
+    anticipo: Decimal | DecimalJsLike | number | string
+    cuotas: number
+    estado?: $Enums.EstadoConsulta
+    mensaje?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SolicitudFinanciacionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    apellido?: StringFieldUpdateOperationsInput | string
+    dni?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    telefono?: StringFieldUpdateOperationsInput | string
+    ingresos?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    anticipo?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cuotas?: IntFieldUpdateOperationsInput | number
+    estado?: EnumEstadoConsultaFieldUpdateOperationsInput | $Enums.EstadoConsulta
+    mensaje?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehiculo?: VehiculoUpdateOneWithoutSolicitudesFinanciacionNestedInput
+  }
+
+  export type SolicitudFinanciacionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    vehiculoId?: NullableStringFieldUpdateOperationsInput | string | null
+    nombre?: StringFieldUpdateOperationsInput | string
+    apellido?: StringFieldUpdateOperationsInput | string
+    dni?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    telefono?: StringFieldUpdateOperationsInput | string
+    ingresos?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    anticipo?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cuotas?: IntFieldUpdateOperationsInput | number
+    estado?: EnumEstadoConsultaFieldUpdateOperationsInput | $Enums.EstadoConsulta
+    mensaje?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SolicitudFinanciacionCreateManyInput = {
+    id?: string
+    vehiculoId?: string | null
+    nombre: string
+    apellido: string
+    dni: string
+    email: string
+    telefono: string
+    ingresos?: Decimal | DecimalJsLike | number | string | null
+    anticipo: Decimal | DecimalJsLike | number | string
+    cuotas: number
+    estado?: $Enums.EstadoConsulta
+    mensaje?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SolicitudFinanciacionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    apellido?: StringFieldUpdateOperationsInput | string
+    dni?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    telefono?: StringFieldUpdateOperationsInput | string
+    ingresos?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    anticipo?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cuotas?: IntFieldUpdateOperationsInput | number
+    estado?: EnumEstadoConsultaFieldUpdateOperationsInput | $Enums.EstadoConsulta
+    mensaje?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SolicitudFinanciacionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    vehiculoId?: NullableStringFieldUpdateOperationsInput | string | null
+    nombre?: StringFieldUpdateOperationsInput | string
+    apellido?: StringFieldUpdateOperationsInput | string
+    dni?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    telefono?: StringFieldUpdateOperationsInput | string
+    ingresos?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    anticipo?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cuotas?: IntFieldUpdateOperationsInput | number
+    estado?: EnumEstadoConsultaFieldUpdateOperationsInput | $Enums.EstadoConsulta
+    mensaje?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -11650,6 +16549,13 @@ export namespace Prisma {
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
   }
 
+  export type EnumMonedaFilter<$PrismaModel = never> = {
+    equals?: $Enums.Moneda | EnumMonedaFieldRefInput<$PrismaModel>
+    in?: $Enums.Moneda[]
+    notIn?: $Enums.Moneda[]
+    not?: NestedEnumMonedaFilter<$PrismaModel> | $Enums.Moneda
+  }
+
   export type EnumTransmisionNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.Transmision | EnumTransmisionFieldRefInput<$PrismaModel> | null
     in?: $Enums.Transmision[] | null
@@ -11688,11 +16594,21 @@ export namespace Prisma {
     none?: ConsultaWhereInput
   }
 
+  export type SolicitudFinanciacionListRelationFilter = {
+    every?: SolicitudFinanciacionWhereInput
+    some?: SolicitudFinanciacionWhereInput
+    none?: SolicitudFinanciacionWhereInput
+  }
+
   export type ImagenVehiculoOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type ConsultaOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SolicitudFinanciacionOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -11827,6 +16743,16 @@ export namespace Prisma {
     _sum?: NestedDecimalFilter<$PrismaModel>
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type EnumMonedaWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Moneda | EnumMonedaFieldRefInput<$PrismaModel>
+    in?: $Enums.Moneda[]
+    notIn?: $Enums.Moneda[]
+    not?: NestedEnumMonedaWithAggregatesFilter<$PrismaModel> | $Enums.Moneda
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMonedaFilter<$PrismaModel>
+    _max?: NestedEnumMonedaFilter<$PrismaModel>
   }
 
   export type EnumTransmisionNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -11983,6 +16909,316 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumEstadoConsultaFilter<$PrismaModel>
     _max?: NestedEnumEstadoConsultaFilter<$PrismaModel>
+  }
+
+  export type DecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type ConfiguracionOrderByRelevanceInput = {
+    fields: ConfiguracionOrderByRelevanceFieldEnum | ConfiguracionOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type ConfiguracionCountOrderByAggregateInput = {
+    id?: SortOrder
+    nombreConcesionaria?: SortOrder
+    telefono?: SortOrder
+    email?: SortOrder
+    direccion?: SortOrder
+    facebookUrl?: SortOrder
+    instagramUrl?: SortOrder
+    horariosAtencion?: SortOrder
+    updatedAt?: SortOrder
+    cotizacionDolar?: SortOrder
+    logoUrl?: SortOrder
+    faviconUrl?: SortOrder
+    siteTitle?: SortOrder
+    siteDescription?: SortOrder
+    heroTitulo?: SortOrder
+    heroSubtitulo?: SortOrder
+    heroCtaTexto?: SortOrder
+    heroCtaUrl?: SortOrder
+    heroImagenUrl?: SortOrder
+    nosotrosTitulo?: SortOrder
+    nosotrosTexto?: SortOrder
+    nosotrosMetrica1Valor?: SortOrder
+    nosotrosMetrica1Sufijo?: SortOrder
+    nosotrosMetrica1Label?: SortOrder
+    nosotrosMetrica2Valor?: SortOrder
+    nosotrosMetrica2Sufijo?: SortOrder
+    nosotrosMetrica2Label?: SortOrder
+    finanEyebrow?: SortOrder
+    finanTitulo?: SortOrder
+    finanTexto?: SortOrder
+    finanTasaAnual?: SortOrder
+    finanEntregaMinima?: SortOrder
+    finanCtaTexto?: SortOrder
+    contactoEyebrow?: SortOrder
+    contactoTitulo?: SortOrder
+    contactoTexto?: SortOrder
+    contactoWhatsappTexto?: SortOrder
+    footerTexto?: SortOrder
+    terminosUrl?: SortOrder
+    privacidadUrl?: SortOrder
+    colorPrimario?: SortOrder
+    colorAcento?: SortOrder
+    colorFondo?: SortOrder
+    colorSuperficie?: SortOrder
+    colorTexto?: SortOrder
+    colorTextoSuave?: SortOrder
+    colorTextoSobrePrimario?: SortOrder
+  }
+
+  export type ConfiguracionAvgOrderByAggregateInput = {
+    cotizacionDolar?: SortOrder
+    finanTasaAnual?: SortOrder
+    finanEntregaMinima?: SortOrder
+  }
+
+  export type ConfiguracionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    nombreConcesionaria?: SortOrder
+    telefono?: SortOrder
+    email?: SortOrder
+    direccion?: SortOrder
+    facebookUrl?: SortOrder
+    instagramUrl?: SortOrder
+    horariosAtencion?: SortOrder
+    updatedAt?: SortOrder
+    cotizacionDolar?: SortOrder
+    logoUrl?: SortOrder
+    faviconUrl?: SortOrder
+    siteTitle?: SortOrder
+    siteDescription?: SortOrder
+    heroTitulo?: SortOrder
+    heroSubtitulo?: SortOrder
+    heroCtaTexto?: SortOrder
+    heroCtaUrl?: SortOrder
+    heroImagenUrl?: SortOrder
+    nosotrosTitulo?: SortOrder
+    nosotrosTexto?: SortOrder
+    nosotrosMetrica1Valor?: SortOrder
+    nosotrosMetrica1Sufijo?: SortOrder
+    nosotrosMetrica1Label?: SortOrder
+    nosotrosMetrica2Valor?: SortOrder
+    nosotrosMetrica2Sufijo?: SortOrder
+    nosotrosMetrica2Label?: SortOrder
+    finanEyebrow?: SortOrder
+    finanTitulo?: SortOrder
+    finanTexto?: SortOrder
+    finanTasaAnual?: SortOrder
+    finanEntregaMinima?: SortOrder
+    finanCtaTexto?: SortOrder
+    contactoEyebrow?: SortOrder
+    contactoTitulo?: SortOrder
+    contactoTexto?: SortOrder
+    contactoWhatsappTexto?: SortOrder
+    footerTexto?: SortOrder
+    terminosUrl?: SortOrder
+    privacidadUrl?: SortOrder
+    colorPrimario?: SortOrder
+    colorAcento?: SortOrder
+    colorFondo?: SortOrder
+    colorSuperficie?: SortOrder
+    colorTexto?: SortOrder
+    colorTextoSuave?: SortOrder
+    colorTextoSobrePrimario?: SortOrder
+  }
+
+  export type ConfiguracionMinOrderByAggregateInput = {
+    id?: SortOrder
+    nombreConcesionaria?: SortOrder
+    telefono?: SortOrder
+    email?: SortOrder
+    direccion?: SortOrder
+    facebookUrl?: SortOrder
+    instagramUrl?: SortOrder
+    horariosAtencion?: SortOrder
+    updatedAt?: SortOrder
+    cotizacionDolar?: SortOrder
+    logoUrl?: SortOrder
+    faviconUrl?: SortOrder
+    siteTitle?: SortOrder
+    siteDescription?: SortOrder
+    heroTitulo?: SortOrder
+    heroSubtitulo?: SortOrder
+    heroCtaTexto?: SortOrder
+    heroCtaUrl?: SortOrder
+    heroImagenUrl?: SortOrder
+    nosotrosTitulo?: SortOrder
+    nosotrosTexto?: SortOrder
+    nosotrosMetrica1Valor?: SortOrder
+    nosotrosMetrica1Sufijo?: SortOrder
+    nosotrosMetrica1Label?: SortOrder
+    nosotrosMetrica2Valor?: SortOrder
+    nosotrosMetrica2Sufijo?: SortOrder
+    nosotrosMetrica2Label?: SortOrder
+    finanEyebrow?: SortOrder
+    finanTitulo?: SortOrder
+    finanTexto?: SortOrder
+    finanTasaAnual?: SortOrder
+    finanEntregaMinima?: SortOrder
+    finanCtaTexto?: SortOrder
+    contactoEyebrow?: SortOrder
+    contactoTitulo?: SortOrder
+    contactoTexto?: SortOrder
+    contactoWhatsappTexto?: SortOrder
+    footerTexto?: SortOrder
+    terminosUrl?: SortOrder
+    privacidadUrl?: SortOrder
+    colorPrimario?: SortOrder
+    colorAcento?: SortOrder
+    colorFondo?: SortOrder
+    colorSuperficie?: SortOrder
+    colorTexto?: SortOrder
+    colorTextoSuave?: SortOrder
+    colorTextoSobrePrimario?: SortOrder
+  }
+
+  export type ConfiguracionSumOrderByAggregateInput = {
+    cotizacionDolar?: SortOrder
+    finanTasaAnual?: SortOrder
+    finanEntregaMinima?: SortOrder
+  }
+
+  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type PlanFinanciacionOrderByRelevanceInput = {
+    fields: PlanFinanciacionOrderByRelevanceFieldEnum | PlanFinanciacionOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type PlanFinanciacionCountOrderByAggregateInput = {
+    id?: SortOrder
+    nombre?: SortOrder
+    cuotas?: SortOrder
+    tasaAnual?: SortOrder
+    activo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PlanFinanciacionAvgOrderByAggregateInput = {
+    cuotas?: SortOrder
+    tasaAnual?: SortOrder
+  }
+
+  export type PlanFinanciacionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    nombre?: SortOrder
+    cuotas?: SortOrder
+    tasaAnual?: SortOrder
+    activo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PlanFinanciacionMinOrderByAggregateInput = {
+    id?: SortOrder
+    nombre?: SortOrder
+    cuotas?: SortOrder
+    tasaAnual?: SortOrder
+    activo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PlanFinanciacionSumOrderByAggregateInput = {
+    cuotas?: SortOrder
+    tasaAnual?: SortOrder
+  }
+
+  export type SolicitudFinanciacionOrderByRelevanceInput = {
+    fields: SolicitudFinanciacionOrderByRelevanceFieldEnum | SolicitudFinanciacionOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type SolicitudFinanciacionCountOrderByAggregateInput = {
+    id?: SortOrder
+    vehiculoId?: SortOrder
+    nombre?: SortOrder
+    apellido?: SortOrder
+    dni?: SortOrder
+    email?: SortOrder
+    telefono?: SortOrder
+    ingresos?: SortOrder
+    anticipo?: SortOrder
+    cuotas?: SortOrder
+    estado?: SortOrder
+    mensaje?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SolicitudFinanciacionAvgOrderByAggregateInput = {
+    ingresos?: SortOrder
+    anticipo?: SortOrder
+    cuotas?: SortOrder
+  }
+
+  export type SolicitudFinanciacionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    vehiculoId?: SortOrder
+    nombre?: SortOrder
+    apellido?: SortOrder
+    dni?: SortOrder
+    email?: SortOrder
+    telefono?: SortOrder
+    ingresos?: SortOrder
+    anticipo?: SortOrder
+    cuotas?: SortOrder
+    estado?: SortOrder
+    mensaje?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SolicitudFinanciacionMinOrderByAggregateInput = {
+    id?: SortOrder
+    vehiculoId?: SortOrder
+    nombre?: SortOrder
+    apellido?: SortOrder
+    dni?: SortOrder
+    email?: SortOrder
+    telefono?: SortOrder
+    ingresos?: SortOrder
+    anticipo?: SortOrder
+    cuotas?: SortOrder
+    estado?: SortOrder
+    mensaje?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SolicitudFinanciacionSumOrderByAggregateInput = {
+    ingresos?: SortOrder
+    anticipo?: SortOrder
+    cuotas?: SortOrder
   }
 
   export type AccountCreateNestedManyWithoutUserInput = {
@@ -12187,6 +17423,13 @@ export namespace Prisma {
     connect?: ConsultaWhereUniqueInput | ConsultaWhereUniqueInput[]
   }
 
+  export type SolicitudFinanciacionCreateNestedManyWithoutVehiculoInput = {
+    create?: XOR<SolicitudFinanciacionCreateWithoutVehiculoInput, SolicitudFinanciacionUncheckedCreateWithoutVehiculoInput> | SolicitudFinanciacionCreateWithoutVehiculoInput[] | SolicitudFinanciacionUncheckedCreateWithoutVehiculoInput[]
+    connectOrCreate?: SolicitudFinanciacionCreateOrConnectWithoutVehiculoInput | SolicitudFinanciacionCreateOrConnectWithoutVehiculoInput[]
+    createMany?: SolicitudFinanciacionCreateManyVehiculoInputEnvelope
+    connect?: SolicitudFinanciacionWhereUniqueInput | SolicitudFinanciacionWhereUniqueInput[]
+  }
+
   export type ImagenVehiculoUncheckedCreateNestedManyWithoutVehiculoInput = {
     create?: XOR<ImagenVehiculoCreateWithoutVehiculoInput, ImagenVehiculoUncheckedCreateWithoutVehiculoInput> | ImagenVehiculoCreateWithoutVehiculoInput[] | ImagenVehiculoUncheckedCreateWithoutVehiculoInput[]
     connectOrCreate?: ImagenVehiculoCreateOrConnectWithoutVehiculoInput | ImagenVehiculoCreateOrConnectWithoutVehiculoInput[]
@@ -12199,6 +17442,13 @@ export namespace Prisma {
     connectOrCreate?: ConsultaCreateOrConnectWithoutVehiculoInput | ConsultaCreateOrConnectWithoutVehiculoInput[]
     createMany?: ConsultaCreateManyVehiculoInputEnvelope
     connect?: ConsultaWhereUniqueInput | ConsultaWhereUniqueInput[]
+  }
+
+  export type SolicitudFinanciacionUncheckedCreateNestedManyWithoutVehiculoInput = {
+    create?: XOR<SolicitudFinanciacionCreateWithoutVehiculoInput, SolicitudFinanciacionUncheckedCreateWithoutVehiculoInput> | SolicitudFinanciacionCreateWithoutVehiculoInput[] | SolicitudFinanciacionUncheckedCreateWithoutVehiculoInput[]
+    connectOrCreate?: SolicitudFinanciacionCreateOrConnectWithoutVehiculoInput | SolicitudFinanciacionCreateOrConnectWithoutVehiculoInput[]
+    createMany?: SolicitudFinanciacionCreateManyVehiculoInputEnvelope
+    connect?: SolicitudFinanciacionWhereUniqueInput | SolicitudFinanciacionWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -12219,6 +17469,10 @@ export namespace Prisma {
     decrement?: Decimal | DecimalJsLike | number | string
     multiply?: Decimal | DecimalJsLike | number | string
     divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type EnumMonedaFieldUpdateOperationsInput = {
+    set?: $Enums.Moneda
   }
 
   export type NullableEnumTransmisionFieldUpdateOperationsInput = {
@@ -12269,6 +17523,20 @@ export namespace Prisma {
     deleteMany?: ConsultaScalarWhereInput | ConsultaScalarWhereInput[]
   }
 
+  export type SolicitudFinanciacionUpdateManyWithoutVehiculoNestedInput = {
+    create?: XOR<SolicitudFinanciacionCreateWithoutVehiculoInput, SolicitudFinanciacionUncheckedCreateWithoutVehiculoInput> | SolicitudFinanciacionCreateWithoutVehiculoInput[] | SolicitudFinanciacionUncheckedCreateWithoutVehiculoInput[]
+    connectOrCreate?: SolicitudFinanciacionCreateOrConnectWithoutVehiculoInput | SolicitudFinanciacionCreateOrConnectWithoutVehiculoInput[]
+    upsert?: SolicitudFinanciacionUpsertWithWhereUniqueWithoutVehiculoInput | SolicitudFinanciacionUpsertWithWhereUniqueWithoutVehiculoInput[]
+    createMany?: SolicitudFinanciacionCreateManyVehiculoInputEnvelope
+    set?: SolicitudFinanciacionWhereUniqueInput | SolicitudFinanciacionWhereUniqueInput[]
+    disconnect?: SolicitudFinanciacionWhereUniqueInput | SolicitudFinanciacionWhereUniqueInput[]
+    delete?: SolicitudFinanciacionWhereUniqueInput | SolicitudFinanciacionWhereUniqueInput[]
+    connect?: SolicitudFinanciacionWhereUniqueInput | SolicitudFinanciacionWhereUniqueInput[]
+    update?: SolicitudFinanciacionUpdateWithWhereUniqueWithoutVehiculoInput | SolicitudFinanciacionUpdateWithWhereUniqueWithoutVehiculoInput[]
+    updateMany?: SolicitudFinanciacionUpdateManyWithWhereWithoutVehiculoInput | SolicitudFinanciacionUpdateManyWithWhereWithoutVehiculoInput[]
+    deleteMany?: SolicitudFinanciacionScalarWhereInput | SolicitudFinanciacionScalarWhereInput[]
+  }
+
   export type ImagenVehiculoUncheckedUpdateManyWithoutVehiculoNestedInput = {
     create?: XOR<ImagenVehiculoCreateWithoutVehiculoInput, ImagenVehiculoUncheckedCreateWithoutVehiculoInput> | ImagenVehiculoCreateWithoutVehiculoInput[] | ImagenVehiculoUncheckedCreateWithoutVehiculoInput[]
     connectOrCreate?: ImagenVehiculoCreateOrConnectWithoutVehiculoInput | ImagenVehiculoCreateOrConnectWithoutVehiculoInput[]
@@ -12295,6 +17563,20 @@ export namespace Prisma {
     update?: ConsultaUpdateWithWhereUniqueWithoutVehiculoInput | ConsultaUpdateWithWhereUniqueWithoutVehiculoInput[]
     updateMany?: ConsultaUpdateManyWithWhereWithoutVehiculoInput | ConsultaUpdateManyWithWhereWithoutVehiculoInput[]
     deleteMany?: ConsultaScalarWhereInput | ConsultaScalarWhereInput[]
+  }
+
+  export type SolicitudFinanciacionUncheckedUpdateManyWithoutVehiculoNestedInput = {
+    create?: XOR<SolicitudFinanciacionCreateWithoutVehiculoInput, SolicitudFinanciacionUncheckedCreateWithoutVehiculoInput> | SolicitudFinanciacionCreateWithoutVehiculoInput[] | SolicitudFinanciacionUncheckedCreateWithoutVehiculoInput[]
+    connectOrCreate?: SolicitudFinanciacionCreateOrConnectWithoutVehiculoInput | SolicitudFinanciacionCreateOrConnectWithoutVehiculoInput[]
+    upsert?: SolicitudFinanciacionUpsertWithWhereUniqueWithoutVehiculoInput | SolicitudFinanciacionUpsertWithWhereUniqueWithoutVehiculoInput[]
+    createMany?: SolicitudFinanciacionCreateManyVehiculoInputEnvelope
+    set?: SolicitudFinanciacionWhereUniqueInput | SolicitudFinanciacionWhereUniqueInput[]
+    disconnect?: SolicitudFinanciacionWhereUniqueInput | SolicitudFinanciacionWhereUniqueInput[]
+    delete?: SolicitudFinanciacionWhereUniqueInput | SolicitudFinanciacionWhereUniqueInput[]
+    connect?: SolicitudFinanciacionWhereUniqueInput | SolicitudFinanciacionWhereUniqueInput[]
+    update?: SolicitudFinanciacionUpdateWithWhereUniqueWithoutVehiculoInput | SolicitudFinanciacionUpdateWithWhereUniqueWithoutVehiculoInput[]
+    updateMany?: SolicitudFinanciacionUpdateManyWithWhereWithoutVehiculoInput | SolicitudFinanciacionUpdateManyWithWhereWithoutVehiculoInput[]
+    deleteMany?: SolicitudFinanciacionScalarWhereInput | SolicitudFinanciacionScalarWhereInput[]
   }
 
   export type VehiculoCreateNestedOneWithoutImagenesInput = {
@@ -12333,6 +17615,30 @@ export namespace Prisma {
     delete?: VehiculoWhereInput | boolean
     connect?: VehiculoWhereUniqueInput
     update?: XOR<XOR<VehiculoUpdateToOneWithWhereWithoutConsultasInput, VehiculoUpdateWithoutConsultasInput>, VehiculoUncheckedUpdateWithoutConsultasInput>
+  }
+
+  export type NullableDecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string | null
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type VehiculoCreateNestedOneWithoutSolicitudesFinanciacionInput = {
+    create?: XOR<VehiculoCreateWithoutSolicitudesFinanciacionInput, VehiculoUncheckedCreateWithoutSolicitudesFinanciacionInput>
+    connectOrCreate?: VehiculoCreateOrConnectWithoutSolicitudesFinanciacionInput
+    connect?: VehiculoWhereUniqueInput
+  }
+
+  export type VehiculoUpdateOneWithoutSolicitudesFinanciacionNestedInput = {
+    create?: XOR<VehiculoCreateWithoutSolicitudesFinanciacionInput, VehiculoUncheckedCreateWithoutSolicitudesFinanciacionInput>
+    connectOrCreate?: VehiculoCreateOrConnectWithoutSolicitudesFinanciacionInput
+    upsert?: VehiculoUpsertWithoutSolicitudesFinanciacionInput
+    disconnect?: VehiculoWhereInput | boolean
+    delete?: VehiculoWhereInput | boolean
+    connect?: VehiculoWhereUniqueInput
+    update?: XOR<XOR<VehiculoUpdateToOneWithWhereWithoutSolicitudesFinanciacionInput, VehiculoUpdateWithoutSolicitudesFinanciacionInput>, VehiculoUncheckedUpdateWithoutSolicitudesFinanciacionInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -12535,6 +17841,13 @@ export namespace Prisma {
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
   }
 
+  export type NestedEnumMonedaFilter<$PrismaModel = never> = {
+    equals?: $Enums.Moneda | EnumMonedaFieldRefInput<$PrismaModel>
+    in?: $Enums.Moneda[]
+    notIn?: $Enums.Moneda[]
+    not?: NestedEnumMonedaFilter<$PrismaModel> | $Enums.Moneda
+  }
+
   export type NestedEnumTransmisionNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.Transmision | EnumTransmisionFieldRefInput<$PrismaModel> | null
     in?: $Enums.Transmision[] | null
@@ -12609,6 +17922,16 @@ export namespace Prisma {
     _max?: NestedDecimalFilter<$PrismaModel>
   }
 
+  export type NestedEnumMonedaWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Moneda | EnumMonedaFieldRefInput<$PrismaModel>
+    in?: $Enums.Moneda[]
+    notIn?: $Enums.Moneda[]
+    not?: NestedEnumMonedaWithAggregatesFilter<$PrismaModel> | $Enums.Moneda
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMonedaFilter<$PrismaModel>
+    _max?: NestedEnumMonedaFilter<$PrismaModel>
+  }
+
   export type NestedEnumTransmisionNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.Transmision | EnumTransmisionFieldRefInput<$PrismaModel> | null
     in?: $Enums.Transmision[] | null
@@ -12667,6 +17990,33 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumEstadoConsultaFilter<$PrismaModel>
     _max?: NestedEnumEstadoConsultaFilter<$PrismaModel>
+  }
+
+  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
   export type AccountCreateWithoutUserInput = {
@@ -12933,7 +18283,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
-    moneda?: string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -12947,6 +18297,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     imagenes?: ImagenVehiculoCreateNestedManyWithoutVehiculoInput
     consultas?: ConsultaCreateNestedManyWithoutVehiculoInput
+    solicitudesFinanciacion?: SolicitudFinanciacionCreateNestedManyWithoutVehiculoInput
   }
 
   export type VehiculoUncheckedCreateWithoutCategoriaInput = {
@@ -12957,7 +18308,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
-    moneda?: string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -12971,6 +18322,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     imagenes?: ImagenVehiculoUncheckedCreateNestedManyWithoutVehiculoInput
     consultas?: ConsultaUncheckedCreateNestedManyWithoutVehiculoInput
+    solicitudesFinanciacion?: SolicitudFinanciacionUncheckedCreateNestedManyWithoutVehiculoInput
   }
 
   export type VehiculoCreateOrConnectWithoutCategoriaInput = {
@@ -13011,7 +18363,7 @@ export namespace Prisma {
     version?: StringNullableFilter<"Vehiculo"> | string | null
     estado?: EnumEstadoVehiculoFilter<"Vehiculo"> | $Enums.EstadoVehiculo
     precio?: DecimalFilter<"Vehiculo"> | Decimal | DecimalJsLike | number | string
-    moneda?: StringFilter<"Vehiculo"> | string
+    moneda?: EnumMonedaFilter<"Vehiculo"> | $Enums.Moneda
     kilometraje?: IntFilter<"Vehiculo"> | number
     color?: StringNullableFilter<"Vehiculo"> | string | null
     motor?: StringNullableFilter<"Vehiculo"> | string | null
@@ -13104,6 +18456,48 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SolicitudFinanciacionCreateWithoutVehiculoInput = {
+    id?: string
+    nombre: string
+    apellido: string
+    dni: string
+    email: string
+    telefono: string
+    ingresos?: Decimal | DecimalJsLike | number | string | null
+    anticipo: Decimal | DecimalJsLike | number | string
+    cuotas: number
+    estado?: $Enums.EstadoConsulta
+    mensaje?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SolicitudFinanciacionUncheckedCreateWithoutVehiculoInput = {
+    id?: string
+    nombre: string
+    apellido: string
+    dni: string
+    email: string
+    telefono: string
+    ingresos?: Decimal | DecimalJsLike | number | string | null
+    anticipo: Decimal | DecimalJsLike | number | string
+    cuotas: number
+    estado?: $Enums.EstadoConsulta
+    mensaje?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SolicitudFinanciacionCreateOrConnectWithoutVehiculoInput = {
+    where: SolicitudFinanciacionWhereUniqueInput
+    create: XOR<SolicitudFinanciacionCreateWithoutVehiculoInput, SolicitudFinanciacionUncheckedCreateWithoutVehiculoInput>
+  }
+
+  export type SolicitudFinanciacionCreateManyVehiculoInputEnvelope = {
+    data: SolicitudFinanciacionCreateManyVehiculoInput | SolicitudFinanciacionCreateManyVehiculoInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CategoriaUpsertWithoutVehiculosInput = {
     update: XOR<CategoriaUpdateWithoutVehiculosInput, CategoriaUncheckedUpdateWithoutVehiculosInput>
     create: XOR<CategoriaCreateWithoutVehiculosInput, CategoriaUncheckedCreateWithoutVehiculosInput>
@@ -13189,6 +18583,42 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Consulta"> | Date | string
   }
 
+  export type SolicitudFinanciacionUpsertWithWhereUniqueWithoutVehiculoInput = {
+    where: SolicitudFinanciacionWhereUniqueInput
+    update: XOR<SolicitudFinanciacionUpdateWithoutVehiculoInput, SolicitudFinanciacionUncheckedUpdateWithoutVehiculoInput>
+    create: XOR<SolicitudFinanciacionCreateWithoutVehiculoInput, SolicitudFinanciacionUncheckedCreateWithoutVehiculoInput>
+  }
+
+  export type SolicitudFinanciacionUpdateWithWhereUniqueWithoutVehiculoInput = {
+    where: SolicitudFinanciacionWhereUniqueInput
+    data: XOR<SolicitudFinanciacionUpdateWithoutVehiculoInput, SolicitudFinanciacionUncheckedUpdateWithoutVehiculoInput>
+  }
+
+  export type SolicitudFinanciacionUpdateManyWithWhereWithoutVehiculoInput = {
+    where: SolicitudFinanciacionScalarWhereInput
+    data: XOR<SolicitudFinanciacionUpdateManyMutationInput, SolicitudFinanciacionUncheckedUpdateManyWithoutVehiculoInput>
+  }
+
+  export type SolicitudFinanciacionScalarWhereInput = {
+    AND?: SolicitudFinanciacionScalarWhereInput | SolicitudFinanciacionScalarWhereInput[]
+    OR?: SolicitudFinanciacionScalarWhereInput[]
+    NOT?: SolicitudFinanciacionScalarWhereInput | SolicitudFinanciacionScalarWhereInput[]
+    id?: StringFilter<"SolicitudFinanciacion"> | string
+    vehiculoId?: StringNullableFilter<"SolicitudFinanciacion"> | string | null
+    nombre?: StringFilter<"SolicitudFinanciacion"> | string
+    apellido?: StringFilter<"SolicitudFinanciacion"> | string
+    dni?: StringFilter<"SolicitudFinanciacion"> | string
+    email?: StringFilter<"SolicitudFinanciacion"> | string
+    telefono?: StringFilter<"SolicitudFinanciacion"> | string
+    ingresos?: DecimalNullableFilter<"SolicitudFinanciacion"> | Decimal | DecimalJsLike | number | string | null
+    anticipo?: DecimalFilter<"SolicitudFinanciacion"> | Decimal | DecimalJsLike | number | string
+    cuotas?: IntFilter<"SolicitudFinanciacion"> | number
+    estado?: EnumEstadoConsultaFilter<"SolicitudFinanciacion"> | $Enums.EstadoConsulta
+    mensaje?: StringNullableFilter<"SolicitudFinanciacion"> | string | null
+    createdAt?: DateTimeFilter<"SolicitudFinanciacion"> | Date | string
+    updatedAt?: DateTimeFilter<"SolicitudFinanciacion"> | Date | string
+  }
+
   export type VehiculoCreateWithoutImagenesInput = {
     id?: string
     marca: string
@@ -13197,7 +18627,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
-    moneda?: string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -13211,6 +18641,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     categoria: CategoriaCreateNestedOneWithoutVehiculosInput
     consultas?: ConsultaCreateNestedManyWithoutVehiculoInput
+    solicitudesFinanciacion?: SolicitudFinanciacionCreateNestedManyWithoutVehiculoInput
   }
 
   export type VehiculoUncheckedCreateWithoutImagenesInput = {
@@ -13222,7 +18653,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
-    moneda?: string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -13235,6 +18666,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     consultas?: ConsultaUncheckedCreateNestedManyWithoutVehiculoInput
+    solicitudesFinanciacion?: SolicitudFinanciacionUncheckedCreateNestedManyWithoutVehiculoInput
   }
 
   export type VehiculoCreateOrConnectWithoutImagenesInput = {
@@ -13261,7 +18693,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    moneda?: StringFieldUpdateOperationsInput | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13275,6 +18707,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     categoria?: CategoriaUpdateOneRequiredWithoutVehiculosNestedInput
     consultas?: ConsultaUpdateManyWithoutVehiculoNestedInput
+    solicitudesFinanciacion?: SolicitudFinanciacionUpdateManyWithoutVehiculoNestedInput
   }
 
   export type VehiculoUncheckedUpdateWithoutImagenesInput = {
@@ -13286,7 +18719,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    moneda?: StringFieldUpdateOperationsInput | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13299,6 +18732,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     consultas?: ConsultaUncheckedUpdateManyWithoutVehiculoNestedInput
+    solicitudesFinanciacion?: SolicitudFinanciacionUncheckedUpdateManyWithoutVehiculoNestedInput
   }
 
   export type VehiculoCreateWithoutConsultasInput = {
@@ -13309,7 +18743,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
-    moneda?: string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -13323,6 +18757,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     categoria: CategoriaCreateNestedOneWithoutVehiculosInput
     imagenes?: ImagenVehiculoCreateNestedManyWithoutVehiculoInput
+    solicitudesFinanciacion?: SolicitudFinanciacionCreateNestedManyWithoutVehiculoInput
   }
 
   export type VehiculoUncheckedCreateWithoutConsultasInput = {
@@ -13334,7 +18769,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
-    moneda?: string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -13347,6 +18782,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     imagenes?: ImagenVehiculoUncheckedCreateNestedManyWithoutVehiculoInput
+    solicitudesFinanciacion?: SolicitudFinanciacionUncheckedCreateNestedManyWithoutVehiculoInput
   }
 
   export type VehiculoCreateOrConnectWithoutConsultasInput = {
@@ -13373,7 +18809,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    moneda?: StringFieldUpdateOperationsInput | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13387,6 +18823,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     categoria?: CategoriaUpdateOneRequiredWithoutVehiculosNestedInput
     imagenes?: ImagenVehiculoUpdateManyWithoutVehiculoNestedInput
+    solicitudesFinanciacion?: SolicitudFinanciacionUpdateManyWithoutVehiculoNestedInput
   }
 
   export type VehiculoUncheckedUpdateWithoutConsultasInput = {
@@ -13398,7 +18835,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    moneda?: StringFieldUpdateOperationsInput | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13411,6 +18848,123 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     imagenes?: ImagenVehiculoUncheckedUpdateManyWithoutVehiculoNestedInput
+    solicitudesFinanciacion?: SolicitudFinanciacionUncheckedUpdateManyWithoutVehiculoNestedInput
+  }
+
+  export type VehiculoCreateWithoutSolicitudesFinanciacionInput = {
+    id?: string
+    marca: string
+    modelo: string
+    anio: number
+    version?: string | null
+    estado?: $Enums.EstadoVehiculo
+    precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
+    kilometraje?: number
+    color?: string | null
+    motor?: string | null
+    transmision?: $Enums.Transmision | null
+    combustible?: $Enums.Combustible | null
+    puertas?: number | null
+    potencia?: number | null
+    descripcion?: string | null
+    publicacion?: $Enums.EstadoPublicacion
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    categoria: CategoriaCreateNestedOneWithoutVehiculosInput
+    imagenes?: ImagenVehiculoCreateNestedManyWithoutVehiculoInput
+    consultas?: ConsultaCreateNestedManyWithoutVehiculoInput
+  }
+
+  export type VehiculoUncheckedCreateWithoutSolicitudesFinanciacionInput = {
+    id?: string
+    categoriaId: string
+    marca: string
+    modelo: string
+    anio: number
+    version?: string | null
+    estado?: $Enums.EstadoVehiculo
+    precio: Decimal | DecimalJsLike | number | string
+    moneda?: $Enums.Moneda
+    kilometraje?: number
+    color?: string | null
+    motor?: string | null
+    transmision?: $Enums.Transmision | null
+    combustible?: $Enums.Combustible | null
+    puertas?: number | null
+    potencia?: number | null
+    descripcion?: string | null
+    publicacion?: $Enums.EstadoPublicacion
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    imagenes?: ImagenVehiculoUncheckedCreateNestedManyWithoutVehiculoInput
+    consultas?: ConsultaUncheckedCreateNestedManyWithoutVehiculoInput
+  }
+
+  export type VehiculoCreateOrConnectWithoutSolicitudesFinanciacionInput = {
+    where: VehiculoWhereUniqueInput
+    create: XOR<VehiculoCreateWithoutSolicitudesFinanciacionInput, VehiculoUncheckedCreateWithoutSolicitudesFinanciacionInput>
+  }
+
+  export type VehiculoUpsertWithoutSolicitudesFinanciacionInput = {
+    update: XOR<VehiculoUpdateWithoutSolicitudesFinanciacionInput, VehiculoUncheckedUpdateWithoutSolicitudesFinanciacionInput>
+    create: XOR<VehiculoCreateWithoutSolicitudesFinanciacionInput, VehiculoUncheckedCreateWithoutSolicitudesFinanciacionInput>
+    where?: VehiculoWhereInput
+  }
+
+  export type VehiculoUpdateToOneWithWhereWithoutSolicitudesFinanciacionInput = {
+    where?: VehiculoWhereInput
+    data: XOR<VehiculoUpdateWithoutSolicitudesFinanciacionInput, VehiculoUncheckedUpdateWithoutSolicitudesFinanciacionInput>
+  }
+
+  export type VehiculoUpdateWithoutSolicitudesFinanciacionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    marca?: StringFieldUpdateOperationsInput | string
+    modelo?: StringFieldUpdateOperationsInput | string
+    anio?: IntFieldUpdateOperationsInput | number
+    version?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
+    precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
+    kilometraje?: IntFieldUpdateOperationsInput | number
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    motor?: NullableStringFieldUpdateOperationsInput | string | null
+    transmision?: NullableEnumTransmisionFieldUpdateOperationsInput | $Enums.Transmision | null
+    combustible?: NullableEnumCombustibleFieldUpdateOperationsInput | $Enums.Combustible | null
+    puertas?: NullableIntFieldUpdateOperationsInput | number | null
+    potencia?: NullableIntFieldUpdateOperationsInput | number | null
+    descripcion?: NullableStringFieldUpdateOperationsInput | string | null
+    publicacion?: EnumEstadoPublicacionFieldUpdateOperationsInput | $Enums.EstadoPublicacion
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    categoria?: CategoriaUpdateOneRequiredWithoutVehiculosNestedInput
+    imagenes?: ImagenVehiculoUpdateManyWithoutVehiculoNestedInput
+    consultas?: ConsultaUpdateManyWithoutVehiculoNestedInput
+  }
+
+  export type VehiculoUncheckedUpdateWithoutSolicitudesFinanciacionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    categoriaId?: StringFieldUpdateOperationsInput | string
+    marca?: StringFieldUpdateOperationsInput | string
+    modelo?: StringFieldUpdateOperationsInput | string
+    anio?: IntFieldUpdateOperationsInput | number
+    version?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
+    precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
+    kilometraje?: IntFieldUpdateOperationsInput | number
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    motor?: NullableStringFieldUpdateOperationsInput | string | null
+    transmision?: NullableEnumTransmisionFieldUpdateOperationsInput | $Enums.Transmision | null
+    combustible?: NullableEnumCombustibleFieldUpdateOperationsInput | $Enums.Combustible | null
+    puertas?: NullableIntFieldUpdateOperationsInput | number | null
+    potencia?: NullableIntFieldUpdateOperationsInput | number | null
+    descripcion?: NullableStringFieldUpdateOperationsInput | string | null
+    publicacion?: EnumEstadoPublicacionFieldUpdateOperationsInput | $Enums.EstadoPublicacion
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    imagenes?: ImagenVehiculoUncheckedUpdateManyWithoutVehiculoNestedInput
+    consultas?: ConsultaUncheckedUpdateManyWithoutVehiculoNestedInput
   }
 
   export type AccountCreateManyUserInput = {
@@ -13501,7 +19055,7 @@ export namespace Prisma {
     version?: string | null
     estado?: $Enums.EstadoVehiculo
     precio: Decimal | DecimalJsLike | number | string
-    moneda?: string
+    moneda?: $Enums.Moneda
     kilometraje?: number
     color?: string | null
     motor?: string | null
@@ -13523,7 +19077,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    moneda?: StringFieldUpdateOperationsInput | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13537,6 +19091,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     imagenes?: ImagenVehiculoUpdateManyWithoutVehiculoNestedInput
     consultas?: ConsultaUpdateManyWithoutVehiculoNestedInput
+    solicitudesFinanciacion?: SolicitudFinanciacionUpdateManyWithoutVehiculoNestedInput
   }
 
   export type VehiculoUncheckedUpdateWithoutCategoriaInput = {
@@ -13547,7 +19102,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    moneda?: StringFieldUpdateOperationsInput | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13561,6 +19116,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     imagenes?: ImagenVehiculoUncheckedUpdateManyWithoutVehiculoNestedInput
     consultas?: ConsultaUncheckedUpdateManyWithoutVehiculoNestedInput
+    solicitudesFinanciacion?: SolicitudFinanciacionUncheckedUpdateManyWithoutVehiculoNestedInput
   }
 
   export type VehiculoUncheckedUpdateManyWithoutCategoriaInput = {
@@ -13571,7 +19127,7 @@ export namespace Prisma {
     version?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoVehiculoFieldUpdateOperationsInput | $Enums.EstadoVehiculo
     precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    moneda?: StringFieldUpdateOperationsInput | string
+    moneda?: EnumMonedaFieldUpdateOperationsInput | $Enums.Moneda
     kilometraje?: IntFieldUpdateOperationsInput | number
     color?: NullableStringFieldUpdateOperationsInput | string | null
     motor?: NullableStringFieldUpdateOperationsInput | string | null
@@ -13601,6 +19157,22 @@ export namespace Prisma {
     telefono?: string | null
     mensaje?: string | null
     estado?: $Enums.EstadoConsulta
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SolicitudFinanciacionCreateManyVehiculoInput = {
+    id?: string
+    nombre: string
+    apellido: string
+    dni: string
+    email: string
+    telefono: string
+    ingresos?: Decimal | DecimalJsLike | number | string | null
+    anticipo: Decimal | DecimalJsLike | number | string
+    cuotas: number
+    estado?: $Enums.EstadoConsulta
+    mensaje?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -13661,6 +19233,54 @@ export namespace Prisma {
     telefono?: NullableStringFieldUpdateOperationsInput | string | null
     mensaje?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: EnumEstadoConsultaFieldUpdateOperationsInput | $Enums.EstadoConsulta
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SolicitudFinanciacionUpdateWithoutVehiculoInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    apellido?: StringFieldUpdateOperationsInput | string
+    dni?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    telefono?: StringFieldUpdateOperationsInput | string
+    ingresos?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    anticipo?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cuotas?: IntFieldUpdateOperationsInput | number
+    estado?: EnumEstadoConsultaFieldUpdateOperationsInput | $Enums.EstadoConsulta
+    mensaje?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SolicitudFinanciacionUncheckedUpdateWithoutVehiculoInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    apellido?: StringFieldUpdateOperationsInput | string
+    dni?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    telefono?: StringFieldUpdateOperationsInput | string
+    ingresos?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    anticipo?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cuotas?: IntFieldUpdateOperationsInput | number
+    estado?: EnumEstadoConsultaFieldUpdateOperationsInput | $Enums.EstadoConsulta
+    mensaje?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SolicitudFinanciacionUncheckedUpdateManyWithoutVehiculoInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    apellido?: StringFieldUpdateOperationsInput | string
+    dni?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    telefono?: StringFieldUpdateOperationsInput | string
+    ingresos?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    anticipo?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cuotas?: IntFieldUpdateOperationsInput | number
+    estado?: EnumEstadoConsultaFieldUpdateOperationsInput | $Enums.EstadoConsulta
+    mensaje?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

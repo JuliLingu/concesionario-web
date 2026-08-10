@@ -6,6 +6,13 @@ import { ConsultaSchema } from "@/schemas/consulta";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { EstadoConsulta } from "../../generated/prisma";
+import {
+  REGLAS,
+  esperaRestante,
+  ipDelCliente,
+  mensajeDeEspera,
+  registrarIntento,
+} from "@/lib/rate-limit";
 
 // ── Crear consulta (acción pública, sin auth requerida) ──────────────────────
 export const createConsulta = async (values: z.infer<typeof ConsultaSchema>) => {
@@ -14,6 +21,13 @@ export const createConsulta = async (values: z.infer<typeof ConsultaSchema>) => 
   if (!validated.success) {
     return { error: "Datos del formulario inválidos" };
   }
+
+  // Cinco consultas por hora y origen: de sobra para quien pregunta por varias
+  // unidades, y suficiente para que la bandeja del panel no se llene de spam.
+  const clave = `consulta:ip:${await ipDelCliente()}`;
+  const espera = esperaRestante(clave, REGLAS.CONSULTA_POR_IP);
+  if (espera > 0) return { error: mensajeDeEspera(espera) };
+  registrarIntento(clave, REGLAS.CONSULTA_POR_IP);
 
   try {
     await prisma.consulta.create({

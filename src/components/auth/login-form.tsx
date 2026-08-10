@@ -14,63 +14,83 @@ export const LoginForm = () => {
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
-
+    const formData = new FormData();
+    formData.append("email", values.email);
+    formData.append("password", values.password);
     startTransition(() => {
-      login(values).then((data) => {
-        if (data?.error) {
-          setError(data.error);
-        }
+      login(formData).then((data) => {
+        if (data?.error) setError(data.error);
       });
     });
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 block">Email Address</label>
-        <input 
-          {...form.register("email")} 
+    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
+      {/* Email */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
+          Correo Electrónico
+        </label>
+        <input
+          {...form.register("email")}
+          placeholder="name@gallery.com"
+          type="email"
           disabled={isPending}
-          placeholder="name@gallery.com" 
-          type="email" 
-          className="bg-surface-low p-4 w-full rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none" 
+          className={`w-full bg-[hsl(var(--input))] rounded px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]/20 disabled:opacity-60 ${form.formState.errors.email ? "ring-2 ring-red-400 bg-red-50" : ""}`}
         />
-        {form.formState.errors.email && <p className="text-primary text-[10px] font-bold uppercase mt-1">{form.formState.errors.email.message}</p>}
+        {form.formState.errors.email && (
+          <span className="text-red-500 text-xs">{form.formState.errors.email.message}</span>
+        )}
       </div>
-      <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 block">Password</label>
-        <input 
-          {...form.register("password")} 
+
+      {/* Password */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
+          Contraseña
+        </label>
+        <input
+          {...form.register("password")}
+          placeholder="••••••••"
+          type="password"
           disabled={isPending}
-          placeholder="••••••••" 
-          type="password" 
-          className="bg-surface-low p-4 w-full rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none" 
+          className={`w-full bg-[hsl(var(--input))] rounded px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]/20 disabled:opacity-60 ${form.formState.errors.password ? "ring-2 ring-red-400 bg-red-50" : ""}`}
         />
-        {form.formState.errors.password && <p className="text-primary text-[10px] font-bold uppercase mt-1">{form.formState.errors.password.message}</p>}
+        {form.formState.errors.password && (
+          <span className="text-red-500 text-xs">{form.formState.errors.password.message}</span>
+        )}
       </div>
-      {error && <div className="bg-primary/5 p-4 text-primary text-[10px] font-black uppercase tracking-widest">{error}</div>}
-      <button 
-        type="submit" 
-        disabled={isPending} 
-        className="bg-racing text-white p-4 w-full rounded-sm hover:translate-y-[-2px] hover:shadow-2xl disabled:opacity-50 transition-all font-black text-xs uppercase tracking-[0.3em]"
+
+      {/* Error */}
+      {error && (
+        <div className="bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] p-3 text-[10px] font-black uppercase tracking-[0.1em] rounded">
+          {error}
+        </div>
+      )}
+
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={isPending}
+        className="w-full bg-[hsl(var(--primary))] hover:brightness-90 text-[hsl(var(--primary-foreground))] py-4 rounded text-xs font-black uppercase tracking-[0.3em] transition-all hover:-translate-y-0.5 hover:shadow-[0_25px_50px_-12px_hsl(var(--primary)/0.5)] disabled:opacity-70 flex items-center justify-center"
       >
-        {isPending ? "Validating..." : "Enter the Gallery"}
+        {isPending ? (
+          <span className="w-5 h-5 border-2 border-[hsl(var(--primary-foreground))]/30 border-t-[hsl(var(--primary-foreground))] rounded-full animate-spin" />
+        ) : (
+          "Iniciar Sesión"
+        )}
       </button>
 
-      <p className="text-center text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">
+      <p className="text-center text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
         ¿No tienes una cuenta?{" "}
-        <Link href="/register" className="text-primary hover:underline transition-all">
+        <Link href="/register" className="text-[hsl(var(--primary))] hover:underline">
           Regístrate aquí
         </Link>
       </p>
     </form>
   );
-};
+};

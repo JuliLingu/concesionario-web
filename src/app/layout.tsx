@@ -4,21 +4,36 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { auth } from "@/auth";
+import { getConfiguracion } from "@/services/configuracion.service";
+import { construirVariablesTema } from "@/lib/colores";
 
-const spaceGrotesk = Space_Grotesk({ 
+
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: '--font-space',
 });
 
-const manrope = Manrope({ 
+const manrope = Manrope({
   subsets: ["latin"],
   variable: '--font-manrope',
 });
 
-export const metadata: Metadata = {
-  title: "JBJ Automotores | The Kinetic Gallery",
-  description: "Una experiencia automotriz editorial y premium.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const configuracion = await getConfiguracion();
+
+  return {
+    title: configuracion.siteTitle,
+    description: configuracion.siteDescription,
+    // Solo se declara si el administrador cargó uno. Ojo: un archivo
+    // app/icon.* o app/favicon.ico tendría prioridad sobre esto.
+    ...(configuracion.faviconUrl && {
+      icons: {
+        icon: configuracion.faviconUrl,
+        apple: configuracion.faviconUrl,
+      },
+    }),
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -26,13 +41,33 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
+  const configuracion = await getConfiguracion();
+
+  // Al encabezado solo se le pasa lo que muestra. El objeto de sesión completo
+  // viajaba serializado en el HTML de todas las páginas, incluido el correo.
+  const usuario = session?.user
+    ? {
+        nombre: session.user.name ?? null,
+        esAdmin: session.user.role === "ADMIN",
+      }
+    : null;
+
+  // La paleta va como estilo inline en <html>: gana por especificidad sobre el
+  // :root de globals.css, se hereda a todo el árbol y llega en el HTML del
+  // servidor, así que no hay parpadeo con los colores por defecto.
+  const tema = construirVariablesTema(configuracion) as React.CSSProperties;
 
   return (
-    <html lang="es" className={`${spaceGrotesk.variable} ${manrope.variable}`} data-scroll-behavior="smooth">
+    <html
+      lang="es"
+      className={`${spaceGrotesk.variable} ${manrope.variable}`}
+      style={tema}
+      data-scroll-behavior="smooth"
+    >
       <body className={manrope.className}>
-        <Header session={session} />
+        <Header usuario={usuario} configuracion={configuracion} />
         <main>{children}</main>
-        <Footer />
+        <Footer configuracion={configuracion} />
       </body>
     </html>
   );
