@@ -2,6 +2,7 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { CACHE_TAGS } from "@/services/cache.service";
+import { registrarError } from "@/lib/log";
 import {
   CONFIGURACION_DEFAULTS,
   CONFIGURACION_NUMERIC_DEFAULTS,
@@ -86,7 +87,7 @@ export const getConfiguracion = cache(async (): Promise<SiteConfig> => {
   try {
     return conDefaults(await readConfiguracion());
   } catch (error) {
-    console.error("Error al obtener la configuración:", error);
+    registrarError("getConfiguracion", error);
     // Si la base falla, la página igual se renderiza con los textos por defecto.
     return conDefaults(null);
   }

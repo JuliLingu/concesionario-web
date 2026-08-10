@@ -8,8 +8,21 @@ import { useEffect, useState } from "react";
 import { handleSignOut } from "@/actions/auth-actions";
 import type { SiteConfig } from "@/lib/configuracion-defaults";
 
+/**
+ * Lo mínimo que el encabezado necesita saber de quien está mirando.
+ *
+ * Antes se recibía el objeto de sesión completo. Como este componente es de
+ * cliente, ese objeto se serializaba en el HTML de todas las páginas —también
+ * las públicas—, con lo que el correo del administrador quedaba a la vista de
+ * cualquier visitante mientras hubiera sesión abierta en ese navegador.
+ */
+export type UsuarioDelHeader = {
+  nombre: string | null;
+  esAdmin: boolean;
+};
+
 interface HeaderProps {
-  session: any;
+  usuario: UsuarioDelHeader | null;
   configuracion: SiteConfig;
 }
 
@@ -19,7 +32,7 @@ const NAV_LINKS = [
   { href: "/#ubicacion", label: "Ubicación" },
 ];
 
-export function Header({ session, configuracion }: HeaderProps) {
+export function Header({ usuario, configuracion }: HeaderProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -94,7 +107,7 @@ export function Header({ session, configuracion }: HeaderProps) {
               {link.label}
             </Link>
           ))}
-          {session?.user?.role === "ADMIN" && (
+          {usuario?.esAdmin && (
             <Link href="/dashboard" className="text-[hsl(var(--foreground))]/60 hover:text-[hsl(var(--foreground))] font-medium transition-colors text-sm">
               Administrador
             </Link>
@@ -109,10 +122,10 @@ export function Header({ session, configuracion }: HeaderProps) {
 
         {/* Session (desktop) */}
         <div className="hidden md:block">
-          {session ? (
+          {usuario ? (
             <div className="flex items-center gap-4">
               <span className="font-bold text-[hsl(var(--foreground))] text-sm">
-                {session.user?.name}
+                {usuario.nombre}
               </span>
               <form action={handleSignOut}>
                 <button
@@ -171,7 +184,7 @@ export function Header({ session, configuracion }: HeaderProps) {
                   {link.label}
                 </Link>
               ))}
-              {session?.user?.role === "ADMIN" && (
+              {usuario?.esAdmin && (
                 <Link
                   href="/dashboard"
                   onClick={() => setOpen(false)}
@@ -189,10 +202,10 @@ export function Header({ session, configuracion }: HeaderProps) {
                 Ver Vehículos
               </Link>
 
-              {session ? (
+              {usuario ? (
                 <div className="mt-4 pt-4 border-t border-black/5 flex items-center justify-between gap-3">
                   <span className="font-bold text-[hsl(var(--foreground))] text-sm truncate">
-                    {session.user?.name}
+                    {usuario.nombre}
                   </span>
                   <form action={handleSignOut}>
                     <button

@@ -43,6 +43,15 @@ export default async function RootLayout({
   const session = await auth();
   const configuracion = await getConfiguracion();
 
+  // Al encabezado solo se le pasa lo que muestra. El objeto de sesión completo
+  // viajaba serializado en el HTML de todas las páginas, incluido el correo.
+  const usuario = session?.user
+    ? {
+        nombre: session.user.name ?? null,
+        esAdmin: session.user.role === "ADMIN",
+      }
+    : null;
+
   // La paleta va como estilo inline en <html>: gana por especificidad sobre el
   // :root de globals.css, se hereda a todo el árbol y llega en el HTML del
   // servidor, así que no hay parpadeo con los colores por defecto.
@@ -56,7 +65,7 @@ export default async function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body className={manrope.className}>
-        <Header session={session} configuracion={configuracion} />
+        <Header usuario={usuario} configuracion={configuracion} />
         <main>{children}</main>
         <Footer configuracion={configuracion} />
       </body>

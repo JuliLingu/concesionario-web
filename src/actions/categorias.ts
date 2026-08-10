@@ -4,6 +4,7 @@ import * as z from "zod";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { registrarError } from "@/lib/log";
 
 const CategoriaSchema = z.object({
   nombre: z.string().min(1, "El nombre de la categoría es obligatorio"),
@@ -53,12 +54,20 @@ export const createCategoria = async (values: z.infer<typeof CategoriaSchema>) =
     revalidatePath("/catalogo");
     return { success: "Categoría creada con éxito" };
   } catch (error) {
-    console.error(error);
+    registrarError("createCategoria", error);
     return { error: "Error al crear la categoría" };
   }
 };
 
+/**
+ * Categorías con el recuento de unidades por categoría, incluidos borradores:
+ * es la vista del panel. El catálogo público arma sus filtros con
+ * getCachedFiltrosCatalogo, que ya sabe qué mostrarle a cada quien.
+ */
 export const getCategorias = async () => {
+  const session = await auth();
+  if (session?.user?.role !== "ADMIN") return [];
+
   try {
     const categorias = await prisma.categoria.findMany({
       orderBy: {

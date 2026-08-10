@@ -105,7 +105,7 @@ export const DashboardClient = ({
                         </td>
                         <td className="py-3 px-4 hidden md:table-cell">
                           {c.vehiculo ? (
-                            <Link href={`/catalogo/${c.vehiculo.id}`} target="_blank" className="text-sm font-bold text-[hsl(var(--foreground))] flex items-center gap-1 hover:text-[hsl(var(--primary))]">
+                            <Link href={`/catalogo/${c.vehiculo.id}`} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[hsl(var(--foreground))] flex items-center gap-1 hover:text-[hsl(var(--primary))]">
                               {c.vehiculo.marca} {c.vehiculo.modelo}
                               <ExternalLink size={11} className="opacity-40" />
                             </Link>

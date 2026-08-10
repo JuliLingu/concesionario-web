@@ -6,6 +6,7 @@ import { VehicleSchema } from "@/schemas/vehicle";
 import { auth } from "@/auth";
 import { revalidatePath, updateTag } from "next/cache";
 import { CACHE_TAGS } from "@/services/cache.service";
+import { registrarError } from "@/lib/log";
 
 /**
  * Las opciones de los filtros del catálogo se calculan a partir del stock, así
@@ -54,12 +55,22 @@ export const createVehicle = async (values: z.infer<typeof VehicleSchema>) => {
     revalidarCatalogo();
     return { success: "Vehículo creado con éxito" };
   } catch (error) {
-    console.error(error);
+    registrarError("createVehicle", error);
     return { error: "Error al crear el vehículo" };
   }
 };
 
+/**
+ * Inventario completo, borradores incluidos: es información del panel.
+ *
+ * La comprobación va acá dentro y no solo en la página que la consume porque
+ * toda función exportada de un archivo "use server" es un endpoint alcanzable
+ * por sí mismo.
+ */
 export const getVehicles = async () => {
+  const session = await auth();
+  if (session?.user?.role !== "ADMIN") return [];
+
   try {
     const vehicles = await prisma.vehiculo.findMany({
       include: {
@@ -128,11 +139,16 @@ export const updateVehicle = async (id: string, values: z.infer<typeof VehicleSc
     revalidarCatalogo();
     return { success: "Vehículo actualizado con éxito" };
   } catch (error) {
-    console.error(error);
+    registrarError("updateVehicle", error);
     return { error: "Error al actualizar el vehículo" };
   }
 };
 
+/**
+ * Ficha de una unidad. La usa el catálogo público, así que un borrador solo se
+ * devuelve si quien mira es el administrador: el listado ya filtraba por
+ * publicación, pero entrar por la URL de la ficha esquivaba ese filtro.
+ */
 export const getVehicleById = async (id: string) => {
   try {
     const vehicle = await prisma.vehiculo.findUnique({
@@ -144,9 +160,16 @@ export const getVehicleById = async (id: string) => {
         },
       },
     });
-    
+
     if (!vehicle) return null;
-    
+
+    if (vehicle.publicacion !== "PUBLICADO") {
+      const session = await auth();
+      // Mismo null que un id inexistente: la página responde 404 y no confirma
+      // que la unidad exista.
+      if (session?.user?.role !== "ADMIN") return null;
+    }
+
     return {
       ...vehicle,
       precio: Number(vehicle.precio)

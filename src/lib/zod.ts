@@ -1,10 +1,11 @@
-import { z } from "zod";
-
-export const loginSchema = z.object({
-  email: z.string().email("Email inválido"),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-});
-
-export const registerSchema = loginSchema.extend({
-  name: z.string().min(2, "Nombre requerido"),
-});
+/**
+ * Alias históricos de los esquemas de autenticación.
+ *
+ * Hasta ahora este archivo definía su propio par de esquemas, con una política
+ * de contraseña distinta de la de `@/schemas/auth`. Tener dos definiciones
+ * significaba que endurecer una dejaba la otra como puerta blanda, así que
+ * quedan apuntando a la única fuente de verdad.
+ *
+ * Para código nuevo, importar directamente de `@/schemas/auth`.
+ */
+export { LoginSchema as loginSchema, RegisterSchema as registerSchema } from "@/schemas/auth";

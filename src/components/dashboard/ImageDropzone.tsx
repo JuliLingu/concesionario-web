@@ -2,10 +2,7 @@
 
 import { useRef, useState } from "react";
 import { AlertCircle, ImagePlus, Loader2, X } from "lucide-react";
-
-const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET =
-  process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "concesionario_unsigned";
+import { firmarSubida } from "@/actions/upload";
 
 const TAMANIO_MAXIMO_MB = 10;
 
@@ -17,19 +14,34 @@ interface Subida {
 }
 
 /**
- * Sube un archivo a Cloudinary con el preset sin firmar.
+ * Sube un archivo a Cloudinary con una firma pedida al servidor.
+ *
+ * La firma se emite por archivo y solo si la sesión es de administrador, así
+ * que ya no hay credenciales de subida en el bundle del navegador. El destino
+ * (`public_id`) y las extensiones admitidas van dentro de la firma: el
+ * navegador no puede cambiarlos sin invalidarla.
  *
  * Se usa XMLHttpRequest y no fetch porque es la única forma de leer el
  * progreso real de la subida y poder mostrar la barra.
  */
-function subirArchivo(archivo: File, onProgreso: (porcentaje: number) => void) {
+async function subirArchivo(archivo: File, onProgreso: (porcentaje: number) => void) {
+  const firma = await firmarSubida();
+  if (!firma.ok) throw new Error(firma.error);
+
+  const { cloudName, apiKey, timestamp, publicId, allowedFormats, signature } =
+    firma.credenciales;
+
   return new Promise<string>((resolve, reject) => {
     const formData = new FormData();
     formData.append("file", archivo);
-    formData.append("upload_preset", UPLOAD_PRESET);
+    formData.append("api_key", apiKey);
+    formData.append("timestamp", String(timestamp));
+    formData.append("public_id", publicId);
+    formData.append("allowed_formats", allowedFormats);
+    formData.append("signature", signature);
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`);
+    xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`);
 
     xhr.upload.addEventListener("progress", (evento) => {
       if (evento.lengthComputable) {
@@ -109,7 +121,7 @@ export function ImageDropzone({
   const proximoId = useRef(0);
 
   const sinCupo = cupoDisponible !== undefined && cupoDisponible <= 0;
-  const bloqueado = disabled || sinCupo || !CLOUD_NAME;
+  const bloqueado = disabled || sinCupo;
   const subiendo = subidas.some((s) => !s.error);
 
   const actualizarSubida = (id: number, cambios: Partial<Subida>) => {
@@ -186,18 +198,8 @@ export function ImageDropzone({
     procesarArchivos(evento.dataTransfer.files);
   };
 
-  if (!CLOUD_NAME) {
-    return (
-      <div className="flex items-start gap-2 rounded border-l-4 border-red-500 bg-red-50 p-3 text-xs font-medium text-red-700">
-        <AlertCircle size={16} className="mt-0.5 shrink-0" />
-        <span>
-          Falta configurar <code>NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME</code>. Sin esa
-          variable no se pueden subir imágenes.
-        </span>
-      </div>
-    );
-  }
-
+  // Si faltan credenciales en el entorno ya no se detecta acá: lo comprueba el
+  // servidor al pedir la firma y el aviso aparece junto al archivo que falló.
   return (
     <div className="flex flex-col gap-3">
       <input

@@ -7,10 +7,29 @@ import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { EstadoConsulta } from "../../generated/prisma";
 import { FEATURE_FINANCIACION } from "@/lib/features";
+import {
+  REGLAS,
+  esperaRestante,
+  ipDelCliente,
+  mensajeDeEspera,
+  registrarIntento,
+} from "@/lib/rate-limit";
 
 // ── Planes de Financiación (Admin) ──────────────────────────────────────────
 
+/**
+ * Planes de financiación.
+ *
+ * Los activos son públicos: los muestra el simulador de la ficha del vehículo.
+ * Los inactivos son borradores comerciales, así que pedirlos exige ser
+ * administrador.
+ */
 export const getPlanes = async (includeInactive = false) => {
+  if (includeInactive) {
+    const session = await auth();
+    if (session?.user?.role !== "ADMIN") return [];
+  }
+
   try {
     return await prisma.planFinanciacion.findMany({
       where: includeInactive ? undefined : { activo: true },
@@ -80,6 +99,13 @@ export const createSolicitud = async (values: z.infer<typeof SolicitudFinanciaci
 
   const validated = SolicitudFinanciacionSchema.safeParse(values);
   if (!validated.success) return { error: "Datos inválidos" };
+
+  // Formulario abierto que además guarda datos personales (DNI, ingresos): sin
+  // cupo, cualquiera puede llenar la tabla desde un script.
+  const clave = `solicitud:ip:${await ipDelCliente()}`;
+  const espera = esperaRestante(clave, REGLAS.SOLICITUD_POR_IP);
+  if (espera > 0) return { error: mensajeDeEspera(espera) };
+  registrarIntento(clave, REGLAS.SOLICITUD_POR_IP);
 
   try {
     await prisma.solicitudFinanciacion.create({
