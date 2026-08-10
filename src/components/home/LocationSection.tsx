@@ -1,56 +1,73 @@
-import { MapPin, Clock } from "lucide-react";
+"use client";
 
-export function LocationSection() {
+import type { SiteConfig } from "@/lib/configuracion-defaults";
+
+interface LocationSectionProps {
+  configuracion: SiteConfig;
+}
+
+export function LocationSection({ configuracion }: LocationSectionProps) {
+  const address = configuracion.direccion;
+
   return (
-    <section id="ubicacion" className="py-24 bg-surface-low">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 shadow-premium">
-        {/* Info Column */}
-        <div className="bg-surface-lowest p-12 md:p-24 flex flex-col justify-center">
-          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary mb-6 block">
-            Visit Us
-          </span>
-          <h2 className="text-5xl md:text-6xl font-bold text-foreground uppercase tracking-tight tight-editorial mb-16">
-            Nuestra Casa <br /> Central.
-          </h2>
+    <section id="ubicacion" className="py-24 bg-[hsl(var(--surface-low))]">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="flex flex-col lg:flex-row shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] rounded-lg overflow-hidden bg-white">
 
-          <div className="space-y-12">
-            <div className="flex gap-6">
-              <div className="w-px h-12 bg-primary/30" />
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40 mb-2">Location</p>
-                <p className="text-foreground font-bold text-lg">Av. Principal 123, Buenos Aires</p>
+          {/* Info Column */}
+          <div className="w-full lg:w-1/2 p-12 md:p-20 flex flex-col justify-center">
+            <h2 className="text-[3rem] md:text-[3.75rem] font-extrabold text-[hsl(var(--foreground))] uppercase tracking-[-0.02em] mb-16 leading-none">
+              Nuestra Casa <br /> Central.
+            </h2>
+
+            <div className="flex flex-col gap-10">
+              <div className="flex gap-5">
+                <div className="w-px h-12 bg-[#b5000b]/30 shrink-0" />
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] mb-1">Ubicación</div>
+                  <div className="text-[hsl(var(--foreground))] font-bold text-lg">{address}</div>
+                </div>
               </div>
-            </div>
 
-            <div className="flex gap-6">
-              <div className="w-px h-12 bg-primary/30" />
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40 mb-2">Open Hours</p>
-                <p className="text-foreground font-bold text-sm uppercase tracking-widest">Lun — Vie: 09:00 — 19:00</p>
-                <p className="text-foreground/40 font-bold text-xs uppercase tracking-widest mt-1">Sábados: 10:00 — 14:00</p>
+              <div className="flex gap-5">
+                <div className="w-px h-12 bg-[#b5000b]/30 shrink-0" />
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] mb-1">Contacto</div>
+                  <div className="text-[hsl(var(--foreground))] font-bold text-sm uppercase tracking-[0.1em]">
+                    {configuracion.telefono}
+                  </div>
+                  <div className="text-[hsl(var(--muted-foreground))] font-bold text-xs uppercase tracking-[0.1em] mt-1">
+                    {configuracion.email}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-5">
+                <div className="w-px h-12 bg-[#b5000b]/30 shrink-0" />
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] mb-1">Horarios</div>
+                  <div className="text-[hsl(var(--foreground))] font-bold text-sm uppercase tracking-[0.1em] whitespace-pre-line">
+                    {configuracion.horariosAtencion}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Map Column */}
-        <div className="w-full h-[400px] lg:h-full bg-surface-low overflow-hidden relative grayscale hover:grayscale-0 transition-all duration-1000">
-           <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3285.218552991631!2d-58.4613291!3d-34.573351!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bcb59020000001%3A0x123456789!2sAv.%20de%20los%20Incas%201234!5e0!3m2!1ses!2sar!4v1710000000000!5m2!1ses!2sar" 
-            width="100%" 
-            height="100%" 
-            style={{ border: 0 }} 
-            allowFullScreen 
-            loading="lazy">
-          </iframe>
-          {/* Overlay Tag */}
-          <div className="absolute top-12 right-12 bg-foreground text-white p-6 shadow-2xl">
-             <p className="text-2xl font-bold font-space tracking-tight italic">HQ-01</p>
-             <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/40 mt-1">Buenos Aires Est.</p>
+          {/* Map Column */}
+          <div className="group w-full lg:w-1/2 h-[400px] lg:h-auto bg-[hsl(var(--surface-low))] relative">
+            <iframe
+              src={`https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`}
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              className="grayscale transition-all duration-1000 ease-in-out group-hover:grayscale-0"
+            />
           </div>
         </div>
       </div>
     </section>
   );
 }
-

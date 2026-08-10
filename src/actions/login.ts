@@ -5,7 +5,8 @@ import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
 import { LoginSchema } from "@/schemas/auth";
 
-export const login = async (values: z.infer<typeof LoginSchema>) => {
+export const login = async (formData: FormData) => {
+  const values = Object.fromEntries(formData.entries());
   const validatedFields = LoginSchema.safeParse(values);
 
   if (!validatedFields.success) {

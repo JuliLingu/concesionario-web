@@ -24,12 +24,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 7.6.0
- * Query Engine version: 75cbdc1eb7150937890ad5465d861175c6624711
+ * Prisma Client JS version: 7.9.1
+ * Query Engine version: e922089b7d7502aff4249d5da3420f6fa55fc6ad
  */
 Prisma.prismaVersion = {
-  client: "7.6.0",
-  engine: "75cbdc1eb7150937890ad5465d861175c6624711"
+  client: "7.9.1",
+  engine: "e922089b7d7502aff4249d5da3420f6fa55fc6ad"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -212,6 +212,76 @@ exports.Prisma.ConsultaScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ConfiguracionScalarFieldEnum = {
+  id: 'id',
+  nombreConcesionaria: 'nombreConcesionaria',
+  telefono: 'telefono',
+  email: 'email',
+  direccion: 'direccion',
+  facebookUrl: 'facebookUrl',
+  instagramUrl: 'instagramUrl',
+  horariosAtencion: 'horariosAtencion',
+  updatedAt: 'updatedAt',
+  cotizacionDolar: 'cotizacionDolar',
+  logoUrl: 'logoUrl',
+  faviconUrl: 'faviconUrl',
+  siteTitle: 'siteTitle',
+  siteDescription: 'siteDescription',
+  heroTitulo: 'heroTitulo',
+  heroSubtitulo: 'heroSubtitulo',
+  heroCtaTexto: 'heroCtaTexto',
+  heroCtaUrl: 'heroCtaUrl',
+  heroImagenUrl: 'heroImagenUrl',
+  nosotrosTitulo: 'nosotrosTitulo',
+  nosotrosTexto: 'nosotrosTexto',
+  nosotrosMetrica1Valor: 'nosotrosMetrica1Valor',
+  nosotrosMetrica1Sufijo: 'nosotrosMetrica1Sufijo',
+  nosotrosMetrica1Label: 'nosotrosMetrica1Label',
+  nosotrosMetrica2Valor: 'nosotrosMetrica2Valor',
+  nosotrosMetrica2Sufijo: 'nosotrosMetrica2Sufijo',
+  nosotrosMetrica2Label: 'nosotrosMetrica2Label',
+  finanEyebrow: 'finanEyebrow',
+  finanTitulo: 'finanTitulo',
+  finanTexto: 'finanTexto',
+  finanTasaAnual: 'finanTasaAnual',
+  finanEntregaMinima: 'finanEntregaMinima',
+  finanCtaTexto: 'finanCtaTexto',
+  contactoEyebrow: 'contactoEyebrow',
+  contactoTitulo: 'contactoTitulo',
+  contactoTexto: 'contactoTexto',
+  contactoWhatsappTexto: 'contactoWhatsappTexto',
+  footerTexto: 'footerTexto',
+  terminosUrl: 'terminosUrl',
+  privacidadUrl: 'privacidadUrl'
+};
+
+exports.Prisma.PlanFinanciacionScalarFieldEnum = {
+  id: 'id',
+  nombre: 'nombre',
+  cuotas: 'cuotas',
+  tasaAnual: 'tasaAnual',
+  activo: 'activo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SolicitudFinanciacionScalarFieldEnum = {
+  id: 'id',
+  vehiculoId: 'vehiculoId',
+  nombre: 'nombre',
+  apellido: 'apellido',
+  dni: 'dni',
+  email: 'email',
+  telefono: 'telefono',
+  ingresos: 'ingresos',
+  anticipo: 'anticipo',
+  cuotas: 'cuotas',
+  estado: 'estado',
+  mensaje: 'mensaje',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -267,7 +337,6 @@ exports.Prisma.VehiculoOrderByRelevanceFieldEnum = {
   marca: 'marca',
   modelo: 'modelo',
   version: 'version',
-  moneda: 'moneda',
   color: 'color',
   motor: 'motor',
   descripcion: 'descripcion'
@@ -288,6 +357,61 @@ exports.Prisma.ConsultaOrderByRelevanceFieldEnum = {
   telefono: 'telefono',
   mensaje: 'mensaje'
 };
+
+exports.Prisma.ConfiguracionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  nombreConcesionaria: 'nombreConcesionaria',
+  telefono: 'telefono',
+  email: 'email',
+  direccion: 'direccion',
+  facebookUrl: 'facebookUrl',
+  instagramUrl: 'instagramUrl',
+  horariosAtencion: 'horariosAtencion',
+  logoUrl: 'logoUrl',
+  faviconUrl: 'faviconUrl',
+  siteTitle: 'siteTitle',
+  siteDescription: 'siteDescription',
+  heroTitulo: 'heroTitulo',
+  heroSubtitulo: 'heroSubtitulo',
+  heroCtaTexto: 'heroCtaTexto',
+  heroCtaUrl: 'heroCtaUrl',
+  heroImagenUrl: 'heroImagenUrl',
+  nosotrosTitulo: 'nosotrosTitulo',
+  nosotrosTexto: 'nosotrosTexto',
+  nosotrosMetrica1Valor: 'nosotrosMetrica1Valor',
+  nosotrosMetrica1Sufijo: 'nosotrosMetrica1Sufijo',
+  nosotrosMetrica1Label: 'nosotrosMetrica1Label',
+  nosotrosMetrica2Valor: 'nosotrosMetrica2Valor',
+  nosotrosMetrica2Sufijo: 'nosotrosMetrica2Sufijo',
+  nosotrosMetrica2Label: 'nosotrosMetrica2Label',
+  finanEyebrow: 'finanEyebrow',
+  finanTitulo: 'finanTitulo',
+  finanTexto: 'finanTexto',
+  finanCtaTexto: 'finanCtaTexto',
+  contactoEyebrow: 'contactoEyebrow',
+  contactoTitulo: 'contactoTitulo',
+  contactoTexto: 'contactoTexto',
+  contactoWhatsappTexto: 'contactoWhatsappTexto',
+  footerTexto: 'footerTexto',
+  terminosUrl: 'terminosUrl',
+  privacidadUrl: 'privacidadUrl'
+};
+
+exports.Prisma.PlanFinanciacionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  nombre: 'nombre'
+};
+
+exports.Prisma.SolicitudFinanciacionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  vehiculoId: 'vehiculoId',
+  nombre: 'nombre',
+  apellido: 'apellido',
+  dni: 'dni',
+  email: 'email',
+  telefono: 'telefono',
+  mensaje: 'mensaje'
+};
 exports.Role = exports.$Enums.Role = {
   USER: 'USER',
   ADMIN: 'ADMIN'
@@ -296,6 +420,11 @@ exports.Role = exports.$Enums.Role = {
 exports.EstadoVehiculo = exports.$Enums.EstadoVehiculo = {
   NUEVO: 'NUEVO',
   USADO: 'USADO'
+};
+
+exports.Moneda = exports.$Enums.Moneda = {
+  ARS: 'ARS',
+  USD: 'USD'
 };
 
 exports.Transmision = exports.$Enums.Transmision = {
@@ -334,7 +463,10 @@ exports.Prisma.ModelName = {
   Categoria: 'Categoria',
   Vehiculo: 'Vehiculo',
   ImagenVehiculo: 'ImagenVehiculo',
-  Consulta: 'Consulta'
+  Consulta: 'Consulta',
+  Configuracion: 'Configuracion',
+  PlanFinanciacion: 'PlanFinanciacion',
+  SolicitudFinanciacion: 'SolicitudFinanciacion'
 };
 
 /**

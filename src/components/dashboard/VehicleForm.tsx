@@ -6,16 +6,25 @@ import * as z from "zod";
 import { useState, useTransition } from "react";
 import { VehicleSchema } from "@/schemas/vehicle";
 import { createVehicle, updateVehicle } from "@/actions/vehicle";
-import { CldUploadWidget } from "next-cloudinary";
+import { ImageDropzone } from "@/components/dashboard/ImageDropzone";
 import Image from "next/image";
-import { ImagePlus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { getCldUrl } from "@/lib/cloudinary";
-import { 
-  Combustible, 
-  Transmision, 
-  EstadoVehiculo, 
-  EstadoPublicacion 
+import {
+  Combustible,
+  Transmision,
+  EstadoVehiculo,
+  EstadoPublicacion,
+  Moneda
 } from "../../../generated/prisma";
+import { formatArs, formatNumeroAr, parseNumeroAr, precioEnPesos } from "@/lib/precio";
+
+const MAX_IMAGENES = 10;
+
+const MONEDA_LABEL: Record<Moneda, string> = {
+  [Moneda.ARS]: "Pesos (ARS)",
+  [Moneda.USD]: "Dólares (USD)",
+};
 
 interface Category {
   id: string;
@@ -26,9 +35,10 @@ interface VehicleFormProps {
   categorias: Category[];
   initialData?: any; // The full vehicle object if we are editing
   onSuccess?: () => void;
+  cotizacionDolar?: number | null;
 }
 
-export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormProps) => {
+export const VehicleForm = ({ categorias, initialData, onSuccess, cotizacionDolar }: VehicleFormProps) => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
@@ -47,6 +57,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
       motor: initialData.motor || "",
       anio: initialData.anio,
       precio: Number(initialData.precio),
+      moneda: initialData.moneda || Moneda.USD,
       kilometraje: initialData.kilometraje,
       combustible: initialData.combustible || Combustible.NAFTA,
       transmision: initialData.transmision || Transmision.MANUAL,
@@ -65,6 +76,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
       motor: "",
       anio: new Date().getFullYear(),
       precio: 0,
+      moneda: Moneda.USD,
       kilometraje: 0,
       combustible: Combustible.NAFTA,
       transmision: Transmision.MANUAL,
@@ -79,15 +91,27 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
     },
   });
 
-  const onUpload = (result: any) => {
-    const info = result.info;
-    if (info && info.secure_url) {
-      setImagenes((prev) => {
-        const newImages = [...prev, info.secure_url];
-        form.setValue("imagenes", newImages);
-        return newImages;
-      });
-    }
+  const moneda = form.watch("moneda");
+  const precio = form.watch("precio");
+  const [precioTexto, setPrecioTexto] = useState(
+    initialData?.precio ? formatNumeroAr(Number(initialData.precio)) : ""
+  );
+
+  /** El precio se escribe con separadores de miles, pero se envía como número. */
+  const onPrecioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valor = parseNumeroAr(e.target.value);
+    setPrecioTexto(valor ? formatNumeroAr(valor) : "");
+    form.setValue("precio", valor, { shouldValidate: true });
+  };
+
+  const precioArs = precioEnPesos(precio || 0, moneda, cotizacionDolar);
+
+  const onUpload = (urls: string[]) => {
+    setImagenes((prev) => {
+      const newImages = [...prev, ...urls].slice(0, MAX_IMAGENES);
+      form.setValue("imagenes", newImages);
+      return newImages;
+    });
   };
 
   const removeImage = (url: string) => {
@@ -118,6 +142,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
             if (data.success) {
               setSuccess(data.success);
               setImagenes([]);
+              setPrecioTexto("");
               form.reset();
               if (onSuccess) onSuccess();
             }
@@ -130,143 +155,175 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
   return (
     <form 
       onSubmit={form.handleSubmit(onSubmit)}
-      className="space-y-8 bg-surface-lowest p-10 md:p-14 shadow-premium rounded-sm"
+      className="bg-[hsl(var(--card))] p-6 md:p-10 rounded shadow-premium flex flex-col gap-8"
     >
-      <div className="mb-12">
-        <h2 className="text-3xl font-bold font-space uppercase tracking-tight text-foreground">
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight uppercase text-foreground">
           {isEditing ? "Editar Vehículo" : "Gestión de Inventario"}
         </h2>
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mt-2">
-          {isEditing ? "Vehicle Modification" : "Vehicle Specification / Entry"}
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Marca */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Marca</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Marca</label>
           <input
             {...form.register("marca")}
             placeholder="Ej: Toyota"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           />
-          {form.formState.errors.marca && (
-            <span className="text-primary text-[10px] font-black uppercase mt-1">{form.formState.errors.marca.message}</span>
-          )}
+          {form.formState.errors.marca && <span className="text-[10px] text-red-500">{form.formState.errors.marca.message}</span>}
         </div>
 
         {/* Modelo */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Modelo</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Modelo</label>
           <input
             {...form.register("modelo")}
             placeholder="Ej: Corolla"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           />
-          {form.formState.errors.modelo && (
-            <span className="text-primary text-[10px] font-black uppercase mt-1">{form.formState.errors.modelo.message}</span>
-          )}
+          {form.formState.errors.modelo && <span className="text-[10px] text-red-500">{form.formState.errors.modelo.message}</span>}
         </div>
         
         {/* Version */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Versión</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Versión</label>
           <input
             {...form.register("version")}
             placeholder="Ej: XEI, Sport, M Comp"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           />
         </div>
 
         {/* Año */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Año</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Año</label>
           <input
             {...form.register("anio", { valueAsNumber: true })}
             type="number"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           />
+        </div>
+
+        {/* Moneda */}
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Moneda del Precio</label>
+          <select
+            {...form.register("moneda")}
+            disabled={isPending}
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
+          >
+            {Object.values(Moneda).map((m) => (
+              <option key={m} value={m}>{MONEDA_LABEL[m]}</option>
+            ))}
+          </select>
         </div>
 
         {/* Precio */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Precio (USD)</label>
-          <input
-            {...form.register("precio", { valueAsNumber: true })}
-            type="number"
-            disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
-          />
+        <div className="flex flex-col gap-1 md:col-span-2">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">
+            Precio {moneda === Moneda.ARS ? "en Pesos" : "en Dólares"}
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-black text-[hsl(var(--muted-foreground))] pointer-events-none">
+              {moneda === Moneda.ARS ? "$" : "U$D"}
+            </span>
+            <input
+              value={precioTexto}
+              onChange={onPrecioChange}
+              inputMode="numeric"
+              placeholder={moneda === Moneda.ARS ? "15.000.000" : "20.000"}
+              disabled={isPending}
+              className={`w-full bg-[hsl(var(--surface-low))] py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20 pr-3 ${moneda === Moneda.ARS ? "pl-7" : "pl-12"}`}
+            />
+          </div>
+
+          {/* Lo que va a ver el visitante: siempre pesos */}
+          {precioArs !== null && precio > 0 && (
+            <span className="text-[10px] font-bold text-[hsl(var(--muted-foreground))]">
+              Se publica como <span className="text-[hsl(var(--primary))]">{formatArs(precioArs)}</span>
+              {moneda === Moneda.USD && cotizacionDolar
+                ? ` · cotización ${formatArs(cotizacionDolar)}`
+                : ""}
+            </span>
+          )}
+          {moneda === Moneda.USD && !cotizacionDolar && (
+            <span className="text-[10px] font-bold text-amber-600">
+              Cargá la cotización del dólar en Configuración para que el precio se muestre en pesos.
+            </span>
+          )}
+          {form.formState.errors.precio && <span className="text-[10px] text-red-500">{form.formState.errors.precio.message}</span>}
         </div>
 
         {/* Kilometraje */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Kilometraje (KM)</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Kilometraje (KM)</label>
           <input
             {...form.register("kilometraje", { valueAsNumber: true })}
             type="number"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           />
         </div>
 
         {/* Motor */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Motor</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Motor</label>
           <input
             {...form.register("motor")}
-            placeholder="Ej: 2.0 TDI, V8 Twinturbo"
+            placeholder="Ej: 2.0 TDI, 1.0 Turbo"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           />
         </div>
 
         {/* Potencia */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Potencia (CV)</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Potencia (CV)</label>
           <input
             {...form.register("potencia", { valueAsNumber: true })}
             type="number"
             placeholder="Ej: 300"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           />
         </div>
 
         {/* Puertas */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Puertas</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Puertas</label>
           <input
             {...form.register("puertas", { valueAsNumber: true })}
             type="number"
             placeholder="Ej: 4"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           />
         </div>
 
         {/* Color */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Color</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Color</label>
           <input
             {...form.register("color")}
             placeholder="Ej: Blanco"
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           />
         </div>
 
         {/* Combustible */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Combustible</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Combustible</label>
           <select
             {...form.register("combustible")}
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none appearance-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           >
             {Object.values(Combustible).map((c) => (
               <option key={c} value={c}>{c}</option>
@@ -275,12 +332,12 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
         </div>
         
         {/* Transmisión */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Transmisión</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Transmisión</label>
           <select
             {...form.register("transmision")}
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none appearance-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           >
             {Object.values(Transmision).map((t) => (
               <option key={t} value={t}>{t}</option>
@@ -289,12 +346,12 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
         </div>
 
         {/* Estado Vehículo */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Estatus Físico</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Estado Vehiculo</label>
           <select
             {...form.register("estado")}
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none appearance-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           >
             {Object.values(EstadoVehiculo).map((o) => (
               <option key={o} value={o}>{o}</option>
@@ -303,12 +360,12 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
         </div>
 
         {/* Estado Publicación */}
-        <div className="flex flex-col gap-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Estado Visibilidad</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Estado Visibilidad</label>
           <select
             {...form.register("publicacion")}
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none appearance-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           >
             {Object.values(EstadoPublicacion).map((o) => (
               <option key={o} value={o}>{o}</option>
@@ -317,12 +374,12 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
         </div>
 
         {/* Categoría */}
-        <div className="flex flex-col gap-2 lg:col-span-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Categoría</label>
+        <div className="flex flex-col gap-1 md:col-span-2">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Categoría</label>
           <select
             {...form.register("categoriaId")}
             disabled={isPending}
-            className="bg-surface-low px-4 py-3 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none appearance-none"
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20"
           >
             {categorias.map((cat) => (
               <option key={cat.id} value={cat.id}>{cat.nombre}</option>
@@ -330,85 +387,72 @@ export const VehicleForm = ({ categorias, initialData, onSuccess }: VehicleFormP
           </select>
         </div>
       </div>
-      <div className="flex flex-col gap-6 py-6 border-t border-foreground/[0.05]">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Galería de Imágenes</label>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {imagenes.map((url) => (
-            <div key={url} className="relative aspect-[4/3] group overflow-hidden rounded-sm bg-surface-low border border-foreground/5">
-              <Image 
-                src={getCldUrl(url, "4:3")} 
-                alt="Imagen vehículo" 
-                fill 
-                sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 16vw"
-                className="object-cover object-center transition-transform group-hover:scale-110 duration-500"
-              />
-              <button
-                type="button"
-                onClick={() => removeImage(url)}
-                className="absolute top-2 right-2 w-6 h-6 bg-primary text-white flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-              >
-                <X size={14} />
-              </button>
-            </div>
-          ))}
 
-          <CldUploadWidget 
-            onSuccess={onUpload} 
-            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "concesionario_unsigned"}
-            options={{
-              multiple: true,
-              maxFiles: 10,
-              resourceType: "image",
-              clientAllowedFormats: ["webp", "png", "jpg", "jpeg"],
-              cropping: true,
-              croppingAspectRatio: 4/3,
-              croppingShowDimensions: true,
-              croppingDefaultSelectionRatio: 4/3
-            }}
-          >
-            {({ open }) => (
-              <button
-                type="button"
-                onClick={() => open()}
-                className="aspect-square flex flex-col items-center justify-center gap-2 bg-surface-low border-2 border-dashed border-foreground/10 hover:border-primary/30 hover:bg-primary/5 transition-all group"
-              >
-                <ImagePlus size={24} className="text-foreground/20 group-hover:text-primary transition-colors" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40 group-hover:text-primary transition-colors">Añadir</span>
-              </button>
-            )}
-          </CldUploadWidget>
-        </div>
+      <div className="pt-8 border-t border-black/5 flex flex-col gap-6">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">Galería de Imágenes</p>
         
+        {imagenes.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {imagenes.map((url) => (
+              <div key={url} className="relative aspect-[4/3] overflow-hidden rounded bg-black/5 group">
+                <Image
+                  src={getCldUrl(url, { modo: "recorte", relacion: "4:3" })}
+                  alt="Imagen vehículo"
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 16vw"
+                  className="object-cover object-center transition-transform duration-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(url)}
+                  className="absolute top-1 right-1 w-6 h-6 bg-[hsl(var(--primary))] text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded hover:bg-red-800"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <ImageDropzone
+          onUpload={onUpload}
+          multiple
+          cupoDisponible={MAX_IMAGENES - imagenes.length}
+          disabled={isPending}
+          titulo="Arrastrá las fotos o hacé clic"
+        />
+
         {imagenes.length === 0 && (
-          <p className="text-[10px] font-medium italic text-foreground/40">Sube al menos una imagen para que el vehículo sea visible en el catálogo.</p>
+          <p className="text-[10px] font-medium italic text-[hsl(var(--muted-foreground))]">Sube al menos una imagen para que el vehículo sea visible en el catálogo.</p>
         )}
       </div>
 
       {/* Descripción */}
-      <div className="flex flex-col gap-2 pt-6 border-t border-foreground/[0.05]">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Descripción Editorial</label>
-        <textarea
-          {...form.register("descripcion")}
-          rows={5}
-          disabled={isPending}
-          className="bg-surface-low px-4 py-4 rounded-sm outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium text-sm border-none resize-none"
-          placeholder="Describe el equipamiento, estado general, etc."
-        />
+      <div className="pt-8 border-t border-black/5 flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Descripción Editorial</label>
+          <textarea
+            {...form.register("descripcion")}
+            placeholder="Describe el equipamiento, estado general, etc."
+            disabled={isPending}
+            rows={5}
+            className="w-full bg-[hsl(var(--surface-low))] px-3 py-2 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 border border-transparent focus:border-[hsl(var(--primary))]/20 resize-y"
+          />
+        </div>
       </div>
 
-      {error && <div className="bg-primary/5 p-4 text-primary text-[10px] font-black uppercase tracking-widest">{error}</div>}
-      {success && <div className="bg-green-500/5 p-4 text-green-600 text-[10px] font-black uppercase tracking-widest">{success}</div>}
+      {error && <p className="bg-red-500/10 text-red-600 p-4 text-[10px] font-black uppercase tracking-[0.1em] rounded">{error}</p>}
+      {success && <p className="bg-green-500/10 text-green-600 p-4 text-[10px] font-black uppercase tracking-[0.1em] rounded">{success}</p>}
 
-      <div className="pt-6">
+      <div className="pt-8">
         <button
           type="submit"
           disabled={isPending}
-          className="bg-racing text-white py-5 px-12 rounded-sm shadow-xl hover:translate-y-[-2px] transition-all font-black text-xs uppercase tracking-[0.4em] disabled:opacity-50"
+          className="bg-[hsl(var(--primary))] text-white py-3 px-8 text-xs font-black uppercase tracking-[0.4em] rounded shadow-premium transition-all hover:bg-red-800 hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none"
         >
           {isPending ? "PROCESANDO..." : isEditing ? "ACTUALIZAR VEHÍCULO" : "GUARDAR EN GALERÍA"}
         </button>
       </div>
     </form>
   );
-};
+};
