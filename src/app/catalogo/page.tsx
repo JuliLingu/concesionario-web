@@ -1,3 +1,4 @@
+import * as z from "zod";
 import { prisma } from "@/lib/prisma";
 import { Prisma, Transmision, Combustible, EstadoVehiculo } from "../../../generated/prisma";
 import { auth } from "@/auth";
@@ -22,6 +23,24 @@ const SORT_OPTIONS = [
 
 type SortValue = typeof SORT_OPTIONS[number]["value"];
 
+/**
+ * Los parámetros de la URL son entrada pública y sin validar llegaban tal cual
+ * a Prisma: `?anioDesde=abc` producía un `gte: NaN` que revienta la consulta, y
+ * `?page=99999999` un `skip` enorme contra la base. Se sanean con `.catch()`,
+ * que ante un valor imposible cae al valor por defecto en lugar de lanzar — que
+ * es lo que corresponde en una URL que cualquiera puede escribir a mano.
+ */
+const anioEnUrl = z.coerce.number().int().min(1900).max(2100).optional().catch(undefined);
+const paginaEnUrl = z.coerce.number().int().min(1).max(500).catch(1);
+const ordenEnUrl = z
+  .enum(SORT_OPTIONS.map((opcion) => opcion.value) as [SortValue, ...SortValue[]])
+  .catch("newest");
+
+/** Tope de valores por filtro: una URL con cientos de marcas arma un IN gigante. */
+const MAXIMO_VALORES_POR_FILTRO = 20;
+/** Ninguna marca, categoría ni enum legítimo se acerca a este largo. */
+const MAXIMO_LARGO_VALOR = 60;
+
 /** El orden por precio no pasa por acá: se resuelve en pesos más abajo. */
 function getOrderBy(sort: SortValue): Prisma.VehiculoOrderByWithRelationInput {
   switch (sort) {
@@ -44,8 +63,12 @@ export default async function CatalogoPage({
 
   const params = await searchParams;
 
-  const toArray = (val: string | string[] | undefined): string[] =>
-    val ? (Array.isArray(val) ? val : [val]) : [];
+  const toArray = (val: string | string[] | undefined): string[] => {
+    const valores = val ? (Array.isArray(val) ? val : [val]) : [];
+    return valores
+      .filter((valor) => valor.length > 0 && valor.length <= MAXIMO_LARGO_VALOR)
+      .slice(0, MAXIMO_VALORES_POR_FILTRO);
+  };
 
   const marcasArray       = toArray(params.marca);
   const categoriasArray   = toArray(params.categoria);
@@ -59,11 +82,11 @@ export default async function CatalogoPage({
     Object.keys(Combustible).includes(c)
   ) as Combustible[];
 
-  const anioDesde = params.anioDesde ? parseInt(params.anioDesde as string) : undefined;
-  const anioHasta = params.anioHasta ? parseInt(params.anioHasta as string) : undefined;
+  const anioDesde = anioEnUrl.parse(params.anioDesde);
+  const anioHasta = anioEnUrl.parse(params.anioHasta);
 
-  const sort = (params.sort as SortValue) ?? "newest";
-  const currentPage = Math.max(1, parseInt((params.page as string) ?? "1"));
+  const sort = ordenEnUrl.parse(params.sort);
+  const currentPage = paginaEnUrl.parse(params.page);
 
   const where: Prisma.VehiculoWhereInput = {
     publicacion: isAdmin ? undefined : "PUBLICADO",

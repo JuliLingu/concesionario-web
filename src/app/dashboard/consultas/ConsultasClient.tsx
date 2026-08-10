@@ -140,6 +140,7 @@ export const ConsultasClient = ({
                           <Link
                             href={`/catalogo/${c.vehiculo.id}`}
                             target="_blank"
+                            rel="noopener noreferrer"
                             className="text-sm font-bold text-[hsl(var(--foreground))] flex items-center gap-1 hover:text-[hsl(var(--primary))]"
                           >
                             {c.vehiculo.marca} {c.vehiculo.modelo}{" "}

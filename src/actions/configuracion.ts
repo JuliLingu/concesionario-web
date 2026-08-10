@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { CACHE_TAGS } from "@/services/cache.service";
 import { ConfiguracionSchema } from "@/schemas/configuracion";
+import { registrarError } from "@/lib/log";
 
 // `values` llega sin tipar a propósito: es la entrada de una server action, o
 // sea un límite de confianza. La forma la garantiza Zod, no el compilador.
@@ -41,7 +42,7 @@ export async function updateConfiguracion(values: unknown) {
 
     return { success: true };
   } catch (error) {
-    console.error("Error al actualizar la configuración:", error);
+    registrarError("updateConfiguracion", error);
     return { success: false, error: "Error al actualizar la configuración." };
   }
 }
