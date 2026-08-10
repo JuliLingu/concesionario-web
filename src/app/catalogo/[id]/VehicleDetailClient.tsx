@@ -12,7 +12,7 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
   const precioArs = precioEnPesos(Number(vehicle.precio), vehicle.moneda, cotizacionDolar);
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--background))] text-foreground pt-header pb-8">
+    <div className="min-h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))] pt-header pb-8">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="h-16 flex items-center mb-4">
           <Link
@@ -36,7 +36,7 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
                   <span className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10 px-1 py-0.5 rounded">
                     {vehicle.estado}
                   </span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] bg-[#0a0a0a] px-1 py-0.5 rounded">
+                  <span className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] bg-[hsl(var(--muted))] px-1 py-0.5 rounded">
                     {vehicle.categoria.nombre}
                   </span>
                 </div>
@@ -57,7 +57,7 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
                 href={whatsappUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="bg-[#c2410c] text-white py-2 px-4 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-[0.1em] rounded shadow-lg hover:bg-black transition-colors"
+                className="bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] py-2 px-4 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-[0.1em] rounded shadow-lg hover:brightness-90 transition-colors"
               >
                 Consultar por WhatsApp
                 <MessageCircle size={18} />
@@ -98,7 +98,7 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
                 Descripción
               </h2>
               {vehicle.descripcion ? (
-                <p className="text-base text-foreground/80 leading-relaxed font-medium whitespace-pre-line">
+                <p className="text-base text-[hsl(var(--foreground))]/80 leading-relaxed font-medium whitespace-pre-line">
                   {vehicle.descripcion}
                 </p>
               ) : (

@@ -37,14 +37,14 @@ export const RegisterForm = () => {
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
       {/* Name */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
           Nombre y Apellido
         </label>
         <input
           {...form.register("name")}
           placeholder="Juan Pérez"
           disabled={isPending}
-          className={`w-full bg-gray-100 rounded px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#c2410c]/20 disabled:opacity-60 ${form.formState.errors.name ? "ring-2 ring-red-400 bg-red-50" : ""}`}
+          className={`w-full bg-[hsl(var(--input))] rounded px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]/20 disabled:opacity-60 ${form.formState.errors.name ? "ring-2 ring-red-400 bg-red-50" : ""}`}
         />
         {form.formState.errors.name && (
           <span className="text-red-500 text-xs">{form.formState.errors.name.message}</span>
@@ -53,7 +53,7 @@ export const RegisterForm = () => {
 
       {/* Email */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
           Correo Electrónico
         </label>
         <input
@@ -61,7 +61,7 @@ export const RegisterForm = () => {
           placeholder="juan@ejemplo.com"
           type="email"
           disabled={isPending}
-          className={`w-full bg-gray-100 rounded px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#c2410c]/20 disabled:opacity-60 ${form.formState.errors.email ? "ring-2 ring-red-400 bg-red-50" : ""}`}
+          className={`w-full bg-[hsl(var(--input))] rounded px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]/20 disabled:opacity-60 ${form.formState.errors.email ? "ring-2 ring-red-400 bg-red-50" : ""}`}
         />
         {form.formState.errors.email && (
           <span className="text-red-500 text-xs">{form.formState.errors.email.message}</span>
@@ -70,7 +70,7 @@ export const RegisterForm = () => {
 
       {/* Password */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
           Contraseña
         </label>
         <input
@@ -78,7 +78,7 @@ export const RegisterForm = () => {
           placeholder="••••••••"
           type="password"
           disabled={isPending}
-          className={`w-full bg-gray-100 rounded px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#c2410c]/20 disabled:opacity-60 ${form.formState.errors.password ? "ring-2 ring-red-400 bg-red-50" : ""}`}
+          className={`w-full bg-[hsl(var(--input))] rounded px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]/20 disabled:opacity-60 ${form.formState.errors.password ? "ring-2 ring-red-400 bg-red-50" : ""}`}
         />
         {form.formState.errors.password && (
           <span className="text-red-500 text-xs">{form.formState.errors.password.message}</span>
@@ -87,7 +87,7 @@ export const RegisterForm = () => {
 
       {/* Error / Success */}
       {error && (
-        <div className="bg-[#c2410c]/10 text-[#c2410c] p-3 text-[10px] font-black uppercase tracking-[0.1em] rounded">
+        <div className="bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] p-3 text-[10px] font-black uppercase tracking-[0.1em] rounded">
           {error}
         </div>
       )}
@@ -101,18 +101,18 @@ export const RegisterForm = () => {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full bg-[#c2410c] hover:bg-[#9a3412] text-white py-4 rounded text-xs font-black uppercase tracking-[0.3em] transition-all hover:-translate-y-0.5 hover:shadow-[0_25px_50px_-12px_rgba(194,65,12,0.5)] disabled:opacity-70 flex items-center justify-center"
+        className="w-full bg-[hsl(var(--primary))] hover:brightness-90 text-[hsl(var(--primary-foreground))] py-4 rounded text-xs font-black uppercase tracking-[0.3em] transition-all hover:-translate-y-0.5 hover:shadow-[0_25px_50px_-12px_hsl(var(--primary)/0.5)] disabled:opacity-70 flex items-center justify-center"
       >
         {isPending ? (
-          <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          <span className="w-5 h-5 border-2 border-[hsl(var(--primary-foreground))]/30 border-t-[hsl(var(--primary-foreground))] rounded-full animate-spin" />
         ) : (
           "Registrarse"
         )}
       </button>
 
-      <p className="text-center text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
+      <p className="text-center text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
         ¿Ya tienes una cuenta?{" "}
-        <Link href="/login" className="text-[#c2410c] hover:underline">
+        <Link href="/login" className="text-[hsl(var(--primary))] hover:underline">
           Inicia sesión aquí
         </Link>
       </p>

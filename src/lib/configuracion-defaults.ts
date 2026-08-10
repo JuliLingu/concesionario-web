@@ -6,6 +6,8 @@
  * único lugar evita repetir `configuracion?.campo || "..."` en cada componente
  * y permite que el service devuelva siempre un objeto completo.
  */
+import { COLORES_DEFAULTS } from "@/lib/colores";
+
 export const CONFIGURACION_DEFAULTS = {
   nombreConcesionaria: "JBJ Automotores",
   // Mismo número que usaba el fallback de WhatsApp en la ficha de vehículo.
@@ -61,6 +63,11 @@ export const CONFIGURACION_DEFAULTS = {
   footerTexto: "Vehículos de calidad. Concesionario en Argentina.",
   terminosUrl: "",
   privacidadUrl: "",
+
+  // Paleta del sitio. Los valores viven en lib/colores.ts junto a la conversión
+  // a variables CSS; acá se suman al resto de la configuración para que el
+  // service los resuelva con el mismo mecanismo de defaults que los textos.
+  ...COLORES_DEFAULTS,
 } as const;
 
 /**

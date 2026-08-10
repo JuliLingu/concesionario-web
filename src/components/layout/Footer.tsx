@@ -39,7 +39,7 @@ export function Footer({ configuracion }: FooterProps) {
   ].filter((red) => red.href);
 
   return (
-    <footer className="py-8 bg-[#1a1c1e]">
+    <footer className="py-8 bg-[hsl(var(--foreground))]">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo */}
@@ -53,18 +53,18 @@ export function Footer({ configuracion }: FooterProps) {
                 className="h-8 w-auto object-contain"
               />
             ) : (
-              <div className="p-1.5 rounded-lg bg-[#c2410c]/10">
-                <Car className="text-[#c2410c] w-5 h-5" />
+              <div className="p-1.5 rounded-lg bg-[hsl(var(--primary))]/10">
+                <Car className="text-[hsl(var(--primary))] w-5 h-5" />
               </div>
             )}
-            <span className="font-extrabold text-white uppercase tracking-tighter">
+            <span className="font-extrabold text-[hsl(var(--background))] uppercase tracking-tighter">
               {firstWord}{" "}
-              {restWords && <span className="text-[#c2410c]">{restWords}</span>}
+              {restWords && <span className="text-[hsl(var(--primary))]">{restWords}</span>}
             </span>
           </div>
 
           {/* Copyright */}
-          <p className="text-white/35 font-light text-sm text-center">
+          <p className="text-[hsl(var(--background))]/35 font-light text-sm text-center">
             {configuracion.footerTexto} {new Date().getFullYear()}
             {configuracion.direccion && ` - ${configuracion.direccion}`}
           </p>
@@ -78,7 +78,7 @@ export function Footer({ configuracion }: FooterProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="text-white/35 hover:text-[#c2410c] transition-colors"
+                className="text-[hsl(var(--background))]/35 hover:text-[hsl(var(--primary))] transition-colors"
               >
                 <Icono />
               </a>
@@ -87,7 +87,7 @@ export function Footer({ configuracion }: FooterProps) {
               <Link
                 key={enlace.label}
                 href={enlace.href}
-                className="text-xs uppercase tracking-widest text-white/35 hover:text-[#c2410c] transition-colors"
+                className="text-xs uppercase tracking-widest text-[hsl(var(--background))]/35 hover:text-[hsl(var(--primary))] transition-colors"
               >
                 {enlace.label}
               </Link>

@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { auth } from "@/auth";
 import { getConfiguracion } from "@/services/configuracion.service";
+import { construirVariablesTema } from "@/lib/colores";
 
 
 const spaceGrotesk = Space_Grotesk({
@@ -42,8 +43,18 @@ export default async function RootLayout({
   const session = await auth();
   const configuracion = await getConfiguracion();
 
+  // La paleta va como estilo inline en <html>: gana por especificidad sobre el
+  // :root de globals.css, se hereda a todo el árbol y llega en el HTML del
+  // servidor, así que no hay parpadeo con los colores por defecto.
+  const tema = construirVariablesTema(configuracion) as React.CSSProperties;
+
   return (
-    <html lang="es" className={`${spaceGrotesk.variable} ${manrope.variable}`} data-scroll-behavior="smooth">
+    <html
+      lang="es"
+      className={`${spaceGrotesk.variable} ${manrope.variable}`}
+      style={tema}
+      data-scroll-behavior="smooth"
+    >
       <body className={manrope.className}>
         <Header session={session} configuracion={configuracion} />
         <main>{children}</main>

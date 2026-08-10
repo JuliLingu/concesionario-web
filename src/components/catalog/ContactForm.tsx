@@ -45,7 +45,7 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
 
   if (success) {
     return (
-      <div className="py-12 px-6 bg-white text-center flex flex-col items-center justify-center gap-4 rounded border border-black/5">
+      <div className="py-12 px-6 bg-[hsl(var(--card))] text-center flex flex-col items-center justify-center gap-4 rounded border border-black/5">
         <div className="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center">
           <CheckCircle2 size={28} className="text-green-600" />
         </div>
@@ -57,7 +57,7 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
         </p>
         <button
           onClick={() => setSuccess(undefined)}
-          className="text-[10px] font-black uppercase tracking-[0.1em] text-[#b5000b] hover:text-[hsl(var(--foreground))] transition-colors mt-2"
+          className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--primary))] hover:text-[hsl(var(--foreground))] transition-colors mt-2"
         >
           Enviar otra consulta
         </button>
@@ -73,7 +73,7 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
             {...form.register("nombre")}
             placeholder="Nombre *"
             disabled={isPending}
-            className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full disabled:opacity-50 ${form.formState.errors.nombre ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+            className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full disabled:opacity-50 ${form.formState.errors.nombre ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
           />
           {form.formState.errors.nombre && (
             <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.nombre.message}</span>
@@ -86,7 +86,7 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
             type="email"
             placeholder="Email *"
             disabled={isPending}
-            className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full disabled:opacity-50 ${form.formState.errors.email ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+            className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full disabled:opacity-50 ${form.formState.errors.email ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
           />
           {form.formState.errors.email && (
             <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.email.message}</span>
@@ -99,7 +99,7 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
           {...form.register("telefono")}
           placeholder="Teléfono (opcional)"
           disabled={isPending}
-          className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full disabled:opacity-50`}
+          className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full disabled:opacity-50`}
         />
       </div>
 
@@ -109,12 +109,12 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
           placeholder="Mensaje (opcional)"
           disabled={isPending}
           rows={4}
-          className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[#b5000b]/20 w-full resize-none disabled:opacity-50`}
+          className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full resize-none disabled:opacity-50`}
         />
       </div>
 
       {error && (
-        <div className="bg-red-50 text-[#b5000b] text-[10px] font-black uppercase tracking-[0.1em] p-3 rounded border-l-4 border-[#b5000b]">
+        <div className="bg-red-50 text-[hsl(var(--primary))] text-[10px] font-black uppercase tracking-[0.1em] p-3 rounded border-l-4 border-[hsl(var(--primary))]">
           {error}
         </div>
       )}
@@ -122,7 +122,7 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
       <button
         type="submit"
         disabled={isPending}
-        className="w-full bg-[hsl(var(--foreground))] text-white py-4 text-[11px] font-black uppercase tracking-[0.1em] rounded hover:bg-[#b5000b] transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+        className="w-full bg-[hsl(var(--foreground))] text-[hsl(var(--background))] py-4 text-[11px] font-black uppercase tracking-[0.1em] rounded hover:bg-[hsl(var(--primary))] transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
       >
         {isPending ? (
           <>

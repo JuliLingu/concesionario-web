@@ -25,7 +25,7 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
   const imagenPrincipal = vehiculo.imagenes.find(img => img.esPrincipal)?.url || vehiculo.imagenes[0]?.url || "";
 
   return (
-    <div className="group relative flex flex-col h-full bg-white shadow-[0_4px_20px_rgba(26,28,30,0.06)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(26,28,30,0.12)]">
+    <div className="group relative flex flex-col h-full bg-[hsl(var(--card))] shadow-[0_4px_20px_rgba(26,28,30,0.06)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(26,28,30,0.12)]">
       {/* Top Image Section */}
       <div className="relative aspect-[4/3] w-full bg-[hsl(var(--surface-low))] overflow-hidden">
         {imagenPrincipal ? (
@@ -48,7 +48,7 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
         {isAdmin && (
           <button
             onClick={(e) => { e.preventDefault(); setIsEditModalOpen(true); }}
-            className="absolute top-3 right-3 z-10 bg-black/60 backdrop-blur-sm text-white text-[9px] font-black uppercase tracking-[0.1em] px-3 py-1.5 flex items-center gap-1 hover:bg-[#b5000b] transition-colors"
+            className="absolute top-3 right-3 z-10 bg-black/60 backdrop-blur-sm text-white text-[9px] font-black uppercase tracking-[0.1em] px-3 py-1.5 flex items-center gap-1 hover:bg-[hsl(var(--primary))] transition-colors"
           >
             <Settings2 size={11} />
             Editar
@@ -60,7 +60,7 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
       <div className="flex flex-col p-5 flex-grow">
         {/* Badges row */}
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#b5000b]">
+          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[hsl(var(--primary))]">
             Nuevo Ingreso
           </span>
           <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] px-2 py-0.5 bg-[hsl(var(--surface-low))]">
@@ -96,12 +96,12 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
 
         {/* Price and CTA */}
         <div className="mt-auto pt-4 border-t border-[hsl(var(--border))]">
-          <span className="block text-2xl font-black text-[#b5000b] tracking-[-0.05em] leading-none tabular-nums">
+          <span className="block text-2xl font-black text-[hsl(var(--primary))] tracking-[-0.05em] leading-none tabular-nums">
             {formatPrecio(vehiculo.precio, vehiculo.moneda, cotizacionDolar)}
           </span>
           <Link
             href={`/catalogo/${vehiculo.id}`}
-            className="mt-4 w-full bg-[#b5000b] text-white px-4 py-3 text-[11px] font-black uppercase tracking-[0.1em] flex items-center justify-center gap-1.5 hover:bg-red-800 active:scale-95 transition-all shadow-[0_4px_6px_-1px_rgba(181,0,11,0.2)]"
+            className="mt-4 w-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-3 text-[11px] font-black uppercase tracking-[0.1em] flex items-center justify-center gap-1.5 hover:brightness-90 active:scale-95 transition-all shadow-[0_4px_6px_-1px_hsl(var(--primary)/0.2)]"
           >
             Ver Detalles <ArrowRight size={14} />
           </Link>
