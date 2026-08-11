@@ -1,40 +1,50 @@
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
-import { DashboardClient } from "./DashboardClient";
+import { requireAdmin } from "@/lib/sesion";
+import { getConfiguracion } from "@/services/configuracion.service";
+import { DashboardView } from "./DashboardView";
 
 export default async function DashboardPage() {
-  const session = await auth();
+  const session = await requireAdmin();
 
-  if (!session || session.user?.role !== "ADMIN") {
-    redirect("/");
-  }
+  const [
+    configuracion,
+    totalVehiculos,
+    publicados,
+    borradores,
+    consultasPendientes,
+    rawUltimasConsultas,
+  ] = await Promise.all([
+    getConfiguracion(),
+    prisma.vehiculo.count(),
+    prisma.vehiculo.count({ where: { publicacion: "PUBLICADO" } }),
+    prisma.vehiculo.count({ where: { publicacion: "BORRADOR"  } }),
+    prisma.consulta.count({ where: { estado: "PENDIENTE" } }),
+    prisma.consulta.findMany({
+      where:   { estado: "PENDIENTE" },
+      select:  {
+        id: true,
+        nombre: true,
+        email: true,
+        estado: true,
+        createdAt: true,
+        vehiculo: { select: { id: true, marca: true, modelo: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take:    5,
+    }),
+  ]);
 
-  const [totalVehiculos, publicados, borradores, consultasPendientes, rawUltimasConsultas] =
-    await Promise.all([
-      prisma.vehiculo.count(),
-      prisma.vehiculo.count({ where: { publicacion: "PUBLICADO" } }),
-      prisma.vehiculo.count({ where: { publicacion: "BORRADOR"  } }),
-      prisma.consulta.count({ where: { estado: "PENDIENTE" } }),
-      prisma.consulta.findMany({
-        where:   { estado: "PENDIENTE" },
-        include: { vehiculo: { select: { id: true, marca: true, modelo: true } } },
-        orderBy: { createdAt: "desc" },
-        take:    5,
-      }),
-    ]);
-
-  const ultimasConsultas = rawUltimasConsultas.map(c => ({
+  // Las fechas no son serializables hacia un Client Component (el botón de
+  // estado lo es), así que viajan como texto.
+  const ultimasConsultas = rawUltimasConsultas.map((c) => ({
     ...c,
     createdAt: c.createdAt.toISOString(),
-    updatedAt: c.updatedAt.toISOString(),
   }));
 
-  const userName = session.user?.name?.split(" ")[0] ?? "Admin";
-
   return (
-    <DashboardClient 
-      userName={userName}
+    <DashboardView
+      userName={session.user?.name?.split(" ")[0] ?? "Admin"}
+      nombreConcesionaria={configuracion.nombreConcesionaria}
       totalVehiculos={totalVehiculos}
       publicados={publicados}
       borradores={borradores}

@@ -35,37 +35,70 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-## Credenciales
+## Variables de entorno
 
-# Conexión a Base de Datos (URL Completa para Prisma)
-DATABASE_URL=""
-
-# Variables para el Adaptador Nativo (Requerido en Prisma 7)
+```bash
+# --- Base de datos ---
+# El adaptador de Prisma 7 se conecta con los campos sueltos, no con la URL.
 DATABASE_HOST=""
-DATABASE_PORT=
+DATABASE_PORT=          # TiDB Cloud: 4000. MySQL/MariaDB local: 3306.
 DATABASE_NAME=""
 DATABASE_USER=""
 DATABASE_PASSWORD=""
 
-TIMEZONE = "America/Argentina/Buenos_Aires";
+# Solo la usa el CLI de Prisma (`prisma db push`), no la aplicación. No hace
+# falta cargarla en el hosting.
+DATABASE_URL=""
 
-CA="./isrgrootx1.pem"
+# Opcional. Conexiones por instancia del proceso; por defecto 2, pensado para
+# serverless. Subirlo solo si se despliega como contenedor persistente.
+DATABASE_POOL_MAX=
 
-
-# Configuración de Auth.js
-# Genera un secreto seguro en terminal, puede ser por ejemplo con: openssl rand -base64 32
-AUTH_SECRET="un_secreto_muy_largo_y_seguro"
-
-# Credenciales de Google OAuth (Ver paso 4)
+# --- Auth.js ---
+# Generar con: openssl rand -base64 32
+AUTH_SECRET=""
 AUTH_GOOGLE_ID=""
 AUTH_GOOGLE_SECRET=""
-
-# Importante para desarrollo local
 AUTH_TRUST_HOST=true
 
-# Configuración de Cloudinary
+# --- Cloudinary ---
+# Las subidas van firmadas desde el servidor: el api_secret nunca llega al
+# navegador y no hay preset sin firmar.
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=""
-NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=""
 CLOUDINARY_API_KEY=""
 CLOUDINARY_API_SECRET=""
+
+# --- Opcionales ---
+# Enciende financiación (portada, simulador, /dashboard/planes y /solicitudes).
+NEXT_PUBLIC_FEATURE_FINANCIACION=
+```
+
+## Base de datos
+
+El esquema se sincroniza con `prisma db push` desde `prisma/schema.prisma`; no
+hay migraciones versionadas ni seed. Las categorías las carga el administrador
+desde `/dashboard/categorias`.
+
+```bash
+npx prisma db push
+```
+
+El cliente de Prisma se genera solo en cada `npm install` (script `postinstall`)
+y no se versiona: `generated/` está ignorado.
+
+## Deploy en Vercel
+
+1. Cargar en el proyecto de Vercel todas las variables de arriba salvo
+   `DATABASE_URL`.
+2. Añadir `https://<dominio>/api/auth/callback/google` a los *Authorized
+   redirect URIs* de la consola de Google Cloud.
+3. `vercel.json` fija la región en `iad1` para que las funciones queden en la
+   misma región que la base (`us-east-1`). Si la base se muda, hay que mover
+   esto también: cada query paga la latencia entre ambas.
+
+Dos límites conocidos de correr esto en serverless, por si el sitio crece: el
+limitador de intentos de `src/lib/rate-limit.ts` cuenta en memoria y cada
+instancia lleva el suyo, así que el cupo efectivo se multiplica; y cada
+instancia abre su propio pool contra la base. Ambos desaparecen si el despliegue
+pasa a ser un contenedor persistente.
 

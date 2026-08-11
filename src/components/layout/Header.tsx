@@ -1,5 +1,4 @@
 "use client";
-import { motion } from "framer-motion";
 import { Car, DoorOpen, Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -64,11 +63,7 @@ export function Header({ usuario, configuracion }: HeaderProps) {
   }, [open]);
 
   return (
-    <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      className="fixed top-0 left-0 right-0 z-50 glass-nav"
-    >
+    <header className="fixed top-0 left-0 right-0 z-50 glass-nav animate-header-in">
       <div className="max-w-7xl mx-auto flex justify-between items-center gap-3 px-4 md:px-8 h-[var(--header-h)]">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 no-underline min-w-0">
@@ -230,6 +225,6 @@ export function Header({ usuario, configuracion }: HeaderProps) {
           </div>
         </>
       )}
-    </motion.header>
+    </header>
   );
 }

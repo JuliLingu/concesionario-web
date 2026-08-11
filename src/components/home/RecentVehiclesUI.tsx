@@ -1,14 +1,12 @@
-"use client";
-
 import Link from "next/link";
-import { VehicleCard } from "../catalog/VehicleCard";
+import { VehicleCard, type VehiculoDeTarjeta } from "../catalog/VehicleCard";
 import { ArrowRight } from "lucide-react";
 
 export function RecentVehiclesUI({
   vehicles,
   cotizacionDolar,
 }: {
-  vehicles: any[];
+  vehicles: VehiculoDeTarjeta[];
   cotizacionDolar?: number | null;
 }) {
   return (
@@ -33,7 +31,7 @@ export function RecentVehiclesUI({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {vehicles.map((vehicle, index) => (
-            <div key={vehicle.id} className="w-full" >
+            <div key={vehicle.id} className="w-full">
               <VehicleCard
                 vehiculo={vehicle}
                 priority={index === 0}

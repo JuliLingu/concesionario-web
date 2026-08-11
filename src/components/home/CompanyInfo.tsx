@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import type { SiteConfig } from "@/lib/configuracion-defaults";
 

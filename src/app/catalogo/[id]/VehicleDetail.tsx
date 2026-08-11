@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { ArrowLeft, Calendar, Fuel, AlignJustify, Disc, MessageCircle } from "lucide-react";
 import { VehicleGallery } from "@/components/catalog/VehicleGallery";
@@ -7,9 +5,34 @@ import { ContactForm } from "@/components/catalog/ContactForm";
 import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
 import { FEATURE_FINANCIACION } from "@/lib/features";
 import { formatPrecio, precioEnPesos } from "@/lib/precio";
+import type { getVehicleById } from "@/actions/vehicle";
 
-export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, cotizacionDolar, planes, contacto }: any) => {
-  const precioArs = precioEnPesos(Number(vehicle.precio), vehicle.moneda, cotizacionDolar);
+type Vehiculo = NonNullable<Awaited<ReturnType<typeof getVehicleById>>>;
+
+interface VehicleDetailProps {
+  vehicle: Vehiculo;
+  vehiculoNombre: string;
+  /** Null cuando la concesionaria todavía no cargó un teléfono. */
+  whatsappUrl: string | null;
+  cotizacionDolar?: number | null;
+  planes: { id: string; nombre: string; cuotas: number; tasaAnual: number }[];
+  contacto: {
+    eyebrow: string;
+    titulo: string;
+    texto: string;
+    whatsappTexto: string;
+  };
+}
+
+export const VehicleDetail = ({
+  vehicle,
+  vehiculoNombre,
+  whatsappUrl,
+  cotizacionDolar,
+  planes,
+  contacto,
+}: VehicleDetailProps) => {
+  const precioArs = precioEnPesos(vehicle.precio, vehicle.moneda, cotizacionDolar);
 
   return (
     <div className="min-h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))] pt-header pb-8">
@@ -50,26 +73,28 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
               </div>
 
               <p className="text-[2.5rem] font-black text-[hsl(var(--primary))] tracking-tighter">
-                {formatPrecio(Number(vehicle.precio), vehicle.moneda, cotizacionDolar)}
+                {formatPrecio(vehicle.precio, vehicle.moneda, cotizacionDolar)}
               </p>
 
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] py-2 px-4 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-[0.1em] rounded shadow-lg hover:brightness-90 transition-colors"
-              >
-                Consultar por WhatsApp
-                <MessageCircle size={18} />
-              </a>
+              {whatsappUrl && (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] py-2 px-4 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-[0.1em] rounded shadow-lg hover:brightness-90 transition-colors"
+                >
+                  Consultar por WhatsApp
+                  <MessageCircle size={18} />
+                </a>
+              )}
 
               <div className="bg-[hsl(var(--card))] rounded-lg p-4 lg:p-6 shadow-sm border border-black/5">
                 <p className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] mb-4">Ficha Rápida</p>
                 <div className="flex flex-col gap-3">
                   <SpecItem icon={<Calendar size={16} />} label="Año" value={vehicle.anio} />
                   <SpecItem icon={<Disc size={16} />} label="KM" value={vehicle.kilometraje.toLocaleString("es-AR")} />
-                  <SpecItem icon={<AlignJustify size={16} />} label="Transmisión" value={vehicle.transmision?.toLowerCase()} capitalize />
-                  <SpecItem icon={<Fuel size={16} />} label="Combustible" value={vehicle.combustible?.toLowerCase()} capitalize border={false} />
+                  <SpecItem icon={<AlignJustify size={16} />} label="Transmisión" value={vehicle.transmision?.toLowerCase() ?? "N/A"} capitalize />
+                  <SpecItem icon={<Fuel size={16} />} label="Combustible" value={vehicle.combustible?.toLowerCase() ?? "N/A"} capitalize border={false} />
                 </div>
               </div>
             </div>
@@ -128,7 +153,7 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
               <FinancingSimulator
                 vehiculoId={vehicle.id}
                 precioArs={precioArs}
-                planes={planes || []}
+                planes={planes}
               />
             </div>
           </div>
@@ -139,23 +164,25 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
             <div className="lg:col-span-6">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(var(--primary))] mb-2">
-                {contacto?.eyebrow}
+                {contacto.eyebrow}
               </p>
               <h2 className="text-3xl font-black tracking-tight uppercase mb-2 whitespace-pre-line">
-                {contacto?.titulo}
+                {contacto.titulo}
               </h2>
               <p className="text-[hsl(var(--muted-foreground))] font-medium leading-relaxed mb-3 whitespace-pre-line">
-                {contacto?.texto}
+                {contacto.texto}
               </p>
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--primary))] transition-colors"
-              >
-                <MessageCircle size={14} />
-                {contacto?.whatsappTexto}
-              </a>
+              {whatsappUrl && (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--primary))] transition-colors"
+                >
+                  <MessageCircle size={14} />
+                  {contacto.whatsappTexto}
+                </a>
+              )}
             </div>
 
             <div className="lg:col-span-6">
@@ -169,7 +196,19 @@ export const VehicleDetailClient = ({ vehicle, vehiculoNombre, whatsappUrl, coti
   );
 };
 
-const SpecItem = ({ icon, label, value, capitalize = false, border = true }: any) => (
+const SpecItem = ({
+  icon,
+  label,
+  value,
+  capitalize = false,
+  border = true,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | number;
+  capitalize?: boolean;
+  border?: boolean;
+}) => (
   <div className={`flex flex-row items-center justify-between ${border ? 'pb-3 border-b border-black/5' : ''}`}>
     <div className="flex items-center gap-2 text-[hsl(var(--muted-foreground))]">
       {icon}

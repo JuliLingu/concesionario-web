@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { ImagenVehiculo } from "../../../generated/prisma";
-import { ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
+import { Car, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { getCldUrl } from "@/lib/cloudinary";
 import { ImageLightbox } from "./ImageLightbox";
 
@@ -18,8 +18,8 @@ export const VehicleGallery = ({ images, altText }: VehicleGalleryProps) => {
 
   if (!images || images.length === 0) {
     return (
-      <div className="w-full aspect-[4/3] bg-[hsl(var(--surface-low))] flex items-center justify-center font-black text-4xl text-black/5 rounded-lg border border-black/5">
-        JBJ
+      <div className="w-full aspect-[4/3] bg-[hsl(var(--surface-low))] flex items-center justify-center rounded-lg border border-black/5">
+        <Car className="w-16 h-16 text-black/10" aria-label="Sin imágenes" />
       </div>
     );
   }

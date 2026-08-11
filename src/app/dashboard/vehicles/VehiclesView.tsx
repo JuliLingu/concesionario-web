@@ -1,17 +1,23 @@
-"use client";
-
 import Link from "next/link";
 import { Plus, Pencil, ArrowLeft } from "lucide-react";
 import { DeleteVehicleButton } from "@/components/dashboard/DeleteVehicleButton";
 import { formatArs, formatPrecioOriginal, precioEnPesos } from "@/lib/precio";
 import { Moneda } from "../../../../generated/prisma";
+import type { getVehicles } from "@/actions/vehicle";
 
-export const VehiclesClient = ({
+interface VehiclesViewProps {
+  vehicles: Awaited<ReturnType<typeof getVehicles>>;
+  publicados: number;
+  borradores: number;
+  cotizacionDolar?: number | null;
+}
+
+export const VehiclesView = ({
   vehicles,
   publicados,
   borradores,
   cotizacionDolar,
-}: any) => {
+}: VehiclesViewProps) => {
   return (
     <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-8">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -37,7 +43,7 @@ export const VehiclesClient = ({
           </div>
           <Link
             href="/dashboard/vehicles/new"
-            className="inline-flex items-center gap-2 bg-[#b5000b] text-white px-6 py-3 text-[11px] font-black uppercase tracking-widest hover:bg-[#9a3412] transition rounded shadow-[0_20px_25px_-5px_rgba(181,0,11,0.25)] hover:scale-95"
+            className="inline-flex items-center gap-2 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-6 py-3 text-[11px] font-black uppercase tracking-widest hover:brightness-90 transition rounded shadow-[0_20px_25px_-5px_hsl(var(--primary)/0.25)] hover:scale-95"
           >
             <Plus size={15} />
             Agregar Vehículo
@@ -78,7 +84,7 @@ export const VehiclesClient = ({
                     </td>
                   </tr>
                 )}
-                {vehicles.map((v: any) => (
+                {vehicles.map((v) => (
                   <tr
                     key={v.id}
                     className="border-b border-[#e5e7eb]/50 hover:bg-[hsl(var(--surface-low))] transition"

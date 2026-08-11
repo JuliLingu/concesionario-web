@@ -1,64 +1,87 @@
-"use client";
-
-import { VehicleCard } from "@/components/catalog/VehicleCard";
+import { VehicleCard, type VehiculoDeTarjeta } from "@/components/catalog/VehicleCard";
+import { VehicleCardAdminOverlay } from "@/components/catalog/VehicleCardAdminOverlay";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
-import { SortController } from "@/components/catalog/SortController";
-import { LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
+import { SortSelect } from "@/components/catalog/SortSelect";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { ITEMS_PER_PAGE, type SortValue } from "@/lib/catalogo";
+import type { FiltrosCatalogo } from "@/services/cache.service";
 
-export const CatalogoClient = ({
+/** Filtros activos leídos de la URL. Se usan para reconstruir los enlaces de paginado. */
+export interface FiltrosActivos {
+  marcas: string[];
+  categorias: string[];
+  estados: string[];
+  transmisiones: string[];
+  combustibles: string[];
+  anioDesde?: number;
+  anioHasta?: number;
+}
+
+interface CatalogoViewProps {
+  vehiculos: VehiculoDeTarjeta[];
+  filtros: FiltrosCatalogo;
+  filtrosActivos: FiltrosActivos;
+  /** Solo se pasan cuando quien mira es administrador; alimentan el modal de edición. */
+  categorias: { id: string; nombre: string }[];
+  isAdmin: boolean;
+  totalCount: number;
+  currentPage: number;
+  totalPages: number;
+  sort: SortValue;
+  cotizacionDolar?: number | null;
+  /** Null cuando la concesionaria todavía no cargó un teléfono. */
+  whatsapp: { importacion: string; asesor: string } | null;
+}
+
+const construirUrl = (
+  filtrosActivos: FiltrosActivos,
+  sort: SortValue,
+  nuevos: Record<string, string>,
+) => {
+  const p = new URLSearchParams();
+  filtrosActivos.marcas.forEach((m) => p.append("marca", m));
+  filtrosActivos.categorias.forEach((c) => p.append("categoria", c));
+  filtrosActivos.estados.forEach((e) => p.append("estado", e));
+  filtrosActivos.transmisiones.forEach((t) => p.append("transmision", t));
+  filtrosActivos.combustibles.forEach((c) => p.append("combustible", c));
+  if (filtrosActivos.anioDesde) p.set("anioDesde", String(filtrosActivos.anioDesde));
+  if (filtrosActivos.anioHasta) p.set("anioHasta", String(filtrosActivos.anioHasta));
+  if (sort !== "newest") p.set("sort", sort);
+  for (const [k, v] of Object.entries(nuevos)) p.set(k, v);
+  const qs = p.toString();
+  return `/catalogo${qs ? `?${qs}` : ""}`;
+};
+
+/** Números de página con elipsis: 1 … 4 5 6 … 20 */
+const numerosDePagina = (actual: number, total: number): (number | "...")[] => {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const paginas: (number | "...")[] = [];
+  const izquierda = Math.max(2, actual - 1);
+  const derecha = Math.min(total - 1, actual + 1);
+  paginas.push(1);
+  if (izquierda > 2) paginas.push("...");
+  for (let p = izquierda; p <= derecha; p++) paginas.push(p);
+  if (derecha < total - 1) paginas.push("...");
+  paginas.push(total);
+  return paginas;
+};
+
+export const CatalogoView = ({
   vehiculos,
   filtros,
+  filtrosActivos,
   categorias,
   isAdmin,
   totalCount,
   currentPage,
   totalPages,
-  ITEMS_PER_PAGE,
   sort,
-  SORT_OPTIONS,
-  marcasArray,
-  categoriasArray,
-  estadosArray,
-  transmisionesArray,
-  combustiblesArray,
-  anioDesde,
-  anioHasta,
   cotizacionDolar,
-  whatsapp
-}: any) => {
-
-  const buildUrl = (newParams: Record<string, string | null>) => {
-    const p = new URLSearchParams();
-    if (marcasArray) marcasArray.forEach((m: string) => p.append("marca", m));
-    if (categoriasArray) categoriasArray.forEach((c: string) => p.append("categoria", c));
-    if (estadosArray) estadosArray.forEach((e: string) => p.append("estado", e));
-    if (transmisionesArray) transmisionesArray.forEach((t: string) => p.append("transmision", t));
-    if (combustiblesArray) combustiblesArray.forEach((c: string) => p.append("combustible", c));
-    if (anioDesde) p.set("anioDesde", String(anioDesde));
-    if (anioHasta) p.set("anioHasta", String(anioHasta));
-    if (sort !== "newest") p.set("sort", sort);
-    for (const [k, v] of Object.entries(newParams)) {
-      if (v === null) p.delete(k);
-      else p.set(k, v);
-    }
-    const qs = p.toString();
-    return `/catalogo${qs ? `?${qs}` : ""}`;
-  };
-
-  const generatePageNumbers = (current: number, total: number): (number | "...")[] => {
-    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-    const pages: (number | "...")[] = [];
-    const delta = 1;
-    const left  = Math.max(2, current - delta);
-    const right = Math.min(total - 1, current + delta);
-    pages.push(1);
-    if (left > 2) pages.push("...");
-    for (let p = left; p <= right; p++) pages.push(p);
-    if (right < total - 1) pages.push("...");
-    pages.push(total);
-    return pages;
-  };
+  whatsapp,
+}: CatalogoViewProps) => {
+  const urlDePagina = (pagina: number) =>
+    construirUrl(filtrosActivos, sort, { page: String(pagina) });
 
   return (
     <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-8 flex flex-col">
@@ -80,22 +103,9 @@ export const CatalogoClient = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-2 bg-[hsl(var(--card))] p-1 border border-black/5 rounded">
-            <select
-              id="sort-select"
-              className="bg-transparent text-[hsl(var(--foreground))] text-[11px] font-black uppercase tracking-[0.1em] border-none border-r border-black/10 pr-2 mr-1 outline-none cursor-pointer focus:ring-0"
-              value={sort}
-              onChange={() => {}}
-            >
-              {SORT_OPTIONS.map((o: any) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-          </div>
+          <SortSelect currentSort={sort} />
         </div>
       </div>
-
-      <SortController currentSort={sort} />
 
       {/* Main Grid */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 flex-grow w-full">
@@ -109,9 +119,22 @@ export const CatalogoClient = ({
           <div className="lg:col-span-9">
             {vehiculos.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {vehiculos.map((v: any, index: number) => (
+                {vehiculos.map((v, index) => (
                   <div key={v.id}>
-                    <VehicleCard vehiculo={v} isAdmin={isAdmin} categorias={categorias} priority={index < 2} cotizacionDolar={cotizacionDolar} />
+                    <VehicleCard
+                      vehiculo={v}
+                      priority={index < 2}
+                      cotizacionDolar={cotizacionDolar}
+                      accionAdmin={
+                        isAdmin ? (
+                          <VehicleCardAdminOverlay
+                            vehiculo={v}
+                            categorias={categorias}
+                            cotizacionDolar={cotizacionDolar}
+                          />
+                        ) : null
+                      }
+                    />
                   </div>
                 ))}
               </div>
@@ -130,19 +153,20 @@ export const CatalogoClient = ({
               <div className="mt-8 flex flex-col items-center gap-2">
                 <div className="flex items-center gap-1">
                   <Link
-                    href={currentPage > 1 ? buildUrl({ page: String(currentPage - 1) }) : "#"}
+                    href={currentPage > 1 ? urlDePagina(currentPage - 1) : "#"}
+                    aria-label="Página anterior"
                     className={`w-10 h-10 flex items-center justify-center rounded transition-all ${currentPage === 1 ? 'text-black/30 pointer-events-none' : 'text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--surface-low))] hover:text-[hsl(var(--foreground))]'}`}
                   >
                     <ChevronLeft size={18} />
                   </Link>
 
-                  {generatePageNumbers(currentPage, totalPages).map((p, i) =>
+                  {numerosDePagina(currentPage, totalPages).map((p, i) =>
                     p === "..." ? (
                       <div key={`ellipsis-${i}`} className="w-10 h-10 flex items-center justify-center text-[hsl(var(--muted-foreground))] font-bold">…</div>
                     ) : (
                       <Link
                         key={p}
-                        href={buildUrl({ page: String(p) })}
+                        href={urlDePagina(p)}
                         className={`w-10 h-10 flex items-center justify-center font-bold text-sm rounded transition-all ${p === currentPage ? 'bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] shadow-md' : 'text-[hsl(var(--foreground))] hover:bg-[hsl(var(--surface-low))]'}`}
                       >
                         {p}
@@ -151,7 +175,8 @@ export const CatalogoClient = ({
                   )}
 
                   <Link
-                    href={currentPage < totalPages ? buildUrl({ page: String(currentPage + 1) }) : "#"}
+                    href={currentPage < totalPages ? urlDePagina(currentPage + 1) : "#"}
+                    aria-label="Página siguiente"
                     className={`w-10 h-10 flex items-center justify-center rounded transition-all ${currentPage === totalPages ? 'text-black/30 pointer-events-none' : 'text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--surface-low))] hover:text-[hsl(var(--foreground))]'}`}
                   >
                     <ChevronRight size={18} />
@@ -164,7 +189,8 @@ export const CatalogoClient = ({
         </div>
       </div>
 
-      {/* Banner */}
+      {/* Banner: son dos botones de WhatsApp, así que sin teléfono no va. */}
+      {whatsapp && (
       <div className="mt-12 bg-[#0a0a0b] py-10 px-3 relative overflow-hidden group">
         <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/3 w-[800px] h-[800px] opacity-20 pointer-events-none transition-transform duration-1000 group-hover:scale-105" style={{ background: 'radial-gradient(circle at center, hsl(var(--primary) / 0.2) 0%, transparent 70%)' }} />
         <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
@@ -177,7 +203,7 @@ export const CatalogoClient = ({
             </p>
             <div className="flex flex-col sm:flex-row gap-2">
               <a
-                href={whatsapp?.importacion}
+                href={whatsapp.importacion}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-2 text-[11px] font-black uppercase tracking-[0.2em] rounded hover:bg-white hover:text-[hsl(var(--primary))] transition text-center"
@@ -185,7 +211,7 @@ export const CatalogoClient = ({
                 Nosotros lo traemos por vos 🚀
               </a>
               <a
-                href={whatsapp?.asesor}
+                href={whatsapp.asesor}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="border border-white/20 text-white px-4 py-2 text-[11px] font-black uppercase tracking-[0.2em] rounded hover:bg-white/10 hover:border-white/30 transition text-center"
@@ -196,6 +222,7 @@ export const CatalogoClient = ({
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };

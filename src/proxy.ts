@@ -63,6 +63,17 @@ export default auth((req) => {
 
   return NextResponse.next();
 });
+/**
+ * Solo las rutas sobre las que este proxy realmente decide algo.
+ *
+ * Antes el matcher era `/((?!api|_next/static|_next/image|favicon.ico).*)`, que
+ * hacía descifrar el JWT de sesión en cada request de la portada, del catálogo
+ * y de cada ficha, para terminar siempre en `NextResponse.next()`. Las páginas
+ * públicas no consultan nada de acá.
+ *
+ * La comprobación de rol no queda solo en manos de este archivo: cada página
+ * del panel la repite con `requireAdmin()` (ver src/lib/sesion.ts).
+ */
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/vehicles/:path*", "/login", "/register"],
 };
