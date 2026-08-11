@@ -1,9 +1,8 @@
 import { getVehicleById } from "@/actions/vehicle";
 import { getConfiguracion } from "@/services/configuracion.service";
-import { conNombreConcesionaria } from "@/lib/configuracion-defaults";
 import { getPlanes } from "@/actions/financiacion";
 import { notFound } from "next/navigation";
-import { VehicleDetailClient } from "./VehicleDetailClient";
+import { VehicleDetail } from "./VehicleDetail";
 import { FEATURE_FINANCIACION } from "@/lib/features";
 import { whatsappUrl } from "@/lib/whatsapp";
 
@@ -14,51 +13,48 @@ interface VehiclePageProps {
 }
 
 export default async function VehicleDetailPage({ params }: VehiclePageProps) {
-  const resolvedParams = await params;
-  const vehicle = await getVehicleById(resolvedParams.id);
+  const { id } = await params;
+
+  // Ninguna de las tres depende de las otras. Con la financiación en stand by
+  // los planes ni se consultan: la ficha no muestra el simulador.
+  const [vehicle, configuracion, rawPlanes] = await Promise.all([
+    getVehicleById(id),
+    getConfiguracion(),
+    FEATURE_FINANCIACION ? getPlanes(false) : [], // solo activos
+  ]);
 
   if (!vehicle) {
     notFound();
   }
 
-  // Con la financiación en stand by no se consultan los planes: la ficha no
-  // muestra el simulador.
-  const [configuracion, rawPlanes] = await Promise.all([
-    getConfiguracion(),
-    FEATURE_FINANCIACION ? getPlanes(false) : [] // solo activos
-  ]);
-  
   const vehiculoNombre = `${vehicle.marca} ${vehicle.modelo} ${vehicle.anio}`;
   const whatsappHref = whatsappUrl(
     configuracion.telefono,
     `Hola, me interesa el ${vehiculoNombre}. ¿Podría darme más información?`,
   );
 
-  const planes = rawPlanes.map(p => ({
+  const planes = rawPlanes.map((p) => ({
     id: p.id,
     nombre: p.nombre,
     cuotas: p.cuotas,
     tasaAnual: p.tasaAnual.toNumber(),
   }));
 
-  // Textos de la sección de consulta: se editan en /dashboard/settings y
-  // admiten el marcador {concesionaria}, que se resuelve acá.
+  // Textos de la sección de consulta: se editan en /dashboard/settings. El
+  // marcador {concesionaria} ya viene resuelto por el service.
   const contacto = {
     eyebrow: configuracion.contactoEyebrow,
     titulo: configuracion.contactoTitulo,
-    texto: conNombreConcesionaria(
-      configuracion.contactoTexto,
-      configuracion.nombreConcesionaria,
-    ),
+    texto: configuracion.contactoTexto,
     whatsappTexto: configuracion.contactoWhatsappTexto,
   };
 
   return (
-    <VehicleDetailClient
+    <VehicleDetail
       vehicle={vehicle}
       vehiculoNombre={vehiculoNombre}
       whatsappUrl={whatsappHref}
-      cotizacionDolar={configuracion?.cotizacionDolar}
+      cotizacionDolar={configuracion.cotizacionDolar}
       planes={planes}
       contacto={contacto}
     />

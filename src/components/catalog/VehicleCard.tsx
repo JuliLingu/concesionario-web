@@ -1,28 +1,36 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { Vehiculo, ImagenVehiculo } from "../../../generated/prisma";
-import { Calendar, Fuel, AlignJustify, ArrowRight, Settings2 } from "lucide-react";
-import { EditModal } from "./EditModal";
+import { Calendar, Car, Fuel, AlignJustify, ArrowRight } from "lucide-react";
 import { getCldUrl } from "@/lib/cloudinary";
 import { formatPrecio } from "@/lib/precio";
 
+export type VehiculoDeTarjeta = Omit<Vehiculo, "precio"> & {
+  imagenes: ImagenVehiculo[];
+  precio: number;
+};
+
 interface VehicleCardProps {
-  vehiculo: Omit<Vehiculo, "precio"> & {
-    imagenes: ImagenVehiculo[];
-    precio: number;
-  };
-  isAdmin?: boolean;
-  categorias?: { id: string; nombre: string }[];
+  vehiculo: VehiculoDeTarjeta;
   priority?: boolean;
   cotizacionDolar?: number | null;
+  /**
+   * Botón de edición superpuesto sobre la foto. Llega como slot desde quien
+   * arma el listado en lugar de decidirse acá con un `isAdmin`: así el modal de
+   * edición —que arrastra el formulario entero del panel— nunca entra en el
+   * bundle de una página pública. Ver VehicleCardAdminOverlay.
+   */
+  accionAdmin?: React.ReactNode;
 }
 
-export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priority = false, cotizacionDolar }: VehicleCardProps) => {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const imagenPrincipal = vehiculo.imagenes.find(img => img.esPrincipal)?.url || vehiculo.imagenes[0]?.url || "";
+export const VehicleCard = ({
+  vehiculo,
+  priority = false,
+  cotizacionDolar,
+  accionAdmin,
+}: VehicleCardProps) => {
+  const imagenPrincipal =
+    vehiculo.imagenes.find((img) => img.esPrincipal)?.url || vehiculo.imagenes[0]?.url || "";
 
   return (
     <div className="group relative flex flex-col h-full bg-[hsl(var(--card))] shadow-[0_4px_20px_rgba(26,28,30,0.06)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(26,28,30,0.12)]">
@@ -40,20 +48,11 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-black/5 font-black text-4xl italic">JBJ</span>
+            <Car className="w-16 h-16 text-[hsl(var(--muted-foreground))] opacity-20" />
           </div>
         )}
 
-        {/* Edit Overlay Button */}
-        {isAdmin && (
-          <button
-            onClick={(e) => { e.preventDefault(); setIsEditModalOpen(true); }}
-            className="absolute top-3 right-3 z-10 bg-black/60 backdrop-blur-sm text-white text-[9px] font-black uppercase tracking-[0.1em] px-3 py-1.5 flex items-center gap-1 hover:bg-[hsl(var(--primary))] transition-colors"
-          >
-            <Settings2 size={11} />
-            Editar
-          </button>
-        )}
+        {accionAdmin}
       </div>
 
       {/* Content Section */}
@@ -107,14 +106,6 @@ export const VehicleCard = ({ vehiculo, isAdmin = false, categorias = [], priori
           </Link>
         </div>
       </div>
-
-      <EditModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        vehiculo={vehiculo}
-        categorias={categorias}
-        cotizacionDolar={cotizacionDolar}
-      />
     </div>
   );
 };

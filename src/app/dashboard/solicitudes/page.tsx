@@ -1,17 +1,20 @@
-import { auth } from "@/auth";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/sesion";
 import { getSolicitudes } from "@/actions/financiacion";
-import { EstadoConsulta } from "../../../../generated/prisma";
-import { SolicitudesClient } from "./SolicitudesClient";
+import { estadoDeUrl } from "@/lib/estados";
+import { formatFechaLarga } from "@/lib/formato";
+import { formatArs } from "@/lib/precio";
 import { FEATURE_FINANCIACION } from "@/lib/features";
-
-const TABS: { value: EstadoConsulta | "TODAS"; label: string }[] = [
-  { value: "TODAS",      label: "Todas"      },
-  { value: "PENDIENTE",  label: "Pendientes" },
-  { value: "VISTA",      label: "Vistas"     },
-  { value: "RESPONDIDA", label: "Respondidas"},
-  { value: "CERRADA",    label: "Cerradas"   },
-];
+import { SolicitudStatusButton } from "@/components/dashboard/SolicitudStatusButton";
+import {
+  CeldaVehiculo,
+  Contacto,
+  PanelListado,
+  SinResultados,
+  TablaPanel,
+  Th,
+} from "@/components/dashboard/PanelListado";
 
 interface SolicitudesPageProps {
   searchParams: Promise<{ estado?: string }>;
@@ -22,40 +25,84 @@ export default async function SolicitudesPage({ searchParams }: SolicitudesPageP
   // la pantalla no es alcanzable.
   if (!FEATURE_FINANCIACION) notFound();
 
-  const session = await auth();
-  if (!session || session.user?.role !== "ADMIN") redirect("/");
+  await requireAdmin();
 
-  const params   = await searchParams;
-  const estadoRaw = params.estado as EstadoConsulta | undefined;
-  const estadoValido = estadoRaw && Object.keys(EstadoConsulta).includes(estadoRaw)
-    ? estadoRaw as EstadoConsulta
-    : undefined;
+  const estado = estadoDeUrl((await searchParams).estado);
 
-  const rawSolicitudes = await getSolicitudes(estadoValido);
-  const rawPendientes = await getSolicitudes("PENDIENTE");
-
-  const solicitudes = rawSolicitudes.map(c => ({
-    ...c,
-    ingresos: c.ingresos?.toNumber() || 0,
-    anticipo: c.anticipo.toNumber(),
-    createdAt: c.createdAt.toISOString(),
-    updatedAt: c.updatedAt.toISOString(),
-  }));
-
-  const pendientes = rawPendientes.map(c => ({
-    ...c,
-    ingresos: c.ingresos?.toNumber() || 0,
-    anticipo: c.anticipo.toNumber(),
-    createdAt: c.createdAt.toISOString(),
-    updatedAt: c.updatedAt.toISOString(),
-  }));
+  const [solicitudes, pendientes] = await Promise.all([
+    getSolicitudes(estado),
+    prisma.solicitudFinanciacion.count({ where: { estado: "PENDIENTE" } }),
+  ]);
 
   return (
-    <SolicitudesClient 
-      solicitudes={solicitudes} 
-      pendientes={pendientes} 
-      TABS={TABS} 
-      estadoValido={estadoValido} 
-    />
+    <PanelListado
+      titulo="Solicitudes de Crédito"
+      resumen={`${solicitudes.length} solicitud${solicitudes.length !== 1 ? "es" : ""}`}
+      pendientes={pendientes}
+      basePath="/dashboard/solicitudes"
+      estadoActivo={estado}
+    >
+      {solicitudes.length === 0 ? (
+        <SinResultados texto="No hay solicitudes en esta categoría." />
+      ) : (
+        <TablaPanel>
+          <thead className="bg-[#f3f3f6]">
+            <tr className="border-b border-[#e5e7eb]">
+              <Th>Cliente / DNI</Th>
+              <Th oculta="lg">Vehículo</Th>
+              <Th>Financiación</Th>
+              <Th oculta="md">Fecha</Th>
+              <Th>Estado</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {solicitudes.map((s) => (
+              <tr
+                key={s.id}
+                className="border-b border-[#e5e7eb]/50 hover:bg-[hsl(var(--surface-low))] transition align-top"
+              >
+                <td className="py-3 px-4">
+                  <div className="font-bold text-sm text-[hsl(var(--foreground))]">
+                    {s.nombre} {s.apellido}
+                  </div>
+                  <div className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">
+                    DNI: {s.dni}
+                  </div>
+                  <Contacto href={`mailto:${s.email}`} texto={s.email} />
+                  {s.telefono && <Contacto href={`tel:${s.telefono}`} texto={s.telefono} tenue />}
+                </td>
+                <td className="py-3 px-4 hidden lg:table-cell">
+                  <CeldaVehiculo vehiculo={s.vehiculo} />
+                </td>
+                <td className="py-3 px-4">
+                  <div className="text-sm font-bold text-[hsl(var(--foreground))]">
+                    {s.cuotas} Cuotas
+                  </div>
+                  <div className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">
+                    Anticipo: {formatArs(s.anticipo.toNumber())}
+                  </div>
+                  <div className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">
+                    Ingresos: {s.ingresos ? formatArs(s.ingresos.toNumber()) : "No especificado"}
+                  </div>
+                  {s.mensaje && (
+                    <div className="text-xs text-[hsl(var(--muted-foreground))] mt-1 italic line-clamp-2">
+                      &ldquo;{s.mensaje}&rdquo;
+                    </div>
+                  )}
+                </td>
+                <td className="py-3 px-4 hidden md:table-cell">
+                  <span className="text-xs text-[hsl(var(--muted-foreground))] font-medium whitespace-nowrap">
+                    {formatFechaLarga(s.createdAt)}
+                  </span>
+                </td>
+                <td className="py-3 px-4">
+                  <SolicitudStatusButton solicitudId={s.id} estadoActual={s.estado} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </TablaPanel>
+      )}
+    </PanelListado>
   );
 }

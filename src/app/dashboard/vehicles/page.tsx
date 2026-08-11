@@ -1,15 +1,10 @@
 import { getVehicles } from "@/actions/vehicle";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
-import { VehiclesClient } from "./VehiclesClient";
+import { requireAdmin } from "@/lib/sesion";
+import { VehiclesView } from "./VehiclesView";
 import { getConfiguracion } from "@/services/configuracion.service";
 
 export default async function VehiclesAdminPage() {
-  const session = await auth();
-
-  if (!session || session.user?.role !== "ADMIN") {
-    redirect("/");
-  }
+  await requireAdmin();
 
   const [vehicles, configuracion] = await Promise.all([
     getVehicles(),
@@ -20,7 +15,7 @@ export default async function VehiclesAdminPage() {
   const borradores = vehicles.filter((v) => v.publicacion === "BORRADOR").length;
 
   return (
-    <VehiclesClient
+    <VehiclesView
       vehicles={vehicles}
       publicados={publicados}
       borradores={borradores}

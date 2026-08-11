@@ -1,5 +1,5 @@
-import { auth } from "@/auth";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import { requireAdmin } from "@/lib/sesion";
 import { getPlanes } from "@/actions/financiacion";
 import { PlanesClient } from "./PlanesClient";
 import { FEATURE_FINANCIACION } from "@/lib/features";
@@ -8,8 +8,7 @@ export default async function PlanesPage() {
   // Financiación en stand by: la pantalla existe pero no es alcanzable.
   if (!FEATURE_FINANCIACION) notFound();
 
-  const session = await auth();
-  if (!session || session.user?.role !== "ADMIN") redirect("/");
+  await requireAdmin();
 
   const rawPlanes = await getPlanes(true);
   

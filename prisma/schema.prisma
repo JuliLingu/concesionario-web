@@ -138,7 +138,9 @@ model Consulta {
 
 model Configuracion {
   id                  String   @id @default("1")
-  nombreConcesionaria String   @default("JBJ Automotores")
+  // Sin default: el nombre siempre llega del formulario de configuración, que
+  // lo exige no vacío. No hay ninguna concesionaria escrita en el esquema.
+  nombreConcesionaria String
   telefono            String?
   email               String?
   direccion           String?

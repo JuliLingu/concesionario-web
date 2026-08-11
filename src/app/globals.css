@@ -86,6 +86,7 @@ html {
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
+  font-family: var(--font-manrope), sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -95,13 +96,6 @@ h1, h2, h3, h4 {
   font-weight: 700;
   letter-spacing: -0.02em;
   text-transform: uppercase;
-}
-
-body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-family: var(--font-manrope), sans-serif;
-  -webkit-font-smoothing: antialiased;
 }
 
 @media (min-width: 768px) {
@@ -127,6 +121,13 @@ body {
   .animate-slide-down {
     animation: slide-down 0.2s ease-out;
     transform-origin: top;
+  }
+
+  /* Entrada del header al cargar la página. Antes la hacía framer-motion, que
+     por una sola transición de montaje metía toda la librería en el bundle de
+     cada ruta: el header vive en el layout raíz. */
+  .animate-header-in {
+    animation: header-in 0.35s ease-out;
   }
 
   .glass-nav {
@@ -167,6 +168,21 @@ body {
 @keyframes slide-down {
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes header-in {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Quien pidió menos movimiento no recibe ninguna de las animaciones de entrada:
+   el contenido aparece directamente en su posición final. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-down,
+  .animate-header-in {
+    animation: none;
+  }
 }
 
 /* Scrollbar */
