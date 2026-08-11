@@ -9,11 +9,17 @@
 import { COLORES_DEFAULTS } from "@/lib/colores";
 
 export const CONFIGURACION_DEFAULTS = {
-  nombreConcesionaria: "JBJ Automotores",
-  // Mismo número que usaba el fallback de WhatsApp en la ficha de vehículo.
-  telefono: "+54 9 223 421-4414",
-  email: "contacto@concesionaria.com",
-  direccion: "Av. Principal 123, Buenos Aires",
+  // Nombre genérico: el de la concesionaria real se carga en el panel. El resto
+  // de los textos lo referencian con el marcador {concesionaria}, así ninguna
+  // agencia queda escrita en el código.
+  nombreConcesionaria: "Concesionaria",
+
+  // Datos de contacto: vacío significa "sin cargar". Las secciones que los
+  // muestran (ubicación, pie, botones de WhatsApp) se omiten hasta que el
+  // administrador los complete, en lugar de mostrar datos de ejemplo.
+  telefono: "",
+  email: "",
+  direccion: "",
   facebookUrl: "",
   instagramUrl: "",
   horariosAtencion: "Lun — Vie: 09:00 — 19:00\nSábados: 10:00 — 14:00",
@@ -24,7 +30,7 @@ export const CONFIGURACION_DEFAULTS = {
   faviconUrl: "",
 
   // SEO / metadata del layout
-  siteTitle: "JBJ Automotores | The Kinetic Gallery",
+  siteTitle: "{concesionaria} | Catálogo de vehículos",
   siteDescription: "Una experiencia automotriz editorial y premium.",
 
   // Portada (Hero)
@@ -37,7 +43,7 @@ export const CONFIGURACION_DEFAULTS = {
   // Nosotros (CompanyInfo)
   nosotrosTitulo: "La Maestría\ndetrás del\nvolante.",
   nosotrosTexto:
-    "En JBJ Automotores, operamos bajo el principio de que un vehículo es una extensión de la identidad. Nuestra trayectoria de dos décadas redefine la curaduría automotriz, seleccionando piezas que trascienden lo convencional.",
+    "En {concesionaria}, operamos bajo el principio de que un vehículo es una extensión de la identidad. Nuestra trayectoria de dos décadas redefine la curaduría automotriz, seleccionando piezas que trascienden lo convencional.",
   nosotrosMetrica1Valor: "5K",
   nosotrosMetrica1Sufijo: "+",
   nosotrosMetrica1Label: "Relaciones Consolidadas",
@@ -74,6 +80,9 @@ export const CONFIGURACION_DEFAULTS = {
  * Marcador admitido dentro de los textos editables: se reemplaza por el nombre
  * cargado en la configuración, así el administrador puede renombrar la
  * concesionaria sin tener que reescribir cada texto.
+ *
+ * Lo resuelve el service para todos los campos, de modo que también sirve en
+ * los textos por defecto y ninguna página tiene que acordarse de aplicarlo.
  */
 export const MARCADOR_CONCESIONARIA = "{concesionaria}";
 

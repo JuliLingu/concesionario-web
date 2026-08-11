@@ -2,11 +2,12 @@
 
 import { X } from "lucide-react";
 import { VehicleForm } from "../dashboard/VehicleForm";
+import type { VehiculoDeTarjeta } from "./VehicleCard";
 
 interface EditModalProps {
   isOpen: boolean;
   onClose: () => void;
-  vehiculo: any;
+  vehiculo: VehiculoDeTarjeta;
   categorias: { id: string; nombre: string }[];
   cotizacionDolar?: number | null;
 }

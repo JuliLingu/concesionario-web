@@ -1,4 +1,4 @@
-# Design System Document: JBJ Automotores
+# Design System Document: Concesionaria
 
 ## 1. Overview & Creative North Star: "The Kinetic Gallery"
 This design system moves away from the traditional, cluttered automotive marketplace and towards a high-end editorial experience. Our Creative North Star is **"The Kinetic Gallery."** We treat every vehicle not as a commodity, but as a masterpiece in motion. 

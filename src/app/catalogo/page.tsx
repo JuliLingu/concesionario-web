@@ -2,26 +2,12 @@ import * as z from "zod";
 import { prisma } from "@/lib/prisma";
 import { Prisma, Transmision, Combustible, EstadoVehiculo } from "../../../generated/prisma";
 import { auth } from "@/auth";
-import { CatalogoClient } from "./CatalogoClient";
+import { CatalogoView, type FiltrosActivos } from "./CatalogoView";
 import { getCachedFiltrosCatalogo, getCachedCategorias } from "@/services/cache.service";
 import { getConfiguracion } from "@/services/configuracion.service";
 import { precioEnPesos } from "@/lib/precio";
 import { whatsappUrl } from "@/lib/whatsapp";
-
-const ITEMS_PER_PAGE = 9;
-
-const SORT_OPTIONS = [
-  { value: "newest",     label: "Más Recientes"   },
-  { value: "oldest",     label: "Más Antiguos"    },
-  { value: "price_asc",  label: "Menor Precio"    },
-  { value: "price_desc", label: "Mayor Precio"    },
-  { value: "km_asc",     label: "Menor Kilometraje" },
-  { value: "km_desc",    label: "Mayor Kilometraje" },
-  { value: "year_desc",  label: "Año (más nuevo)" },
-  { value: "year_asc",   label: "Año (más antiguo)"},
-] as const;
-
-type SortValue = typeof SORT_OPTIONS[number]["value"];
+import { ITEMS_PER_PAGE, SORT_OPTIONS, type SortValue } from "@/lib/catalogo";
 
 /**
  * Los parámetros de la URL son entrada pública y sin validar llegaban tal cual
@@ -53,15 +39,50 @@ function getOrderBy(sort: SortValue): Prisma.VehiculoOrderByWithRelationInput {
   }
 }
 
+/**
+ * Ids de la página cuando se ordena por precio.
+ *
+ * Cada vehículo guarda su precio en la moneda que eligió el administrador, así
+ * que ordenar por la columna `precio` mezclaría pesos con dólares. Para esos dos
+ * criterios pasamos todo a pesos y paginamos en memoria.
+ */
+async function idsOrdenadosPorPrecio(
+  where: Prisma.VehiculoWhereInput,
+  sort: SortValue,
+  pagina: number,
+  cotizacionDolar: number | null,
+): Promise<string[]> {
+  const candidatos = await prisma.vehiculo.findMany({
+    where,
+    select: { id: true, precio: true, moneda: true },
+  });
+
+  return candidatos
+    .map((v) => ({
+      id: v.id,
+      precioArs:
+        precioEnPesos(Number(v.precio), v.moneda, cotizacionDolar) ?? Number(v.precio),
+    }))
+    .sort((a, b) =>
+      sort === "price_asc" ? a.precioArs - b.precioArs : b.precioArs - a.precioArs,
+    )
+    .slice((pagina - 1) * ITEMS_PER_PAGE, pagina * ITEMS_PER_PAGE)
+    .map((v) => v.id);
+}
+
 export default async function CatalogoPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const session = await auth();
-  const isAdmin = session?.user?.role === "ADMIN";
+  // Sesión, parámetros y configuración no dependen entre sí: van juntos.
+  const [session, params, configuracion] = await Promise.all([
+    auth(),
+    searchParams,
+    getConfiguracion(),
+  ]);
 
-  const params = await searchParams;
+  const isAdmin = session?.user?.role === "ADMIN";
 
   const toArray = (val: string | string[] | undefined): string[] => {
     const valores = val ? (Array.isArray(val) ? val : [val]) : [];
@@ -70,20 +91,15 @@ export default async function CatalogoPage({
       .slice(0, MAXIMO_VALORES_POR_FILTRO);
   };
 
-  const marcasArray       = toArray(params.marca);
-  const categoriasArray   = toArray(params.categoria);
-  const estadosArray      = toArray(params.estado).filter((e) =>
-    Object.keys(EstadoVehiculo).includes(e)
-  ) as EstadoVehiculo[];
-  const transmisionesArray = toArray(params.transmision).filter((t) =>
-    Object.keys(Transmision).includes(t)
-  ) as Transmision[];
-  const combustiblesArray = toArray(params.combustible).filter((c) =>
-    Object.keys(Combustible).includes(c)
-  ) as Combustible[];
-
-  const anioDesde = anioEnUrl.parse(params.anioDesde);
-  const anioHasta = anioEnUrl.parse(params.anioHasta);
+  const filtrosActivos: FiltrosActivos = {
+    marcas: toArray(params.marca),
+    categorias: toArray(params.categoria),
+    estados: toArray(params.estado).filter((e) => Object.keys(EstadoVehiculo).includes(e)),
+    transmisiones: toArray(params.transmision).filter((t) => Object.keys(Transmision).includes(t)),
+    combustibles: toArray(params.combustible).filter((c) => Object.keys(Combustible).includes(c)),
+    anioDesde: anioEnUrl.parse(params.anioDesde),
+    anioHasta: anioEnUrl.parse(params.anioHasta),
+  };
 
   const sort = ordenEnUrl.parse(params.sort);
   const currentPage = paginaEnUrl.parse(params.page);
@@ -92,47 +108,31 @@ export default async function CatalogoPage({
     publicacion: isAdmin ? undefined : "PUBLICADO",
   };
 
-  if (marcasArray.length > 0)       where.marca = { in: marcasArray };
-  if (categoriasArray.length > 0)   where.categoria = { slug: { in: categoriasArray } };
-  if (estadosArray.length > 0)      where.estado = { in: estadosArray };
-  if (transmisionesArray.length > 0) where.transmision = { in: transmisionesArray };
-  if (combustiblesArray.length > 0)  where.combustible = { in: combustiblesArray };
-  if (anioDesde || anioHasta) {
+  const { marcas, categorias: slugsCategoria, estados, transmisiones, combustibles } = filtrosActivos;
+  if (marcas.length > 0)        where.marca = { in: marcas };
+  if (slugsCategoria.length > 0) where.categoria = { slug: { in: slugsCategoria } };
+  if (estados.length > 0)       where.estado = { in: estados as EstadoVehiculo[] };
+  if (transmisiones.length > 0) where.transmision = { in: transmisiones as Transmision[] };
+  if (combustibles.length > 0)  where.combustible = { in: combustibles as Combustible[] };
+  if (filtrosActivos.anioDesde || filtrosActivos.anioHasta) {
     where.anio = {
-      ...(anioDesde ? { gte: anioDesde } : {}),
-      ...(anioHasta ? { lte: anioHasta } : {}),
+      ...(filtrosActivos.anioDesde ? { gte: filtrosActivos.anioDesde } : {}),
+      ...(filtrosActivos.anioHasta ? { lte: filtrosActivos.anioHasta } : {}),
     };
   }
 
-  const configuracion = await getConfiguracion();
-
-  /**
-   * Cada vehículo guarda su precio en la moneda que eligió el administrador,
-   * así que ordenar por la columna `precio` mezclaría pesos con dólares.
-   * Para esos dos criterios pasamos todo a pesos y paginamos en memoria.
-   */
   const ordenaPorPrecio = sort === "price_asc" || sort === "price_desc";
-  let idsDeLaPagina: string[] | null = null;
 
-  if (ordenaPorPrecio) {
-    const candidatos = await prisma.vehiculo.findMany({
-      where,
-      select: { id: true, precio: true, moneda: true },
-    });
-
-    idsDeLaPagina = candidatos
-      .map((v) => ({
-        id: v.id,
-        precioArs:
-          precioEnPesos(Number(v.precio), v.moneda, configuracion.cotizacionDolar) ??
-          Number(v.precio),
-      }))
-      .sort((a, b) =>
-        sort === "price_asc" ? a.precioArs - b.precioArs : b.precioArs - a.precioArs,
-      )
-      .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
-      .map((v) => v.id);
-  }
+  // Las opciones de los filtros salen del stock real; al administrador se le
+  // ofrecen también las de los borradores. Las categorías solo hacen falta para
+  // el modal de edición, así que fuera del panel ni se consultan.
+  const [filtros, categorias, idsDeLaPagina] = await Promise.all([
+    getCachedFiltrosCatalogo(isAdmin),
+    isAdmin ? getCachedCategorias() : [],
+    ordenaPorPrecio
+      ? idsOrdenadosPorPrecio(where, sort, currentPage, configuracion.cotizacionDolar)
+      : null,
+  ]);
 
   const [totalCount, rawVehiculos] = await Promise.all([
     prisma.vehiculo.count({ where }),
@@ -151,63 +151,45 @@ export default async function CatalogoPage({
     }),
   ]);
 
+  // El `in` no conserva el orden: se reordena según los ids que calculamos.
   const ordenados = idsDeLaPagina
     ? idsDeLaPagina
         .map((id) => rawVehiculos.find((v) => v.id === id))
         .filter((v) => v !== undefined)
     : rawVehiculos;
 
-  const vehiculos = ordenados.map((v) => ({
-    ...v,
-    precio: Number(v.precio),
-  }));
-
-  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+  const vehiculos = ordenados.map((v) => ({ ...v, precio: Number(v.precio) }));
 
   /**
    * Banner de cierre: los dos botones abren WhatsApp con el número de la
    * concesionaria y un mensaje distinto según lo que el cliente esté buscando.
+   * Sin teléfono cargado no hay a dónde enlazar y el banner no se muestra.
    */
-  const whatsapp = {
-    importacion: whatsappUrl(
-      configuracion.telefono,
-      `Hola, no encontré lo que busco en el catálogo de ${configuracion.nombreConcesionaria}. ¿Pueden conseguirme un vehículo?`,
-    ),
-    asesor: whatsappUrl(
-      configuracion.telefono,
-      `Hola, estoy viendo el catálogo de ${configuracion.nombreConcesionaria} y me gustaría hablar con un asesor.`,
-    ),
-  };
-
-  // Las opciones salen del stock real. Al administrador se le ofrecen también
-  // las de los borradores, que es lo que ve listado más arriba.
-  const filtros = await getCachedFiltrosCatalogo(isAdmin);
-
-  let categorias: { id: string; nombre: string }[] = [];
-  if (isAdmin) {
-    categorias = await getCachedCategorias();
-  }
+  const urlImportacion = whatsappUrl(
+    configuracion.telefono,
+    `Hola, no encontré lo que busco en el catálogo de ${configuracion.nombreConcesionaria}. ¿Pueden conseguirme un vehículo?`,
+  );
+  const urlAsesor = whatsappUrl(
+    configuracion.telefono,
+    `Hola, estoy viendo el catálogo de ${configuracion.nombreConcesionaria} y me gustaría hablar con un asesor.`,
+  );
+  const whatsapp =
+    urlImportacion && urlAsesor
+      ? { importacion: urlImportacion, asesor: urlAsesor }
+      : null;
 
   return (
-    <CatalogoClient 
+    <CatalogoView
       vehiculos={vehiculos}
-      cotizacionDolar={configuracion?.cotizacionDolar}
+      cotizacionDolar={configuracion.cotizacionDolar}
       filtros={filtros}
+      filtrosActivos={filtrosActivos}
       categorias={categorias}
       isAdmin={isAdmin}
       totalCount={totalCount}
       currentPage={currentPage}
-      totalPages={totalPages}
-      ITEMS_PER_PAGE={ITEMS_PER_PAGE}
+      totalPages={Math.ceil(totalCount / ITEMS_PER_PAGE)}
       sort={sort}
-      SORT_OPTIONS={SORT_OPTIONS}
-      marcasArray={marcasArray}
-      categoriasArray={categoriasArray}
-      estadosArray={estadosArray}
-      transmisionesArray={transmisionesArray}
-      combustiblesArray={combustiblesArray}
-      anioDesde={anioDesde}
-      anioHasta={anioHasta}
       whatsapp={whatsapp}
     />
   );

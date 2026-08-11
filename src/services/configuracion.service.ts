@@ -6,6 +6,7 @@ import { registrarError } from "@/lib/log";
 import {
   CONFIGURACION_DEFAULTS,
   CONFIGURACION_NUMERIC_DEFAULTS,
+  conNombreConcesionaria,
   type SiteConfig,
 } from "@/lib/configuracion-defaults";
 
@@ -36,8 +37,17 @@ function conDefaults(config: Record<string, unknown> | null): SiteConfig {
     ]),
   ) as { [K in keyof typeof CONFIGURACION_DEFAULTS]: string };
 
+  // El marcador {concesionaria} se resuelve una sola vez, acá: así funciona en
+  // cualquier texto —cargado o por defecto— sin que cada página lo repita.
+  const resueltos = Object.fromEntries(
+    Object.entries(textos).map(([clave, valor]) => [
+      clave,
+      conNombreConcesionaria(valor, textos.nombreConcesionaria),
+    ]),
+  ) as typeof textos;
+
   return {
-    ...textos,
+    ...resueltos,
     id: (config?.id as string) ?? "1",
     cotizacionDolar: numeroOrDefault(
       config?.cotizacionDolar,

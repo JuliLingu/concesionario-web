@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { VehicleForm } from "@/components/dashboard/VehicleForm";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/sesion";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { getCachedCategorias } from "@/services/cache.service";
 import { getConfiguracion } from "@/services/configuracion.service";
 
 interface EditVehiclePageProps {
@@ -12,35 +12,27 @@ interface EditVehiclePageProps {
 }
 
 export default async function EditVehiclePage({ params }: EditVehiclePageProps) {
-  const session = await auth();
+  await requireAdmin();
 
-  if (!session || session.user?.role !== "ADMIN") {
-    redirect("/");
-  }
+  const { id } = await params;
 
-  const resolvedParams = await params;
-
-  const vehiculo = await prisma.vehiculo.findUnique({
-    where: { id: resolvedParams.id },
-    include: {
-      imagenes: { orderBy: { orden: "asc" } },
-      categoria: true,
-    },
-  });
+  const [vehiculo, categorias, configuracion] = await Promise.all([
+    prisma.vehiculo.findUnique({
+      where: { id },
+      include: {
+        imagenes: { orderBy: { orden: "asc" } },
+        categoria: true,
+      },
+    }),
+    getCachedCategorias(),
+    getConfiguracion(),
+  ]);
 
   if (!vehiculo) {
     notFound();
   }
 
-  const [categorias, configuracion] = await Promise.all([
-    prisma.categoria.findMany({
-      select: { id: true, nombre: true },
-      orderBy: { nombre: "asc" },
-    }),
-    getConfiguracion(),
-  ]);
-
-  // Serialize Decimal to number to avoid Next.js serialization error
+  // Los Decimal de Prisma no son serializables hacia el formulario, que es de cliente.
   const initialData = {
     ...vehiculo,
     precio: Number(vehiculo.precio),
@@ -62,7 +54,11 @@ export default async function EditVehiclePage({ params }: EditVehiclePageProps) 
           {vehiculo.marca} {vehiculo.modelo} — {vehiculo.anio}
         </p>
       </div>
-      <VehicleForm categorias={categorias} initialData={initialData} cotizacionDolar={configuracion.cotizacionDolar} />
+      <VehicleForm
+        categorias={categorias}
+        initialData={initialData}
+        cotizacionDolar={configuracion.cotizacionDolar}
+      />
     </div>
   );
 }

@@ -1,24 +1,38 @@
-"use client";
-
 import Link from "next/link";
 import { Car, CheckCircle2, FileText, MessageSquare, Plus, LayoutList, ArrowRight, ExternalLink, Tags, Wallet, CreditCard } from "lucide-react";
 import { ConsultaStatusButton } from "@/components/dashboard/ConsultaStatusButton";
 import { FEATURE_FINANCIACION } from "@/lib/features";
+import { formatFechaCorta } from "@/lib/formato";
+import type { EstadoConsulta } from "../../../generated/prisma";
 
-export const DashboardClient = ({
+interface ConsultaResumida {
+  id: string;
+  nombre: string;
+  email: string;
+  estado: EstadoConsulta;
+  createdAt: string;
+  vehiculo: { id: string; marca: string; modelo: string } | null;
+}
+
+interface DashboardViewProps {
+  userName: string;
+  nombreConcesionaria: string;
+  totalVehiculos: number;
+  publicados: number;
+  borradores: number;
+  consultasPendientes: number;
+  ultimasConsultas: ConsultaResumida[];
+}
+
+export const DashboardView = ({
   userName,
+  nombreConcesionaria,
   totalVehiculos,
   publicados,
   borradores,
   consultasPendientes,
-  ultimasConsultas
-}: any) => {
-
-  const formatDate = (date: string) =>
-    new Intl.DateTimeFormat("es-AR", {
-      day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
-    }).format(new Date(date));
-
+  ultimasConsultas,
+}: DashboardViewProps) => {
   return (
     <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-8">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -32,7 +46,7 @@ export const DashboardClient = ({
             Bienvenido, {userName}
           </h1>
           <p className="text-[hsl(var(--muted-foreground))] font-medium">
-            Resumen de actividad de JBJ Automotores
+            Resumen de actividad de {nombreConcesionaria}
           </p>
         </div>
 
@@ -74,7 +88,7 @@ export const DashboardClient = ({
         </div>
 
         {/* ── Últimas Consultas Pendientes ── */}
-        {ultimasConsultas.length > 0 && (
+        {ultimasConsultas.length > 0 ? (
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-bold uppercase tracking-tight text-[hsl(var(--foreground))]">
@@ -97,11 +111,11 @@ export const DashboardClient = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {ultimasConsultas.map((c: any) => (
+                    {ultimasConsultas.map((c) => (
                       <tr key={c.id} className="border-b border-[#e5e7eb]/50 hover:bg-[hsl(var(--surface-low))] transition">
                         <td className="py-3 px-4">
                           <div className="font-bold text-sm text-[hsl(var(--foreground))]">{c.nombre}</div>
-                          <Link href={`mailto:${c.email}`} className="text-xs text-[hsl(var(--primary))] hover:underline">{c.email}</Link>
+                          <a href={`mailto:${c.email}`} className="text-xs text-[hsl(var(--primary))] hover:underline">{c.email}</a>
                         </td>
                         <td className="py-3 px-4 hidden md:table-cell">
                           {c.vehiculo ? (
@@ -114,7 +128,7 @@ export const DashboardClient = ({
                           )}
                         </td>
                         <td className="py-3 px-4 hidden lg:table-cell">
-                          <span className="text-xs text-[hsl(var(--muted-foreground))] font-medium">{formatDate(c.createdAt)}</span>
+                          <span className="text-xs text-[hsl(var(--muted-foreground))] font-medium">{formatFechaCorta(c.createdAt)}</span>
                         </td>
                         <td className="py-3 px-4">
                           <ConsultaStatusButton consultaId={c.id} estadoActual={c.estado} />
@@ -126,9 +140,7 @@ export const DashboardClient = ({
               </div>
             </div>
           </div>
-        )}
-
-        {ultimasConsultas.length === 0 && (
+        ) : (
           <div className="py-8 text-center bg-white rounded shadow-[0_20px_40px_rgba(26,28,30,0.06)] flex flex-col items-center gap-2">
             <CheckCircle2 size={32} className="text-green-500 opacity-40" />
             <span className="text-[hsl(var(--muted-foreground))] font-medium text-sm">
@@ -144,7 +156,19 @@ export const DashboardClient = ({
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-const MetricCard = ({ label, value, icon, href, accent }: any) => {
+const MetricCard = ({
+  label,
+  value,
+  icon,
+  href,
+  accent,
+}: {
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  href: string;
+  accent?: "primary" | "green";
+}) => {
   const iconColor = accent === "primary" ? "text-[hsl(var(--primary))]" : accent === "green" ? "text-green-600" : "text-[hsl(var(--muted-foreground))]";
   const textColor = accent === "primary" ? "text-[hsl(var(--primary))]" : accent === "green" ? "text-green-600" : "text-[hsl(var(--foreground))]";
 
@@ -164,8 +188,22 @@ const MetricCard = ({ label, value, icon, href, accent }: any) => {
   );
 };
 
-const QuickAction = ({ href, icon, label, description, primary, badge }: any) => (
-  <Link href={href} className={`relative flex items-center gap-4 p-5 rounded transition ${primary ? 'bg-[#b5000b] hover:bg-[#9a3412]' : 'bg-white hover:bg-[hsl(var(--surface-low))] shadow-[0_20px_40px_rgba(26,28,30,0.06)]'}`}>
+const QuickAction = ({
+  href,
+  icon,
+  label,
+  description,
+  primary,
+  badge,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  description: string;
+  primary?: boolean;
+  badge?: number;
+}) => (
+  <Link href={href} className={`relative flex items-center gap-4 p-5 rounded transition ${primary ? 'bg-[hsl(var(--primary))] hover:brightness-90' : 'bg-white hover:bg-[hsl(var(--surface-low))] shadow-[0_20px_40px_rgba(26,28,30,0.06)]'}`}>
     <div className={`w-10 h-10 flex items-center justify-center shrink-0 rounded ${primary ? 'bg-white/10 text-white' : 'bg-[hsl(var(--foreground))] text-[hsl(var(--muted-foreground))]'}`}>
       {icon}
     </div>

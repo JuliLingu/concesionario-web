@@ -40,6 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/src/generated/prisma
-
-/src/generated/prisma
+# Cliente de Prisma. Se regenera en cada `npm install` (script postinstall),
+# así que no se versiona: un cliente commiteado se queda viejo en silencio
+# cuando alguien toca el schema y no vuelve a generarlo.
+/generated

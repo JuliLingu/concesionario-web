@@ -1,5 +1,3 @@
-"use client";
-
 import { Building2 } from "lucide-react";
 import type { SiteConfig } from "@/lib/configuracion-defaults";
 

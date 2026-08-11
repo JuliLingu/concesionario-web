@@ -234,7 +234,10 @@ const FilterSection = ({
   children: React.ReactNode;
   noBorder?: boolean;
 }) => (
-  <div className={`mb-6 pb-${noBorder ? '0' : '6'} ${noBorder ? '' : 'border-b border-black/5'}`}>
+  // Las clases van completas y no interpoladas (`pb-${...}`): Tailwind analiza
+  // el archivo como texto y no genera las que se arman en tiempo de ejecución,
+  // así que ese padding nunca llegaba a existir.
+  <div className={`mb-6 ${noBorder ? '' : 'pb-6 border-b border-black/5'}`}>
     <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-[hsl(var(--muted-foreground))] mb-4">
       {title}
     </h3>

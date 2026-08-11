@@ -40,8 +40,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
-  const configuracion = await getConfiguracion();
+  // Ninguna depende de la otra: en serie eran dos viajes encadenados en el
+  // camino crítico de todas las páginas.
+  const [session, configuracion] = await Promise.all([auth(), getConfiguracion()]);
 
   // Al encabezado solo se le pasa lo que muestra. El objeto de sesión completo
   // viajaba serializado en el HTML de todas las páginas, incluido el correo.
