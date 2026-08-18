@@ -13,7 +13,10 @@ export default async function HomePage() {
   return (
     <main style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Hero configuracion={configuracion} />
-      <RecentVehicles cotizacionDolar={configuracion.cotizacionDolar} />
+      <RecentVehicles
+        cotizacionDolar={configuracion.cotizacionDolar}
+        mostrarPrecios={configuracion.mostrarPrecios}
+      />
       <CompanyInfo configuracion={configuracion} />
       {FEATURE_FINANCIACION && <FinancingSection configuracion={configuracion} />}
       <LocationSection configuracion={configuracion} />

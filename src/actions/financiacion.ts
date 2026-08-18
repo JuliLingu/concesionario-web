@@ -5,8 +5,10 @@ import { prisma } from "@/lib/prisma";
 import { PlanFinanciacionSchema, SolicitudFinanciacionSchema } from "@/schemas/financiacion";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { EstadoConsulta } from "../../generated/prisma";
 import { FEATURE_FINANCIACION } from "@/lib/features";
+import { avisarSolicitud } from "@/services/avisos.service";
 import {
   REGLAS,
   esperaRestante,
@@ -115,6 +117,20 @@ export const createSolicitud = async (values: z.infer<typeof SolicitudFinanciaci
       },
     });
     revalidatePath("/dashboard/solicitudes");
+
+    // Mismo criterio que en la consulta: el aviso no bloquea la respuesta. Sin
+    // DNI ni ingresos en el correo, eso queda del lado del panel.
+    after(() =>
+      avisarSolicitud({
+        nombre:    validated.data.nombre,
+        apellido:  validated.data.apellido,
+        email:     validated.data.email,
+        telefono:  validated.data.telefono,
+        cuotas:    validated.data.cuotas,
+        vehiculoId: validated.data.vehiculoId || null,
+      }),
+    );
+
     return { success: "Solicitud de crédito enviada con éxito. Nos pondremos en contacto." };
   } catch {
     return { error: "Error al enviar la solicitud. Por favor intentá de nuevo." };

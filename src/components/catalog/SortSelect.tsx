@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
-import { SORT_OPTIONS } from "@/lib/catalogo";
+import type { SortOption } from "@/lib/catalogo";
 
 /**
  * Desplegable de orden del catálogo.
@@ -12,7 +12,14 @@ import { SORT_OPTIONS } from "@/lib/catalogo";
  * engancharle el listener. Un solo componente controlado hace lo mismo sin el
  * acoplamiento por id ni el aviso de React por el campo controlado sin handler.
  */
-export const SortSelect = ({ currentSort }: { currentSort: string }) => {
+export const SortSelect = ({
+  currentSort,
+  opciones,
+}: {
+  currentSort: string;
+  /** Las arma la página: con los precios ocultos vienen sin los dos órdenes por importe. */
+  opciones: readonly SortOption[];
+}) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -35,7 +42,7 @@ export const SortSelect = ({ currentSort }: { currentSort: string }) => {
         value={currentSort}
         onChange={(e) => onChange(e.target.value)}
       >
-        {SORT_OPTIONS.map((o) => (
+        {opciones.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}
           </option>

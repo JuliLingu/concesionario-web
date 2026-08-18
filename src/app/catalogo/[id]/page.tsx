@@ -55,6 +55,7 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
       vehiculoNombre={vehiculoNombre}
       whatsappUrl={whatsappHref}
       cotizacionDolar={configuracion.cotizacionDolar}
+      mostrarPrecios={configuracion.mostrarPrecios}
       planes={planes}
       contacto={contacto}
     />

@@ -16,12 +16,15 @@ interface VehicleCardAdminOverlayProps {
   vehiculo: VehiculoDeTarjeta;
   categorias: { id: string; nombre: string }[];
   cotizacionDolar?: number | null;
+  /** Precios a la vista, según Configuración. Llega hasta el formulario de edición. */
+  mostrarPrecios?: boolean;
 }
 
 export const VehicleCardAdminOverlay = ({
   vehiculo,
   categorias,
   cotizacionDolar,
+  mostrarPrecios,
 }: VehicleCardAdminOverlayProps) => {
   const [abierto, setAbierto] = useState(false);
 
@@ -45,6 +48,7 @@ export const VehicleCardAdminOverlay = ({
           vehiculo={vehiculo}
           categorias={categorias}
           cotizacionDolar={cotizacionDolar}
+          mostrarPrecios={mostrarPrecios}
         />
       )}
     </>

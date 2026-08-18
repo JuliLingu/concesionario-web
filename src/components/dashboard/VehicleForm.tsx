@@ -36,9 +36,16 @@ interface VehicleFormProps {
   initialData?: any; // The full vehicle object if we are editing
   onSuccess?: () => void;
   cotizacionDolar?: number | null;
+  /**
+   * Precios a la vista, según Configuración. Con `false` los campos de precio y
+   * moneda no se muestran: el valor que ya tenía la unidad viaja igual en el
+   * formulario —sigue en `defaultValues`— así que editar otro dato no lo borra,
+   * y un alta nueva se guarda con precio 0.
+   */
+  mostrarPrecios?: boolean;
 }
 
-export const VehicleForm = ({ categorias, initialData, onSuccess, cotizacionDolar }: VehicleFormProps) => {
+export const VehicleForm = ({ categorias, initialData, onSuccess, cotizacionDolar, mostrarPrecios = true }: VehicleFormProps) => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
@@ -211,6 +218,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess, cotizacionDola
         </div>
 
         {/* Moneda */}
+        {mostrarPrecios && (
         <div className="flex flex-col gap-1">
           <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">Moneda del Precio</label>
           <select
@@ -223,8 +231,10 @@ export const VehicleForm = ({ categorias, initialData, onSuccess, cotizacionDola
             ))}
           </select>
         </div>
+        )}
 
         {/* Precio */}
+        {mostrarPrecios && (
         <div className="flex flex-col gap-1 md:col-span-2">
           <label className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">
             Precio {moneda === Moneda.ARS ? "en Pesos" : "en Dólares"}
@@ -259,6 +269,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess, cotizacionDola
           )}
           {form.formState.errors.precio && <span className="text-[10px] text-red-500">{form.formState.errors.precio.message}</span>}
         </div>
+        )}
 
         {/* Kilometraje */}
         <div className="flex flex-col gap-1">

@@ -58,6 +58,7 @@ export default async function EditVehiclePage({ params }: EditVehiclePageProps) 
         categorias={categorias}
         initialData={initialData}
         cotizacionDolar={configuracion.cotizacionDolar}
+        mostrarPrecios={configuracion.mostrarPrecios}
       />
     </div>
   );

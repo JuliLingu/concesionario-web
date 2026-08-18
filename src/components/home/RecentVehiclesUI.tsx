@@ -5,9 +5,12 @@ import { ArrowRight } from "lucide-react";
 export function RecentVehiclesUI({
   vehicles,
   cotizacionDolar,
+  mostrarPrecios,
 }: {
   vehicles: VehiculoDeTarjeta[];
   cotizacionDolar?: number | null;
+  /** Precios a la vista, según Configuración. */
+  mostrarPrecios?: boolean;
 }) {
   return (
     <section className="bg-[hsl(var(--card))] py-32">
@@ -36,6 +39,7 @@ export function RecentVehiclesUI({
                 vehiculo={vehicle}
                 priority={index === 0}
                 cotizacionDolar={cotizacionDolar}
+                mostrarPrecios={mostrarPrecios}
               />
             </div>
           ))}

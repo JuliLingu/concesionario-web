@@ -98,12 +98,26 @@ export const CONFIGURACION_NUMERIC_DEFAULTS = {
 } as const;
 
 /**
+ * Interruptores del panel.
+ *
+ * `mostrarPrecios` decide si el importe de cada unidad se pide en el alta y se
+ * publica en el sitio. Arranca en `true` porque es lo que espera una
+ * concesionaria común; la que prefiere manejar el precio por consulta lo apaga
+ * desde Configuración.
+ */
+export const CONFIGURACION_BOOLEAN_DEFAULTS = {
+  mostrarPrecios: true,
+} as const;
+
+/**
  * Forma de la configuración tal como la reciben los componentes: sin nulls en
  * los textos (ya resueltos contra los defaults) y con los Decimal de Prisma
  * convertidos a number.
  */
 export type SiteConfig = {
   -readonly [K in keyof typeof CONFIGURACION_DEFAULTS]: string;
+} & {
+  -readonly [K in keyof typeof CONFIGURACION_BOOLEAN_DEFAULTS]: boolean;
 } & {
   id: string;
   cotizacionDolar: number | null;

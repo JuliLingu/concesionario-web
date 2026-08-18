@@ -4,7 +4,7 @@ import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { SortSelect } from "@/components/catalog/SortSelect";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { ITEMS_PER_PAGE, type SortValue } from "@/lib/catalogo";
+import { ITEMS_PER_PAGE, type SortOption, type SortValue } from "@/lib/catalogo";
 import type { FiltrosCatalogo } from "@/services/cache.service";
 
 /** Filtros activos leídos de la URL. Se usan para reconstruir los enlaces de paginado. */
@@ -29,7 +29,11 @@ interface CatalogoViewProps {
   currentPage: number;
   totalPages: number;
   sort: SortValue;
+  /** Sin los dos órdenes por importe cuando la concesionaria oculta los precios. */
+  opcionesDeOrden: readonly SortOption[];
   cotizacionDolar?: number | null;
+  /** Precios a la vista, según Configuración. */
+  mostrarPrecios: boolean;
   /** Null cuando la concesionaria todavía no cargó un teléfono. */
   whatsapp: { importacion: string; asesor: string } | null;
 }
@@ -77,7 +81,9 @@ export const CatalogoView = ({
   currentPage,
   totalPages,
   sort,
+  opcionesDeOrden,
   cotizacionDolar,
+  mostrarPrecios,
   whatsapp,
 }: CatalogoViewProps) => {
   const urlDePagina = (pagina: number) =>
@@ -103,7 +109,7 @@ export const CatalogoView = ({
             </p>
           </div>
 
-          <SortSelect currentSort={sort} />
+          <SortSelect currentSort={sort} opciones={opcionesDeOrden} />
         </div>
       </div>
 
@@ -125,12 +131,14 @@ export const CatalogoView = ({
                       vehiculo={v}
                       priority={index < 2}
                       cotizacionDolar={cotizacionDolar}
+                      mostrarPrecios={mostrarPrecios}
                       accionAdmin={
                         isAdmin ? (
                           <VehicleCardAdminOverlay
                             vehiculo={v}
                             categorias={categorias}
                             cotizacionDolar={cotizacionDolar}
+                            mostrarPrecios={mostrarPrecios}
                           />
                         ) : null
                       }

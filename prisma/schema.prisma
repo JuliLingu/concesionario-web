@@ -150,6 +150,11 @@ model Configuracion {
   updatedAt           DateTime @updatedAt
   cotizacionDolar     Decimal? @db.Decimal(10, 2)
 
+  // Precios a la vista. Cada concesionaria decide si publica el importe de sus
+  // unidades: con `false` el precio deja de pedirse en el alta y de mostrarse en
+  // todo el sitio, pero el valor ya cargado sigue guardado en cada vehículo.
+  mostrarPrecios Boolean @default(true)
+
   // Identidad visual
   logoUrl    String? @db.Text
   faviconUrl String? @db.Text

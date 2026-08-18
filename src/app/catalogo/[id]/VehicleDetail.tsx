@@ -15,6 +15,11 @@ interface VehicleDetailProps {
   /** Null cuando la concesionaria todavía no cargó un teléfono. */
   whatsappUrl: string | null;
   cotizacionDolar?: number | null;
+  /**
+   * Precios a la vista, según Configuración. Con `false` la ficha va sin importe
+   * y sin simulador de cuotas, que también lo dejaría a la vista.
+   */
+  mostrarPrecios?: boolean;
   planes: { id: string; nombre: string; cuotas: number; tasaAnual: number }[];
   contacto: {
     eyebrow: string;
@@ -29,6 +34,7 @@ export const VehicleDetail = ({
   vehiculoNombre,
   whatsappUrl,
   cotizacionDolar,
+  mostrarPrecios = true,
   planes,
   contacto,
 }: VehicleDetailProps) => {
@@ -72,9 +78,11 @@ export const VehicleDetail = ({
                 </p>
               </div>
 
-              <p className="text-[2.5rem] font-black text-[hsl(var(--primary))] tracking-tighter">
-                {formatPrecio(vehicle.precio, vehicle.moneda, cotizacionDolar)}
-              </p>
+              {mostrarPrecios && (
+                <p className="text-[2.5rem] font-black text-[hsl(var(--primary))] tracking-tighter">
+                  {formatPrecio(vehicle.precio, vehicle.moneda, cotizacionDolar)}
+                </p>
+              )}
 
               {whatsappUrl && (
                 <a
@@ -135,7 +143,7 @@ export const VehicleDetail = ({
           </div>
         </div>
 
-        {FEATURE_FINANCIACION && precioArs !== null && (
+        {FEATURE_FINANCIACION && mostrarPrecios && precioArs !== null && (
         <div className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-black/5">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
             <div className="lg:col-span-5">

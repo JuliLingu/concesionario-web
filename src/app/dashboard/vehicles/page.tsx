@@ -20,6 +20,7 @@ export default async function VehiclesAdminPage() {
       publicados={publicados}
       borradores={borradores}
       cotizacionDolar={configuracion.cotizacionDolar}
+      mostrarPrecios={configuracion.mostrarPrecios}
     />
   );
 }
