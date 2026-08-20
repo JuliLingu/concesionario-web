@@ -7,7 +7,13 @@ import { getCachedFiltrosCatalogo, getCachedCategorias } from "@/services/cache.
 import { getConfiguracion } from "@/services/configuracion.service";
 import { precioEnPesos } from "@/lib/precio";
 import { whatsappUrl } from "@/lib/whatsapp";
-import { ITEMS_PER_PAGE, SORT_OPTIONS, type SortValue } from "@/lib/catalogo";
+import {
+  ITEMS_PER_PAGE,
+  SORT_OPTIONS,
+  esOrdenPorPrecio,
+  opcionesDeOrden,
+  type SortValue,
+} from "@/lib/catalogo";
 
 /**
  * Los parámetros de la URL son entrada pública y sin validar llegaban tal cual
@@ -101,7 +107,13 @@ export default async function CatalogoPage({
     anioHasta: anioEnUrl.parse(params.anioHasta),
   };
 
-  const sort = ordenEnUrl.parse(params.sort);
+  // Con los precios ocultos, `?sort=price_asc` escrito a mano volvería a
+  // exponerlos: ordenaría la grilla de más barato a más caro. Cae a "newest".
+  const sortEnUrl = ordenEnUrl.parse(params.sort);
+  const sort: SortValue =
+    !configuracion.mostrarPrecios && esOrdenPorPrecio(sortEnUrl)
+      ? "newest"
+      : sortEnUrl;
   const currentPage = paginaEnUrl.parse(params.page);
 
   const where: Prisma.VehiculoWhereInput = {
@@ -121,7 +133,7 @@ export default async function CatalogoPage({
     };
   }
 
-  const ordenaPorPrecio = sort === "price_asc" || sort === "price_desc";
+  const ordenaPorPrecio = esOrdenPorPrecio(sort);
 
   // Las opciones de los filtros salen del stock real; al administrador se le
   // ofrecen también las de los borradores. Las categorías solo hacen falta para
@@ -182,6 +194,8 @@ export default async function CatalogoPage({
     <CatalogoView
       vehiculos={vehiculos}
       cotizacionDolar={configuracion.cotizacionDolar}
+      mostrarPrecios={configuracion.mostrarPrecios}
+      opcionesDeOrden={opcionesDeOrden(configuracion.mostrarPrecios)}
       filtros={filtros}
       filtrosActivos={filtrosActivos}
       categorias={categorias}

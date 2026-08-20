@@ -10,9 +10,11 @@ interface EditModalProps {
   vehiculo: VehiculoDeTarjeta;
   categorias: { id: string; nombre: string }[];
   cotizacionDolar?: number | null;
+  /** Precios a la vista, según Configuración. Con `false` el formulario no pide precio. */
+  mostrarPrecios?: boolean;
 }
 
-export const EditModal = ({ isOpen, onClose, vehiculo, categorias, cotizacionDolar }: EditModalProps) => {
+export const EditModal = ({ isOpen, onClose, vehiculo, categorias, cotizacionDolar, mostrarPrecios }: EditModalProps) => {
   if (!isOpen) return null;
 
   return (
@@ -31,7 +33,7 @@ export const EditModal = ({ isOpen, onClose, vehiculo, categorias, cotizacionDol
         </button>
 
         <div className="flex-1 overflow-y-auto p-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-black/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-black/20">
-          <VehicleForm initialData={vehiculo} categorias={categorias} onSuccess={onClose} cotizacionDolar={cotizacionDolar} />
+          <VehicleForm initialData={vehiculo} categorias={categorias} onSuccess={onClose} cotizacionDolar={cotizacionDolar} mostrarPrecios={mostrarPrecios} />
         </div>
       </div>
     </div>

@@ -14,6 +14,8 @@ interface VehicleCardProps {
   vehiculo: VehiculoDeTarjeta;
   priority?: boolean;
   cotizacionDolar?: number | null;
+  /** Precios a la vista, según Configuración. Con `false` la tarjeta va sin importe. */
+  mostrarPrecios?: boolean;
   /**
    * Botón de edición superpuesto sobre la foto. Llega como slot desde quien
    * arma el listado en lugar de decidirse acá con un `isAdmin`: así el modal de
@@ -27,6 +29,7 @@ export const VehicleCard = ({
   vehiculo,
   priority = false,
   cotizacionDolar,
+  mostrarPrecios = true,
   accionAdmin,
 }: VehicleCardProps) => {
   const imagenPrincipal =
@@ -95,12 +98,14 @@ export const VehicleCard = ({
 
         {/* Price and CTA */}
         <div className="mt-auto pt-4 border-t border-[hsl(var(--border))]">
-          <span className="block text-2xl font-black text-[hsl(var(--primary))] tracking-[-0.05em] leading-none tabular-nums">
-            {formatPrecio(vehiculo.precio, vehiculo.moneda, cotizacionDolar)}
-          </span>
+          {mostrarPrecios && (
+            <span className="block text-2xl font-black text-[hsl(var(--primary))] tracking-[-0.05em] leading-none tabular-nums">
+              {formatPrecio(vehiculo.precio, vehiculo.moneda, cotizacionDolar)}
+            </span>
+          )}
           <Link
             href={`/catalogo/${vehiculo.id}`}
-            className="mt-4 w-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-3 text-[11px] font-black uppercase tracking-[0.1em] flex items-center justify-center gap-1.5 hover:brightness-90 active:scale-95 transition-all shadow-[0_4px_6px_-1px_hsl(var(--primary)/0.2)]"
+            className={`w-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-3 text-[11px] font-black uppercase tracking-[0.1em] flex items-center justify-center gap-1.5 hover:brightness-90 active:scale-95 transition-all shadow-[0_4px_6px_-1px_hsl(var(--primary)/0.2)] ${mostrarPrecios ? "mt-4" : ""}`}
           >
             Ver Detalles <ArrowRight size={14} />
           </Link>

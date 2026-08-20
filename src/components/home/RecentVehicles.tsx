@@ -1,7 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { RecentVehiclesUI } from "./RecentVehiclesUI";
 
-export async function RecentVehicles({ cotizacionDolar }: { cotizacionDolar?: number | null }) {
+export async function RecentVehicles({
+  cotizacionDolar,
+  mostrarPrecios,
+}: {
+  cotizacionDolar?: number | null;
+  /** Precios a la vista, según Configuración. */
+  mostrarPrecios?: boolean;
+}) {
   const rawVehicles = await prisma.vehiculo.findMany({
     // Sin este filtro la portada mostraba también los borradores, que son
     // unidades que el administrador todavía no publicó.
@@ -21,5 +28,11 @@ export async function RecentVehicles({ cotizacionDolar }: { cotizacionDolar?: nu
     precio: Number(v.precio),
   }));
 
-  return <RecentVehiclesUI vehicles={recentVehicles} cotizacionDolar={cotizacionDolar} />;
+  return (
+    <RecentVehiclesUI
+      vehicles={recentVehicles}
+      cotizacionDolar={cotizacionDolar}
+      mostrarPrecios={mostrarPrecios}
+    />
+  );
 }

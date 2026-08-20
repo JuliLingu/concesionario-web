@@ -34,7 +34,11 @@ export default async function NewVehiclePage() {
             catálogo.
           </p>
         </div>
-        <VehicleForm categorias={categorias} cotizacionDolar={configuracion.cotizacionDolar} />
+        <VehicleForm
+          categorias={categorias}
+          cotizacionDolar={configuracion.cotizacionDolar}
+          mostrarPrecios={configuracion.mostrarPrecios}
+        />
       </div>
     </div>
   );

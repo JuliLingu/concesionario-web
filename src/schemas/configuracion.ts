@@ -19,6 +19,20 @@ const numeroOpcional = z
     return Number.isNaN(numero) ? null : numero;
   });
 
+/**
+ * Interruptor del panel. Viaja en un input oculto como "true"/"false" y no como
+ * un checkbox suelto: un checkbox sin marcar directamente no aparece en el
+ * FormData, y entonces "apagado" y "campo no enviado" serían indistinguibles.
+ * Si aun así falta, gana el valor por defecto en lugar de apagarse solo.
+ */
+const interruptor = (porDefecto: boolean) =>
+  z
+    .union([z.string(), z.boolean()])
+    .optional()
+    .transform((valor) =>
+      valor === undefined ? porDefecto : valor === true || valor === "true",
+    );
+
 const urlOpcional = textoOpcional.refine(
   (valor) => !valor || /^(https?:\/\/|\/)/.test(valor),
   { message: "Debe ser una URL válida o una ruta que empiece con /" },
@@ -62,6 +76,9 @@ export const ConfiguracionSchema = z.object({
   instagramUrl: urlOpcional,
   horariosAtencion: textoOpcional,
   cotizacionDolar: numeroOpcional,
+
+  // Precios a la vista
+  mostrarPrecios: interruptor(true),
 
   // Identidad visual
   logoUrl: imagenOpcional,

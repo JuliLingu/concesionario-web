@@ -20,4 +20,23 @@ export const SORT_OPTIONS = [
   { value: "year_asc",   label: "Año (más antiguo)" },
 ] as const;
 
-export type SortValue = (typeof SORT_OPTIONS)[number]["value"];
+export type SortOption = (typeof SORT_OPTIONS)[number];
+export type SortValue = SortOption["value"];
+
+/** Criterios que ordenan por importe: no aplican si la concesionaria oculta los precios. */
+const ORDENES_POR_PRECIO: SortValue[] = ["price_asc", "price_desc"];
+
+export function esOrdenPorPrecio(sort: SortValue) {
+  return ORDENES_POR_PRECIO.includes(sort);
+}
+
+/**
+ * Opciones del desplegable de orden. Con los precios ocultos se caen las dos que
+ * ordenan por importe: sin precio a la vista no significan nada, y ordenar por
+ * él dejaría adivinar cuál unidad es más cara.
+ */
+export function opcionesDeOrden(mostrarPrecios: boolean): readonly SortOption[] {
+  return mostrarPrecios
+    ? SORT_OPTIONS
+    : SORT_OPTIONS.filter((opcion) => !esOrdenPorPrecio(opcion.value));
+}

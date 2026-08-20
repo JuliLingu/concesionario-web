@@ -10,6 +10,8 @@ interface VehiclesViewProps {
   publicados: number;
   borradores: number;
   cotizacionDolar?: number | null;
+  /** Precios a la vista, según Configuración. Con `false` la tabla va sin la columna. */
+  mostrarPrecios?: boolean;
 }
 
 export const VehiclesView = ({
@@ -17,6 +19,7 @@ export const VehiclesView = ({
   publicados,
   borradores,
   cotizacionDolar,
+  mostrarPrecios = true,
 }: VehiclesViewProps) => {
   return (
     <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-8">
@@ -62,9 +65,11 @@ export const VehiclesView = ({
                   <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))] hidden md:table-cell">
                     Categoría
                   </th>
-                  <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">
-                    Precio
-                  </th>
+                  {mostrarPrecios && (
+                    <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">
+                      Precio
+                    </th>
+                  )}
                   <th className="text-left py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[hsl(var(--muted-foreground))]">
                     Visibilidad
                   </th>
@@ -77,7 +82,7 @@ export const VehiclesView = ({
                 {vehicles.length === 0 && (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={mostrarPrecios ? 5 : 4}
                       className="text-center py-8 text-[hsl(var(--muted-foreground))] text-sm font-medium italic"
                     >
                       No hay vehículos cargados aún.
@@ -103,6 +108,7 @@ export const VehiclesView = ({
                         {v.categoria.nombre}
                       </span>
                     </td>
+                    {mostrarPrecios && (
                     <td className="py-3 px-4">
                       <div className="font-bold text-sm text-[hsl(var(--foreground))]">
                         {formatPrecioOriginal(Number(v.precio), v.moneda)}
@@ -120,6 +126,7 @@ export const VehiclesView = ({
                         </div>
                       ) : null}
                     </td>
+                    )}
                     <td className="py-3 px-4">
                       <span
                         className={`text-[10px] font-black uppercase tracking-widest inline-block px-2 py-1 rounded ${

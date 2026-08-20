@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { CACHE_TAGS } from "@/services/cache.service";
 import { registrarError } from "@/lib/log";
 import {
+  CONFIGURACION_BOOLEAN_DEFAULTS,
   CONFIGURACION_DEFAULTS,
   CONFIGURACION_NUMERIC_DEFAULTS,
   conNombreConcesionaria,
@@ -28,6 +29,11 @@ function numeroOrDefault(valor: unknown, porDefecto: number | null) {
   return Number.isNaN(numero) ? porDefecto : numero;
 }
 
+/** Una fila anterior a la columna trae `null`: vale el valor por defecto. */
+function booleanoOrDefault(valor: unknown, porDefecto: boolean) {
+  return typeof valor === "boolean" ? valor : porDefecto;
+}
+
 /** Completa los campos faltantes con los valores por defecto del sitio. */
 function conDefaults(config: Record<string, unknown> | null): SiteConfig {
   const textos = Object.fromEntries(
@@ -46,8 +52,16 @@ function conDefaults(config: Record<string, unknown> | null): SiteConfig {
     ]),
   ) as typeof textos;
 
+  const interruptores = Object.fromEntries(
+    Object.entries(CONFIGURACION_BOOLEAN_DEFAULTS).map(([clave, porDefecto]) => [
+      clave,
+      booleanoOrDefault(config?.[clave], porDefecto),
+    ]),
+  ) as { [K in keyof typeof CONFIGURACION_BOOLEAN_DEFAULTS]: boolean };
+
   return {
     ...resueltos,
+    ...interruptores,
     id: (config?.id as string) ?? "1",
     cotizacionDolar: numeroOrDefault(
       config?.cotizacionDolar,

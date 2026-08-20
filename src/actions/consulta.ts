@@ -5,7 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { ConsultaSchema } from "@/schemas/consulta";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { EstadoConsulta } from "../../generated/prisma";
+import { avisarConsulta } from "@/services/avisos.service";
 import {
   REGLAS,
   esperaRestante,
@@ -41,6 +43,21 @@ export const createConsulta = async (values: z.infer<typeof ConsultaSchema>) => 
     });
 
     revalidatePath("/dashboard/consultas");
+
+    // El aviso sale con la respuesta ya entregada: el visitante ve la
+    // confirmación al instante y no espera a que conteste el proveedor de
+    // correo. Va después del create a propósito — si guardar falló, no hay
+    // consulta de la que avisar.
+    after(() =>
+      avisarConsulta({
+        nombre:    validated.data.nombre,
+        email:     validated.data.email,
+        telefono:  validated.data.telefono,
+        mensaje:   validated.data.mensaje,
+        vehiculoId: validated.data.vehiculoId || null,
+      }),
+    );
+
     return { success: "Consulta enviada con éxito. Nos pondremos en contacto a la brevedad." };
   } catch {
     return { error: "Error al enviar la consulta. Por favor intentá de nuevo." };

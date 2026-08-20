@@ -1,0 +1,85 @@
+name: CI
+
+# Corre en cada push y en cada pull request contra la rama principal. La idea no
+# es cubrir todo, es que ninguna actualización de dependencias llegue a una
+# instalación de un cliente sin que antes se haya comprobado que el proyecto
+# compila, que los flujos críticos siguen contestando lo que tienen que
+# contestar, y que las migraciones se aplican contra una base vacía.
+on:
+  push:
+    branches: [master, dev]
+  pull_request:
+    branches: [master, dev]
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+
+    services:
+      # Una base de verdad, descartable. Sirve para dos cosas: comprobar que el
+      # historial de migraciones se aplica desde cero —que es lo que va a pasar
+      # en cada instalación nueva— y darle al build una base a la que conectarse
+      # cuando prerenderiza las páginas del catálogo.
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: prueba
+          MYSQL_DATABASE: concesionario
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pprueba"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: 3306
+      DATABASE_NAME: concesionario
+      DATABASE_USER: root
+      DATABASE_PASSWORD: prueba
+      DATABASE_URL: mysql://root:prueba@127.0.0.1:3306/concesionario
+      # Valores de relleno: el build los exige presentes, no válidos. Ninguno da
+      # acceso a nada — la CI no habla con Google ni con Cloudinary.
+      AUTH_SECRET: secreto-solo-para-la-integracion-continua
+      AUTH_GOOGLE_ID: ci
+      AUTH_GOOGLE_SECRET: ci
+      AUTH_TRUST_HOST: "true"
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ci
+      CLOUDINARY_API_KEY: ci
+      CLOUDINARY_API_SECRET: ci
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` respeta el lockfile: la CI comprueba exactamente las versiones
+      # que se van a instalar en producción, no las que npm elegiría hoy.
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Aplicar migraciones sobre una base vacía
+        run: npm run db:deploy
+
+      # No bloquea todavía: el proyecto arrastra 23 avisos previos (20 de ellos
+      # `no-explicit-any`, más uno de variable sin usar y dos de hooks). Se
+      # informan en cada corrida para que no crezcan, pero cortar acá dejaría la
+      # CI en rojo permanente y nadie volvería a mirarla. Al limpiarlos, quitar
+      # esta línea: a partir de ahí el lint pasa a bloquear como el resto.
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Tipos
+        run: npm run typecheck
+
+      - name: Pruebas
+        run: npm test
+
+      - name: Build
+        run: npm run build

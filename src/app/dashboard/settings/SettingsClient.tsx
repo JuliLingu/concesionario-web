@@ -20,6 +20,7 @@ import {
   Palette,
   Baseline,
   RotateCcw,
+  Tag,
 } from "lucide-react";
 import { ImageDropzone } from "@/components/dashboard/ImageDropzone";
 import { updateConfiguracion } from "@/actions/configuracion";
@@ -97,6 +98,62 @@ function FormField({
             className={`w-full bg-[hsl(var(--input))] text-sm rounded px-3 py-2.5 focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 ${icon ? "pl-9" : ""}`}
           />
         )}
+      </div>
+      {helperText && (
+        <p className="text-xs text-[hsl(var(--muted-foreground))]">
+          {helperText}
+        </p>
+      )}
+    </div>
+  );
+}
+
+interface ToggleFieldProps {
+  label: string;
+  /** Nombre del input oculto que viaja en el FormData. */
+  name: string;
+  checked: boolean;
+  onChange: (valor: boolean) => void;
+  helperText?: string;
+}
+
+/**
+ * Interruptor de sí/no.
+ *
+ * El valor viaja en un input oculto como "true"/"false" en lugar de un
+ * `<input type="checkbox">`: un checkbox sin marcar no aparece en el FormData,
+ * así que el servidor no podría distinguir "apagado" de "no lo mandaron".
+ */
+function ToggleField({
+  label,
+  name,
+  checked,
+  onChange,
+  helperText,
+}: ToggleFieldProps) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <input type="hidden" name={name} value={checked ? "true" : "false"} />
+      <div className="flex items-center justify-between gap-4">
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">
+          {label}
+        </span>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={checked}
+          aria-label={label}
+          onClick={() => onChange(!checked)}
+          className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
+            checked ? "bg-[#b5000b]" : "bg-[hsl(var(--border))]"
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+              checked ? "left-[22px]" : "left-0.5"
+            }`}
+          />
+        </button>
       </div>
       {helperText && (
         <p className="text-xs text-[hsl(var(--muted-foreground))]">
@@ -268,7 +325,13 @@ function ColorField({
  * ni de salir del panel. Va con estilos inline porque los colores cambian con
  * cada pulsación y todavía no son variables CSS.
  */
-function VistaPreviaColores({ paleta }: { paleta: Paleta }) {
+function VistaPreviaColores({
+  paleta,
+  mostrarPrecios,
+}: {
+  paleta: Paleta;
+  mostrarPrecios: boolean;
+}) {
   const primario = colorSeguro(paleta, "colorPrimario");
   const acento = colorSeguro(paleta, "colorAcento");
   const fondo = colorSeguro(paleta, "colorFondo");
@@ -335,8 +398,10 @@ function VistaPreviaColores({ paleta }: { paleta: Paleta }) {
             >
               Ficha de vehículo
             </p>
+            {/* La maqueta refleja el sitio real: sin precios a la vista, la
+                tarjeta muestra el modelo donde iría el importe. */}
             <p className="text-xl font-black" style={{ color: primario }}>
-              USD 25.000
+              {mostrarPrecios ? "USD 25.000" : "Toyota Corolla"}
             </p>
           </div>
           <span
@@ -406,6 +471,9 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
     configuracion.heroImagenUrl,
   );
   const [logoUrl, setLogoUrl] = useState(configuracion.logoUrl);
+  const [mostrarPrecios, setMostrarPrecios] = useState(
+    configuracion.mostrarPrecios,
+  );
   const [faviconUrl, setFaviconUrl] = useState(configuracion.faviconUrl);
   const [paleta, setPaleta] = useState<Paleta>(() =>
     Object.fromEntries(
@@ -555,14 +623,6 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
                 helperText="Cada salto de línea se respeta en la página"
                 icon={<Clock size={16} />}
               />
-              <FormField
-                label="Cotización del Dólar (ARS)"
-                name="cotizacionDolar"
-                type="number"
-                defaultValue={configuracion.cotizacionDolar}
-                helperText="Se utilizará para mostrar los precios en pesos argentinos"
-                icon={<DollarSign size={16} />}
-              />
             </Card>
 
             <Card
@@ -586,6 +646,29 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
               <p className="text-xs text-[hsl(var(--muted-foreground))]">
                 Los iconos solo aparecen en el pie de página si cargás la URL.
               </p>
+            </Card>
+
+            <Card title="Precios" icon={<Tag size={18} color="#b5000b" />}>
+              <ToggleField
+                label="Mostrar precios en el sitio"
+                name="mostrarPrecios"
+                checked={mostrarPrecios}
+                onChange={setMostrarPrecios}
+                helperText="Si lo apagás, el precio deja de pedirse al cargar un vehículo y no se muestra en el catálogo, en la ficha ni en el inventario del panel. Los importes ya cargados quedan guardados y vuelven a aparecer si lo encendés de nuevo."
+              />
+
+              {/* Se mantiene montado aunque esté oculto: si se desmontara, el
+                  formulario dejaría de enviar la cotización y se guardaría vacía. */}
+              <div className={mostrarPrecios ? "" : "hidden"}>
+                <FormField
+                  label="Cotización del Dólar (ARS)"
+                  name="cotizacionDolar"
+                  type="number"
+                  defaultValue={configuracion.cotizacionDolar}
+                  helperText="Se utilizará para mostrar los precios en pesos argentinos"
+                  icon={<DollarSign size={16} />}
+                />
+              </div>
             </Card>
           </div>
 
@@ -709,7 +792,10 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
                 title="Vista Previa"
                 icon={<Palette size={18} color="#b5000b" />}
               >
-                <VistaPreviaColores paleta={paleta} />
+                <VistaPreviaColores
+                  paleta={paleta}
+                  mostrarPrecios={mostrarPrecios}
+                />
                 <p className="text-xs text-[hsl(var(--muted-foreground))]">
                   La vista previa se actualiza al instante, pero los cambios
                   recién se aplican al sitio cuando guardás. Revisá que los
