@@ -44,3 +44,4 @@ next-env.d.ts
 # así que no se versiona: un cliente commiteado se queda viejo en silencio
 # cuando alguien toca el schema y no vuelve a generarlo.
 /generated
+Costos-y-Propuesta-Comercial.docx
