@@ -175,6 +175,26 @@ describe("unidad de interés", () => {
   });
 });
 
+describe("código de referencia", () => {
+  it("se deriva del id y viaja de vuelta al formulario", async () => {
+    mocks.crearTasacion.mockResolvedValue({ id: "cmtuk50750000iom5ahdlty4y" });
+
+    const resultado = (await enviar(TASACION_VALIDA)) as { referencia?: string };
+
+    expect(resultado.referencia).toBe("DLTY4Y");
+  });
+
+  it("va en el aviso, que es donde el vendedor lo cruza con el WhatsApp", async () => {
+    mocks.crearTasacion.mockResolvedValue({ id: "cmtuk50750000iom5ahdlty4y" });
+
+    await enviar(TASACION_VALIDA);
+
+    expect(mocks.avisarTasacion).toHaveBeenCalledWith(
+      expect.objectContaining({ referencia: "DLTY4Y" }),
+    );
+  });
+});
+
 describe("aviso al concesionario", () => {
   it("se programa después de guardar", async () => {
     const resultado = await enviar(TASACION_VALIDA);

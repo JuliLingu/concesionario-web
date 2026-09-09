@@ -54,6 +54,8 @@ export const TasacionForm = ({ unidades, unidadInicial, telefono }: TasacionForm
   // Se guarda lo enviado para poder armar el mensaje de WhatsApp con el auto
   // concreto: el formulario ya no está montado cuando se muestra la confirmación.
   const [enviado, setEnviado] = useState<{ marca: string; modelo: string; anio: number }>();
+  /** Código que devuelve la acción; se repite en el mensaje de WhatsApp. */
+  const [referencia, setReferencia] = useState<string>();
   const [isPending, start] = useTransition();
 
   const form = useForm<TasacionInput, unknown, TasacionData>({
@@ -86,6 +88,7 @@ export const TasacionForm = ({ unidades, unidadInicial, telefono }: TasacionForm
       if (result.error) setError(result.error);
       if (result.success) {
         setEnviado({ marca: values.marca, modelo: values.modelo, anio: values.anio });
+        setReferencia(result.referencia);
         setSuccess(result.success);
       }
     });
@@ -94,40 +97,79 @@ export const TasacionForm = ({ unidades, unidadInicial, telefono }: TasacionForm
   if (success) {
     // El formulario no pide fotos a propósito (ver PLAN-TASACION.md § 2.4): la
     // subida pública abriría la cuenta de Cloudinary del cliente a cualquiera.
-    // Este botón las encamina por WhatsApp, que es donde el vendedor trabaja.
+    //
+    // Esta pantalla es la que las consigue igual, y por eso no dice "listo".
+    // Presentada como confirmación, el visitante lee "ya está" y se va, y el
+    // vendedor termina escribiéndole para pedirle las fotos — el ida y vuelta
+    // que el módulo venía a sacar. Presentada como un paso que falta, con el
+    // detalle de qué sacar, las fotos llegan solas y completas.
     const auto = enviado ? `${enviado.marca} ${enviado.modelo} ${enviado.anio}` : "mi usado";
     const enlaceWhatsapp = whatsappUrl(
       telefono,
-      `Hola, acabo de enviar la tasación de mi ${auto}. Te paso las fotos.`,
+      `Hola, mandé la tasación de mi ${auto}${
+        referencia ? ` (código ${referencia})` : ""
+      }. Te paso las fotos.`,
     );
 
     return (
-      <div className="py-12 px-6 bg-[hsl(var(--card))] text-center flex flex-col items-center justify-center gap-4 rounded border border-black/5">
+      <div className="py-10 px-6 bg-[hsl(var(--card))] flex flex-col items-center text-center gap-4 rounded border border-black/5">
         <div className="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center">
           <CheckCircle2 size={28} className="text-green-600" />
         </div>
-        <h3 className="font-black text-lg uppercase tracking-[-0.02em] text-[hsl(var(--foreground))] mt-2">
-          ¡Tasación enviada!
-        </h3>
-        <p className="text-[hsl(var(--muted-foreground))] font-medium max-w-[340px] leading-relaxed">
-          {success}
-        </p>
 
-        {enlaceWhatsapp && (
-          <>
-            <p className="text-sm text-[hsl(var(--muted-foreground))] font-medium max-w-[340px] leading-relaxed">
-              Si nos pasás fotos por WhatsApp, la cotización sale más precisa.
+        <div>
+          <h3 className="font-black text-lg uppercase tracking-[-0.02em] text-[hsl(var(--foreground))]">
+            Recibimos tu tasación
+          </h3>
+          {referencia && (
+            <p className="text-xs text-[hsl(var(--muted-foreground))] font-medium mt-1">
+              Código{" "}
+              <span className="font-black tracking-widest text-[hsl(var(--foreground))]">
+                {referencia}
+              </span>
             </p>
+          )}
+        </div>
+
+        {enlaceWhatsapp ? (
+          <>
+            <div className="w-full max-w-[380px] bg-[hsl(var(--surface-low))] rounded p-5 flex flex-col gap-3 text-left">
+              <div className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--primary))]">
+                Falta un paso
+              </div>
+              <p className="text-sm text-[hsl(var(--foreground))] font-medium leading-relaxed">
+                Sin fotos la cotización es una estimación. Mandanos estas cuatro
+                por WhatsApp y te pasamos un número firme:
+              </p>
+              <ul className="text-sm text-[hsl(var(--muted-foreground))] font-medium flex flex-col gap-1">
+                <li>1. Frente, en diagonal</li>
+                <li>2. Lateral completo</li>
+                <li>3. Interior desde la puerta</li>
+                <li>4. Tablero con el kilometraje</li>
+              </ul>
+            </div>
+
             <a
               href={enlaceWhatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#25D366] text-white px-6 py-3 text-[11px] font-black uppercase tracking-[0.1em] rounded hover:brightness-95 transition"
+              className="w-full max-w-[380px] inline-flex items-center justify-center gap-2 bg-[#25D366] text-white px-6 py-4 text-[11px] font-black uppercase tracking-[0.1em] rounded hover:brightness-95 transition"
             >
               <MessageCircle size={16} />
-              Mandar fotos por WhatsApp
+              Mandar las fotos por WhatsApp
             </a>
+
+            <p className="text-xs text-[hsl(var(--muted-foreground))] font-medium max-w-[340px] leading-relaxed">
+              El mensaje ya va escrito con tu código. Si preferís, un asesor te
+              contacta igual para coordinar.
+            </p>
           </>
+        ) : (
+          // Sin teléfono cargado en Configuración no hay a dónde mandarlas: se
+          // muestra la confirmación a secas en lugar de un botón roto.
+          <p className="text-[hsl(var(--muted-foreground))] font-medium max-w-[340px] leading-relaxed">
+            {success}
+          </p>
         )}
       </div>
     );

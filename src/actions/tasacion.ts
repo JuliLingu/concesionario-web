@@ -9,6 +9,7 @@ import { after } from "next/server";
 import { EstadoConsulta } from "../../generated/prisma";
 import { getConfiguracion } from "@/services/configuracion.service";
 import { avisarTasacion } from "@/services/avisos.service";
+import { codigoDeReferencia } from "@/lib/referencia";
 import {
   REGLAS,
   esperaRestante,
@@ -66,9 +67,14 @@ export const createTasacion = async (values: z.infer<typeof TasacionSchema>) => 
       validated.data.vehiculoInteresId,
     );
 
-    await prisma.tasacion.create({
+    const tasacion = await prisma.tasacion.create({
       data: { ...validated.data, vehiculoInteresId },
+      select: { id: true },
     });
+
+    // Viaja de vuelta al formulario y va también en el aviso: es lo que permite
+    // que las fotos que lleguen por WhatsApp se aten a esta fila sin preguntar.
+    const referencia = codigoDeReferencia(tasacion.id);
 
     revalidatePath("/dashboard/tasaciones");
 
@@ -88,12 +94,14 @@ export const createTasacion = async (values: z.infer<typeof TasacionSchema>) => 
         moneda:           validated.data.moneda,
         observaciones:    validated.data.observaciones,
         vehiculoInteresId,
+        referencia,
       }),
     );
 
     return {
       success:
         "Recibimos los datos de tu usado. Un asesor se va a comunicar con vos para cotizarlo.",
+      referencia,
     };
   } catch {
     return { error: "Error al enviar la tasación. Por favor intentá de nuevo." };

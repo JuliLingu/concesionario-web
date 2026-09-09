@@ -5,6 +5,7 @@ import { getTasaciones, updateTasacionEstado } from "@/actions/tasacion";
 import { estadoDeUrl } from "@/lib/estados";
 import { formatFechaLarga } from "@/lib/formato";
 import { formatNumeroAr, formatPrecioOriginal } from "@/lib/precio";
+import { codigoDeReferencia } from "@/lib/referencia";
 import { getConfiguracion } from "@/services/configuracion.service";
 import { EstadoButton } from "@/components/dashboard/EstadoButton";
 import {
@@ -83,6 +84,12 @@ export default async function TasacionesPage({ searchParams }: TasacionesPagePro
                   <td className="py-3 px-4">
                     <div className="font-bold text-sm text-[hsl(var(--foreground))]">
                       {t.nombre}
+                    </div>
+                    {/* El mismo código que el visitante repite al mandar las
+                        fotos por WhatsApp desde un número que puede no ser el
+                        de abajo. Es lo que permite atar ese chat a esta fila. */}
+                    <div className="text-[10px] font-black tracking-widest text-[hsl(var(--muted-foreground))] mt-0.5">
+                      {codigoDeReferencia(t.id)}
                     </div>
                     <Contacto href={`mailto:${t.email}`} texto={t.email} />
                     <Contacto href={`tel:${t.telefono}`} texto={t.telefono} tenue />

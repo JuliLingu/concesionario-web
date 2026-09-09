@@ -231,6 +231,8 @@ export type DatosTasacion = {
   moneda: Moneda;
   observaciones: string | null;
   vehiculoInteresId: string | null;
+  /** Código corto que el visitante repite al mandar las fotos por WhatsApp. */
+  referencia: string;
 };
 
 /**
@@ -254,6 +256,9 @@ export async function avisarTasacion(datos: DatosTasacion): Promise<void> {
     const ofrecido = `${datos.marca} ${datos.modelo} (${datos.anio})`;
 
     const filas: Fila[] = [
+      // Primero de todo: si las fotos ya llegaron por WhatsApp, es lo que
+      // permite emparejar ese chat con esta tasación de un vistazo.
+      ["Referencia", datos.referencia],
       ["Ofrece", ofrecido],
       ["Kilometraje", `${formatNumeroAr(datos.kilometraje)} km`],
       [
@@ -272,7 +277,7 @@ export async function avisarTasacion(datos: DatosTasacion): Promise<void> {
     const enlace = enlaceAlPanel("/dashboard/tasaciones");
 
     await enviarMail(destinatario.destino, {
-      asunto: `Nueva tasación: ${ofrecido} — ${datos.nombre}`,
+      asunto: `Nueva tasación ${datos.referencia}: ${ofrecido} — ${datos.nombre}`,
       texto: cuerpoTexto(filas, enlace),
       html: cuerpoHtml(filas, enlace),
       // Responder desde el correo le contesta a quien ofrece el auto.
