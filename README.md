@@ -80,9 +80,6 @@ MAIL_FROM=""            # Ej: Avisos <avisos@midominio.com>
 MAIL_TO=
 
 # --- Opcionales ---
-# Enciende financiación (portada, simulador, /dashboard/planes y /solicitudes).
-NEXT_PUBLIC_FEATURE_FINANCIACION=
-
 # Base pública del sitio, para que los avisos puedan enlazar al panel. En Vercel
 # se deduce sola; en un contenedor propio hay que cargarla.
 APP_URL=

@@ -16,6 +16,7 @@ export interface FiltrosActivos {
   combustibles: string[];
   anioDesde?: number;
   anioHasta?: number;
+  soloFinanciables: boolean;
 }
 
 interface CatalogoViewProps {
@@ -34,6 +35,8 @@ interface CatalogoViewProps {
   cotizacionDolar?: number | null;
   /** Precios a la vista, según Configuración. */
   mostrarPrecios: boolean;
+  /** Módulo de financiación encendido: habilita el filtro de unidades en cuotas. */
+  financiacionActiva: boolean;
   /** Null cuando la concesionaria todavía no cargó un teléfono. */
   whatsapp: { importacion: string; asesor: string } | null;
 }
@@ -51,6 +54,7 @@ const construirUrl = (
   filtrosActivos.combustibles.forEach((c) => p.append("combustible", c));
   if (filtrosActivos.anioDesde) p.set("anioDesde", String(filtrosActivos.anioDesde));
   if (filtrosActivos.anioHasta) p.set("anioHasta", String(filtrosActivos.anioHasta));
+  if (filtrosActivos.soloFinanciables) p.set("financiable", "1");
   if (sort !== "newest") p.set("sort", sort);
   for (const [k, v] of Object.entries(nuevos)) p.set(k, v);
   const qs = p.toString();
@@ -84,6 +88,7 @@ export const CatalogoView = ({
   opcionesDeOrden,
   cotizacionDolar,
   mostrarPrecios,
+  financiacionActiva,
   whatsapp,
 }: CatalogoViewProps) => {
   const urlDePagina = (pagina: number) =>
@@ -118,7 +123,7 @@ export const CatalogoView = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           {/* Filters */}
           <div className="lg:col-span-3">
-            <CatalogFilters filtros={filtros} />
+            <CatalogFilters filtros={filtros} financiacionActiva={financiacionActiva} />
           </div>
 
           {/* Vehicles */}

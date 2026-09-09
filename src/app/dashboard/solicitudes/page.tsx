@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/sesion";
-import { getSolicitudes } from "@/actions/financiacion";
+import { getSolicitudes, updateSolicitudEstado } from "@/actions/financiacion";
 import { estadoDeUrl } from "@/lib/estados";
 import { formatFechaLarga } from "@/lib/formato";
 import { formatArs } from "@/lib/precio";
-import { FEATURE_FINANCIACION } from "@/lib/features";
-import { SolicitudStatusButton } from "@/components/dashboard/SolicitudStatusButton";
+import { getConfiguracion } from "@/services/configuracion.service";
+import { EstadoButton } from "@/components/dashboard/EstadoButton";
 import {
   CeldaVehiculo,
   Contacto,
@@ -21,9 +21,9 @@ interface SolicitudesPageProps {
 }
 
 export default async function SolicitudesPage({ searchParams }: SolicitudesPageProps) {
-  // Financiación en stand by: las solicitudes guardadas siguen en la base, pero
-  // la pantalla no es alcanzable.
-  if (!FEATURE_FINANCIACION) notFound();
+  // Financiación apagada desde Configuración: las solicitudes guardadas siguen
+  // en la base, pero la pantalla no es alcanzable.
+  if (!(await getConfiguracion()).financiacionActiva) notFound();
 
   await requireAdmin();
 
@@ -96,7 +96,11 @@ export default async function SolicitudesPage({ searchParams }: SolicitudesPageP
                   </span>
                 </td>
                 <td className="py-3 px-4">
-                  <SolicitudStatusButton solicitudId={s.id} estadoActual={s.estado} />
+                  <EstadoButton
+                    id={s.id}
+                    estadoActual={s.estado}
+                    cambiarEstadoAction={updateSolicitudEstado}
+                  />
                 </td>
               </tr>
             ))}

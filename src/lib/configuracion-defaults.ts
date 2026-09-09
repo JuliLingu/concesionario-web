@@ -58,6 +58,13 @@ export const CONFIGURACION_DEFAULTS = {
     "Planes personalizados con tasas preferenciales para nuestra selección más exclusiva. Transparencia técnica en cada cuota.",
   finanCtaTexto: "Simular Crédito",
 
+  // Tasación de usados
+  tasacionEyebrow: "Entregá tu usado",
+  tasacionTitulo: "¿Cuánto\nvale tu auto?",
+  tasacionTexto:
+    "Contanos qué tenés y un asesor de {concesionaria} te pasa una cotización. Si te sirve, lo tomamos como parte de pago de cualquier unidad del catálogo.",
+  tasacionCtaTexto: "Cotizar mi usado",
+
   // Consulta por unidad (ficha de vehículo)
   contactoEyebrow: "¿Te interesa?",
   contactoTitulo: "Consultá por esta unidad",
@@ -104,9 +111,21 @@ export const CONFIGURACION_NUMERIC_DEFAULTS = {
  * publica en el sitio. Arranca en `true` porque es lo que espera una
  * concesionaria común; la que prefiere manejar el precio por consulta lo apaga
  * desde Configuración.
+ *
+ * `financiacionActiva` enciende el módulo de financiación completo: la sección
+ * de la portada, el simulador de la ficha y las pantallas de planes y
+ * solicitudes del panel. Arranca apagado porque no toda concesionaria financia;
+ * apagarlo no borra nada, los planes y las solicitudes quedan en la base.
+ *
+ * `tasacionActiva` enciende la toma de usados: el formulario público y la
+ * bandeja del panel. Mismo criterio, y por la misma razón práctica: sin esto,
+ * cada instalación ya entregada empezaría a juntar propuestas de compra en una
+ * pantalla que su dueño no sabe que existe.
  */
 export const CONFIGURACION_BOOLEAN_DEFAULTS = {
   mostrarPrecios: true,
+  financiacionActiva: false,
+  tasacionActiva: false,
 } as const;
 
 /**

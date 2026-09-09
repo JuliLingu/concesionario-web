@@ -1,8 +1,21 @@
 "use client";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { updateSolicitudEstado } from "@/actions/financiacion";
 import { EstadoConsulta } from "../../../generated/prisma";
+
+/**
+ * Botón de estado de las bandejas del panel.
+ *
+ * Consultas y solicitudes de crédito ya compartían el enum de estado y la barra
+ * de pestañas (ver `lib/estados.ts`), pero cada una tenía su propia copia de
+ * este botón: dos archivos idénticos salvo la acción que llamaban y el nombre
+ * del prop del id. Cada bandeja nueva sumaba otra copia, y cambiar un color de
+ * estado obligaba a acordarse de tocarlas todas.
+ *
+ * La acción llega como prop. Es lo que documenta Next para las server actions
+ * que cruzan a un componente de cliente, y de ahí el sufijo `Action` en el
+ * nombre del prop.
+ */
 
 const ESTADO_CONFIG: Record<EstadoConsulta, { label: string; colorClass: string }> = {
   PENDIENTE:  { label: "Pendiente",  colorClass: "bg-[#b5000b]/10 text-[#b5000b]" },
@@ -18,19 +31,25 @@ const NEXT_ESTADOS: Record<EstadoConsulta, { value: EstadoConsulta; label: strin
   CERRADA:    [],
 };
 
-interface SolicitudStatusButtonProps {
-  solicitudId: string;
+interface EstadoButtonProps {
+  /** Id de la fila: consulta, solicitud, o lo que traiga la bandeja. */
+  id: string;
   estadoActual: EstadoConsulta;
+  /**
+   * Server action que persiste el cambio. Se ignora lo que devuelve: la
+   * pantalla se rearma con `router.refresh()`, que trae el estado real.
+   */
+  cambiarEstadoAction: (id: string, estado: EstadoConsulta) => Promise<unknown>;
 }
 
-export const SolicitudStatusButton = ({ solicitudId, estadoActual }: SolicitudStatusButtonProps) => {
+export const EstadoButton = ({ id, estadoActual, cambiarEstadoAction }: EstadoButtonProps) => {
   const [isPending, start] = useTransition();
   const router = useRouter();
   const next = NEXT_ESTADOS[estadoActual];
 
   const handle = (estado: EstadoConsulta) => {
     start(async () => {
-      await updateSolicitudEstado(solicitudId, estado);
+      await cambiarEstadoAction(id, estado);
       router.refresh();
     });
   };

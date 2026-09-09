@@ -92,12 +92,17 @@ model Vehiculo {
   potencia               Int?
   descripcion            String?                 @db.Text
   publicacion            EstadoPublicacion       @default(BORRADOR)
+  // Opt-in a la financiación: los planes son globales, así que sin esta marca
+  // cualquier alta nueva entraría sola al simulador. Apagado por defecto, la
+  // unidad se ofrece solo al contado hasta que el administrador diga lo contrario.
+  financiable            Boolean                 @default(false)
   createdAt              DateTime                @default(now())
   updatedAt              DateTime                @updatedAt
   categoria              Categoria               @relation(fields: [categoriaId], references: [id])
   imagenes               ImagenVehiculo[]
   consultas              Consulta[]
   solicitudesFinanciacion SolicitudFinanciacion[]
+  tasaciones             Tasacion[]
 
   @@index([categoriaId])
   @@index([publicacion])
@@ -180,13 +185,26 @@ model Configuracion {
   nosotrosMetrica2Sufijo String?
   nosotrosMetrica2Label  String?
 
-  // Financiación
+  // Financiación. El módulo entero (sección de portada, simulador, planes y
+  // solicitudes) se enciende desde Configuración. Arranca apagado: la
+  // concesionaria que no financia no ve nada del tema en el sitio ni en el panel.
+  financiacionActiva Boolean  @default(false)
   finanEyebrow       String?
   finanTitulo        String?  @db.Text
   finanTexto         String?  @db.Text
   finanTasaAnual     Decimal? @db.Decimal(5, 2)
   finanEntregaMinima Decimal? @db.Decimal(5, 2)
   finanCtaTexto      String?
+
+  // Tasación de usados. Igual que financiación, el módulo entero (formulario
+  // público, bandeja del panel y avisos) se enciende desde Configuración y
+  // arranca apagado: la concesionaria que no toma usados no ve nada del tema, y
+  // ninguna instalación ya entregada empieza a juntar propuestas que nadie mira.
+  tasacionActiva   Boolean @default(false)
+  tasacionEyebrow  String?
+  tasacionTitulo   String? @db.Text
+  tasacionTexto    String? @db.Text
+  tasacionCtaTexto String?
 
   // Consulta por unidad (ficha de vehículo)
   contactoEyebrow       String?
@@ -264,6 +282,57 @@ model PlanFinanciacion {
   updatedAt DateTime @updatedAt
 
   @@map("planes_financiacion")
+}
+
+/**
+ * Usado que un visitante ofrece al concesionario.
+ *
+ * Tabla propia y no un `Vehiculo` con campos en null: un vehículo es stock
+ * —tiene precio, estado de publicación, categoría e imágenes propias— y una
+ * tasación es lo que un desconocido dice de un auto que todavía no es de nadie.
+ * Mezclarlas obligaría a aflojar media docena de campos obligatorios y a
+ * filtrar por estado en cada consulta del catálogo.
+ *
+ * Por lo mismo, marca y modelo son texto libre y no apuntan a `Categoria`: esa
+ * taxonomía es interna del concesionario y quien completa el formulario no
+ * tiene por qué conocerla.
+ */
+model Tasacion {
+  id String @id @default(cuid())
+
+  // Quién ofrece. El teléfono es obligatorio: una tasación se cierra llamando.
+  nombre   String
+  email    String
+  telefono String
+
+  // Qué ofrece.
+  marca       String
+  modelo      String
+  anio        Int
+  kilometraje Int
+  version     String?
+  combustible Combustible?
+  transmision Transmision?
+
+  // Lo que espera cobrar. Opcional a propósito: mucha gente no tiene idea de
+  // cuánto vale su auto, y exigirlo es perder la mitad de los formularios.
+  precioPretendido Decimal? @db.Decimal(12, 2)
+  moneda           Moneda   @default(USD)
+  observaciones    String?  @db.Text
+
+  // Unidad del catálogo por la que quiere permutar. Es lo que convierte una
+  // tasación en una venta y no solo en una compra. SetNull igual que en
+  // Consulta: si la unidad se da de baja, la tasación sobrevive.
+  vehiculoInteresId String?
+  vehiculoInteres   Vehiculo? @relation(fields: [vehiculoInteresId], references: [id], onDelete: SetNull)
+
+  estado    EstadoConsulta @default(PENDIENTE)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([vehiculoInteresId])
+  @@index([estado])
+  @@map("tasaciones")
 }
 
 model SolicitudFinanciacion {

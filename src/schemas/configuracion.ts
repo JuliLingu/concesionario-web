@@ -106,12 +106,20 @@ export const ConfiguracionSchema = z.object({
   nosotrosMetrica2Label: textoOpcional,
 
   // Financiación
+  financiacionActiva: interruptor(false),
   finanEyebrow: textoOpcional,
   finanTitulo: textoOpcional,
   finanTexto: textoOpcional,
   finanTasaAnual: numeroOpcional,
   finanEntregaMinima: numeroOpcional,
   finanCtaTexto: textoOpcional,
+
+  // Tasación de usados
+  tasacionActiva: interruptor(false),
+  tasacionEyebrow: textoOpcional,
+  tasacionTitulo: textoOpcional,
+  tasacionTexto: textoOpcional,
+  tasacionCtaTexto: textoOpcional,
 
   // Consulta por unidad (ficha de vehículo)
   contactoEyebrow: textoOpcional,

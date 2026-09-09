@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { ArrowLeft, Calendar, Fuel, AlignJustify, Disc, MessageCircle } from "lucide-react";
+import { ArrowLeft, Calendar, Fuel, AlignJustify, Disc, MessageCircle, Handshake } from "lucide-react";
 import { VehicleGallery } from "@/components/catalog/VehicleGallery";
 import { ContactForm } from "@/components/catalog/ContactForm";
 import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
-import { FEATURE_FINANCIACION } from "@/lib/features";
 import { formatPrecio, precioEnPesos } from "@/lib/precio";
 import type { getVehicleById } from "@/actions/vehicle";
 
@@ -20,6 +19,13 @@ interface VehicleDetailProps {
    * y sin simulador de cuotas, que también lo dejaría a la vista.
    */
   mostrarPrecios?: boolean;
+  /** Módulo de financiación encendido en Configuración: muestra el simulador. */
+  financiacionActiva?: boolean;
+  /**
+   * Módulo de tasación encendido: ofrece entregar el usado en parte de pago por
+   * esta unidad. El enlace la lleva preseleccionada.
+   */
+  tasacion?: { activa: boolean; ctaTexto: string };
   planes: { id: string; nombre: string; cuotas: number; tasaAnual: number }[];
   contacto: {
     eyebrow: string;
@@ -35,6 +41,8 @@ export const VehicleDetail = ({
   whatsappUrl,
   cotizacionDolar,
   mostrarPrecios = true,
+  financiacionActiva = false,
+  tasacion,
   planes,
   contacto,
 }: VehicleDetailProps) => {
@@ -96,6 +104,19 @@ export const VehicleDetail = ({
                 </a>
               )}
 
+              {/* Secundario a propósito: el botón principal de la ficha sigue
+                  siendo consultar por la unidad. La permuta es el otro camino,
+                  no el mismo con otro color. */}
+              {tasacion?.activa && (
+                <Link
+                  href={`/tasacion?vehiculo=${vehicle.id}`}
+                  className="bg-[hsl(var(--surface-low))] text-[hsl(var(--foreground))] py-2 px-4 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-[0.1em] rounded hover:bg-[hsl(var(--muted))] transition-colors"
+                >
+                  <Handshake size={18} />
+                  {tasacion.ctaTexto}
+                </Link>
+              )}
+
               <div className="bg-[hsl(var(--card))] rounded-lg p-4 lg:p-6 shadow-sm border border-black/5">
                 <p className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] mb-4">Ficha Rápida</p>
                 <div className="flex flex-col gap-3">
@@ -143,7 +164,12 @@ export const VehicleDetail = ({
           </div>
         </div>
 
-        {FEATURE_FINANCIACION && mostrarPrecios && precioArs !== null && (
+        {/* Sin planes activos el simulador se renderiza vacío: el bloque entero
+            se omite para no dejar el título colgado. */}
+        {financiacionActiva &&
+          mostrarPrecios &&
+          precioArs !== null &&
+          planes.length > 0 && (
         <div className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-black/5">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
             <div className="lg:col-span-5">

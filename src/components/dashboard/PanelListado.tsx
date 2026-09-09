@@ -135,14 +135,24 @@ export const Contacto = ({
   </a>
 );
 
-/** Celda "Vehículo": enlace a la ficha, o "General" si la consulta no es de una unidad. */
+/**
+ * Celda "Vehículo": enlace a la ficha, o un texto tenue si la fila no apunta a
+ * ninguna unidad. Ese texto cambia según la bandeja —una consulta sin vehículo
+ * es "General", una tasación sin vehículo es otra cosa—, así que es un prop.
+ */
 export const CeldaVehiculo = ({
   vehiculo,
+  textoSinUnidad = "General",
 }: {
   vehiculo: { id: string; marca: string; modelo: string; anio: number } | null;
+  textoSinUnidad?: string;
 }) => {
   if (!vehiculo) {
-    return <span className="text-sm text-[hsl(var(--muted-foreground))] italic">General</span>;
+    return (
+      <span className="text-sm text-[hsl(var(--muted-foreground))] italic">
+        {textoSinUnidad}
+      </span>
+    );
   }
   return (
     <Link

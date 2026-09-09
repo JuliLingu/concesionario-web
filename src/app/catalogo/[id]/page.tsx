@@ -3,7 +3,6 @@ import { getConfiguracion } from "@/services/configuracion.service";
 import { getPlanes } from "@/actions/financiacion";
 import { notFound } from "next/navigation";
 import { VehicleDetail } from "./VehicleDetail";
-import { FEATURE_FINANCIACION } from "@/lib/features";
 import { whatsappUrl } from "@/lib/whatsapp";
 
 interface VehiclePageProps {
@@ -15,17 +14,23 @@ interface VehiclePageProps {
 export default async function VehicleDetailPage({ params }: VehiclePageProps) {
   const { id } = await params;
 
-  // Ninguna de las tres depende de las otras. Con la financiación en stand by
-  // los planes ni se consultan: la ficha no muestra el simulador.
-  const [vehicle, configuracion, rawPlanes] = await Promise.all([
+  const [vehicle, configuracion] = await Promise.all([
     getVehicleById(id),
     getConfiguracion(),
-    FEATURE_FINANCIACION ? getPlanes(false) : [], // solo activos
   ]);
 
   if (!vehicle) {
     notFound();
   }
+
+  // Los planes son globales, así que la unidad tiene que estar marcada como
+  // financiable para ofrecerlos: sin eso, un alta nueva entraría sola al
+  // simulador. Si el módulo está apagado o la unidad es solo contado, los planes
+  // ni se consultan.
+  const rawPlanes =
+    configuracion.financiacionActiva && vehicle.financiable
+      ? await getPlanes(false) // solo activos
+      : [];
 
   const vehiculoNombre = `${vehicle.marca} ${vehicle.modelo} ${vehicle.anio}`;
   const whatsappHref = whatsappUrl(
@@ -56,6 +61,11 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
       whatsappUrl={whatsappHref}
       cotizacionDolar={configuracion.cotizacionDolar}
       mostrarPrecios={configuracion.mostrarPrecios}
+      financiacionActiva={configuracion.financiacionActiva}
+      tasacion={{
+        activa: configuracion.tasacionActiva,
+        ctaTexto: configuracion.tasacionCtaTexto,
+      }}
       planes={planes}
       contacto={contacto}
     />

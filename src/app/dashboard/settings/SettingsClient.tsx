@@ -21,22 +21,25 @@ import {
   Baseline,
   RotateCcw,
   Tag,
+  CreditCard,
+  Handshake,
 } from "lucide-react";
 import { ImageDropzone } from "@/components/dashboard/ImageDropzone";
 import { updateConfiguracion } from "@/actions/configuracion";
-import type { SiteConfig } from "@/lib/configuracion-defaults";
+import { MARCADOR_CONCESIONARIA, type SiteConfig } from "@/lib/configuracion-defaults";
 import {
   CAMPOS_COLOR,
   COLORES_DEFAULTS,
   COLOR_HEX_REGEX,
   type CampoColor,
 } from "@/lib/colores";
-import { FEATURE_FINANCIACION } from "@/lib/features";
 import Link from "next/link";
 import { Facebook, Instagram } from "@/components/icons/Social";
 
 interface SettingsClientProps {
   configuracion: SiteConfig;
+  /** Unidades publicadas marcadas como financiables: si son cero, la portada no muestra la sección. */
+  vehiculosFinanciables: number;
 }
 
 interface FieldProps {
@@ -451,20 +454,17 @@ const TABS = [
   { id: "portada", label: "Portada" },
   { id: "nosotros", label: "Nosotros" },
   { id: "financiacion", label: "Financiación" },
+  { id: "tasacion", label: "Tasación" },
   { id: "contacto", label: "Consulta por Unidad" },
   { id: "pie", label: "Pie y SEO" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
 
-// La pestaña de financiación queda oculta mientras la feature está en stand by.
-// Sus campos siguen montados (ocultos) para que guardar la configuración no
-// borre los textos ya cargados.
-const TABS_VISIBLES = TABS.filter(
-  (t) => t.id !== "financiacion" || FEATURE_FINANCIACION,
-);
-
-export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
+export const SettingsClient = ({
+  configuracion,
+  vehiculosFinanciables,
+}: SettingsClientProps) => {
   const [isPending, startTransition] = useTransition();
   const [tab, setTab] = useState<TabId>("general");
   const [heroImagenUrl, setHeroImagenUrl] = useState(
@@ -473,6 +473,12 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
   const [logoUrl, setLogoUrl] = useState(configuracion.logoUrl);
   const [mostrarPrecios, setMostrarPrecios] = useState(
     configuracion.mostrarPrecios,
+  );
+  const [financiacionActiva, setFinanciacionActiva] = useState(
+    configuracion.financiacionActiva,
+  );
+  const [tasacionActiva, setTasacionActiva] = useState(
+    configuracion.tasacionActiva,
   );
   const [faviconUrl, setFaviconUrl] = useState(configuracion.faviconUrl);
   const [paleta, setPaleta] = useState<Paleta>(() =>
@@ -487,6 +493,25 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
     type: null,
     message: "",
   });
+
+  // Las pestañas de los módulos acompañan a su interruptor sin esperar al
+  // guardado. Sus campos siguen montados (ocultos) para que guardar no borre los
+  // textos ya cargados; si estabas parado en una al apagarla, volvés a General.
+  const tabsVisibles = TABS.filter((t) => {
+    if (t.id === "financiacion") return financiacionActiva;
+    if (t.id === "tasacion") return tasacionActiva;
+    return true;
+  });
+
+  const cambiarFinanciacion = (valor: boolean) => {
+    setFinanciacionActiva(valor);
+    if (!valor && tab === "financiacion") setTab("general");
+  };
+
+  const cambiarTasacion = (valor: boolean) => {
+    setTasacionActiva(valor);
+    if (!valor && tab === "tasacion") setTab("general");
+  };
 
   const cambiarColor = (campo: CampoColor, valor: string) =>
     setPaleta((actual) => ({ ...actual, [campo]: valor }));
@@ -557,7 +582,7 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
 
         {/* Tabs */}
         <div className="mb-6 flex flex-wrap gap-2 border-b border-[hsl(var(--border))]">
-          {TABS_VISIBLES.map((t) => (
+          {tabsVisibles.map((t) => (
             <button
               key={t.id}
               type="button"
@@ -669,6 +694,89 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
                   icon={<DollarSign size={16} />}
                 />
               </div>
+            </Card>
+
+            <Card
+              title="Módulos"
+              icon={<CreditCard size={18} color="#b5000b" />}
+            >
+              <ToggleField
+                label="Financiación"
+                name="financiacionActiva"
+                checked={financiacionActiva}
+                onChange={cambiarFinanciacion}
+                helperText="Activa la sección de financiación en la portada, el simulador de cuotas en la ficha de cada vehículo y las pantallas de Planes y Solicitudes de Crédito en el panel. Si lo apagás no se borra nada: los planes y las solicitudes quedan guardados y vuelven a aparecer al encenderlo."
+              />
+              {/* La ficha esconde el simulador sin precios a la vista: la cuota
+                  mensual delataría el importe que se decidió no publicar. Se
+                  avisa acá porque, si no, el módulo queda encendido sin efecto
+                  visible y no hay forma de darse cuenta. */}
+              {financiacionActiva && !mostrarPrecios && (
+                <p className="text-xs font-bold text-amber-600">
+                  Con &ldquo;Mostrar precios&rdquo; apagado el simulador de
+                  cuotas no aparece en ninguna ficha, aunque marques la unidad
+                  como financiable: la cuota dejaría el precio a la vista. La
+                  sección de la portada sí se sigue mostrando.
+                </p>
+              )}
+              {financiacionActiva && vehiculosFinanciables === 0 && (
+                <p className="text-xs font-bold text-amber-600">
+                  Ninguna unidad publicada está marcada como financiable, así que
+                  la sección de financiación no aparece en la portada. Marcalas
+                  una por una desde el{" "}
+                  <Link
+                    href="/dashboard/vehicles"
+                    className="underline hover:text-[hsl(var(--primary))]"
+                  >
+                    inventario
+                  </Link>
+                  , en el bloque &ldquo;Financiación&rdquo; de cada ficha.
+                </p>
+              )}
+              {financiacionActiva && (
+                <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                  Los textos y las cifras se editan en la pestaña
+                  &ldquo;Financiación&rdquo;. Antes de publicar, cargá al menos
+                  un plan en{" "}
+                  <Link
+                    href="/dashboard/planes"
+                    className="font-bold text-[hsl(var(--primary))] hover:underline"
+                  >
+                    Planes de Financiación
+                  </Link>
+                  : sin planes activos el simulador no se muestra.
+                </p>
+              )}
+
+              <ToggleField
+                label="Tasación de usados"
+                name="tasacionActiva"
+                checked={tasacionActiva}
+                onChange={cambiarTasacion}
+                helperText="Publica el formulario donde un visitante ofrece su usado, y habilita la bandeja de Tasaciones en el panel. Si lo apagás no se borra nada: las tasaciones recibidas quedan guardadas y vuelven a aparecer al encenderlo."
+              />
+              {tasacionActiva && (
+                <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                  Los textos se editan en la pestaña &ldquo;Tasación&rdquo;. El
+                  formulario queda publicado en{" "}
+                  <Link
+                    href="/tasacion"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-bold text-[hsl(var(--primary))] hover:underline"
+                  >
+                    /tasacion
+                  </Link>
+                  , y lo que llegue se lee en{" "}
+                  <Link
+                    href="/dashboard/tasaciones"
+                    className="font-bold text-[hsl(var(--primary))] hover:underline"
+                  >
+                    Tasaciones
+                  </Link>
+                  .
+                </p>
+              )}
             </Card>
           </div>
 
@@ -1002,6 +1110,72 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
                 Si dejás una cifra vacía, deja de mostrarse en la página de
                 inicio.
               </p>
+            </Card>
+          </div>
+
+          {/* ── Tasación ────────────────────────────────────────────── */}
+          <div
+            className={
+              tab === "tasacion"
+                ? "grid grid-cols-1 md:grid-cols-2 gap-6"
+                : "hidden"
+            }
+          >
+            <Card
+              title="Textos de Tasación"
+              icon={<Type size={18} color="#b5000b" />}
+            >
+              <FormField
+                label="Volanta"
+                name="tasacionEyebrow"
+                defaultValue={configuracion.tasacionEyebrow}
+                placeholder="Entregá tu usado"
+              />
+              <FormField
+                label="Título"
+                name="tasacionTitulo"
+                defaultValue={configuracion.tasacionTitulo}
+                rows={2}
+                helperText="Cada salto de línea se respeta en la página"
+              />
+              <FormField
+                label="Texto Descriptivo"
+                name="tasacionTexto"
+                defaultValue={configuracion.tasacionTexto}
+                rows={5}
+                helperText="Se usa en la portada y como descripción de la página de tasación"
+              />
+              <FormField
+                label="Texto del Botón"
+                name="tasacionCtaTexto"
+                defaultValue={configuracion.tasacionCtaTexto}
+                placeholder="Cotizar mi usado"
+              />
+            </Card>
+
+            <Card
+              title="Dónde aparece"
+              icon={<Handshake size={18} color="#b5000b" />}
+            >
+              <p className="text-xs text-[hsl(var(--muted-foreground))] leading-relaxed">
+                Con el módulo encendido, estos textos se muestran en la sección de
+                la portada, en el enlace del encabezado y en la página del
+                formulario. La ficha de cada vehículo suma un botón que lleva al
+                formulario con esa unidad ya elegida.
+              </p>
+              <p className="text-xs text-[hsl(var(--muted-foreground))] leading-relaxed">
+                Podés escribir <code>{MARCADOR_CONCESIONARIA}</code> dentro de
+                cualquiera de estos textos y se reemplaza por el nombre de la
+                concesionaria.
+              </p>
+              <Link
+                href="/tasacion"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-bold text-[hsl(var(--primary))] hover:underline"
+              >
+                Ver el formulario publicado →
+              </Link>
             </Card>
           </div>
 

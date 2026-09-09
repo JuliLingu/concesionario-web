@@ -252,7 +252,6 @@ ve mal, pero no se cae.
 | `RESEND_API_KEY` `MAIL_FROM` | 5 | No, pero sin ellas no hay avisos |
 | `MAIL_TO` | 5 | Solo durante la puesta en marcha |
 | `APP_URL` | 7 | En Vercel se deduce; cargarla igual |
-| `NEXT_PUBLIC_FEATURE_FINANCIACION` | — | No (hoy apagada) |
 
 ## Pendientes conocidos
 

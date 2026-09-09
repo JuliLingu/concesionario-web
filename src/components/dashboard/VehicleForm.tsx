@@ -43,9 +43,15 @@ interface VehicleFormProps {
    * y un alta nueva se guarda con precio 0.
    */
   mostrarPrecios?: boolean;
+  /**
+   * Módulo de financiación encendido en Configuración. Con `false` la marca de
+   * "financiable" no se muestra, pero —igual que el precio— sigue viajando en el
+   * formulario, así que editar la unidad desde otro lado no la desmarca.
+   */
+  financiacionActiva?: boolean;
 }
 
-export const VehicleForm = ({ categorias, initialData, onSuccess, cotizacionDolar, mostrarPrecios = true }: VehicleFormProps) => {
+export const VehicleForm = ({ categorias, initialData, onSuccess, cotizacionDolar, mostrarPrecios = true, financiacionActiva = false }: VehicleFormProps) => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
@@ -75,6 +81,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess, cotizacionDola
       descripcion: initialData.descripcion || "",
       categoriaId: initialData.categoriaId,
       publicacion: initialData.publicacion || EstadoPublicacion.BORRADOR,
+      financiable: initialData.financiable ?? false,
       imagenes: initialData.imagenes?.map((img: any) => img.url) || [],
     } : {
       marca: "",
@@ -94,6 +101,7 @@ export const VehicleForm = ({ categorias, initialData, onSuccess, cotizacionDola
       descripcion: "",
       categoriaId: categorias[0]?.id || "",
       publicacion: EstadoPublicacion.BORRADOR,
+      financiable: false,
       imagenes: [],
     },
   });
@@ -398,6 +406,26 @@ export const VehicleForm = ({ categorias, initialData, onSuccess, cotizacionDola
           </select>
         </div>
       </div>
+
+      {financiacionActiva && (
+        <div className="pt-8 border-t border-black/5 flex flex-col gap-4">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">Financiación</p>
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              {...form.register("financiable")}
+              disabled={isPending}
+              className="mt-0.5 h-4 w-4 shrink-0 accent-[hsl(var(--primary))] cursor-pointer"
+            />
+            <span className="flex flex-col gap-1">
+              <span className="text-sm font-bold text-[hsl(var(--foreground))]">Ofrecer esta unidad en cuotas</span>
+              <span className="text-[10px] font-medium text-[hsl(var(--muted-foreground))]">
+                El simulador aparece en la ficha con los planes activos que tengas cargados. Sin marcar, la unidad se publica solo al contado.
+              </span>
+            </span>
+          </label>
+        </div>
+      )}
 
       <div className="pt-8 border-t border-black/5 flex flex-col gap-6">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))]">Galería de Imágenes</p>
