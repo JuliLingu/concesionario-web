@@ -62,6 +62,10 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
       cotizacionDolar={configuracion.cotizacionDolar}
       mostrarPrecios={configuracion.mostrarPrecios}
       financiacionActiva={configuracion.financiacionActiva}
+      tasacion={{
+        activa: configuracion.tasacionActiva,
+        ctaTexto: configuracion.tasacionCtaTexto,
+      }}
       planes={planes}
       contacto={contacto}
     />

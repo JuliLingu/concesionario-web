@@ -2,6 +2,7 @@ import { Hero } from "@/components/home/Hero";
 import { RecentVehicles } from "@/components/home/RecentVehicles";
 import { CompanyInfo } from "@/components/home/CompanyInfo";
 import { FinancingSection } from "@/components/home/FinancingSection";
+import { TasacionSection } from "@/components/home/TasacionSection";
 import { LocationSection } from "@/components/home/LocationSection";
 
 import { prisma } from "@/lib/prisma";
@@ -28,6 +29,10 @@ export default async function HomePage() {
       />
       <CompanyInfo configuracion={configuracion} />
       {hayFinanciables && <FinancingSection configuracion={configuracion} />}
+      {/* A diferencia de financiación, no depende del stock: la tasación existe
+          justamente para conseguirlo, así que tiene sentido incluso con el
+          catálogo vacío. */}
+      {configuracion.tasacionActiva && <TasacionSection configuracion={configuracion} />}
       <LocationSection configuracion={configuracion} />
     </main>
   );

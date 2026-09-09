@@ -22,10 +22,11 @@ import {
   RotateCcw,
   Tag,
   CreditCard,
+  Handshake,
 } from "lucide-react";
 import { ImageDropzone } from "@/components/dashboard/ImageDropzone";
 import { updateConfiguracion } from "@/actions/configuracion";
-import type { SiteConfig } from "@/lib/configuracion-defaults";
+import { MARCADOR_CONCESIONARIA, type SiteConfig } from "@/lib/configuracion-defaults";
 import {
   CAMPOS_COLOR,
   COLORES_DEFAULTS,
@@ -453,6 +454,7 @@ const TABS = [
   { id: "portada", label: "Portada" },
   { id: "nosotros", label: "Nosotros" },
   { id: "financiacion", label: "Financiación" },
+  { id: "tasacion", label: "Tasación" },
   { id: "contacto", label: "Consulta por Unidad" },
   { id: "pie", label: "Pie y SEO" },
 ] as const;
@@ -492,16 +494,23 @@ export const SettingsClient = ({
     message: "",
   });
 
-  // La pestaña de financiación acompaña al interruptor sin esperar al guardado.
-  // Sus campos siguen montados (ocultos) para que guardar no borre los textos ya
-  // cargados; si estabas parado en ella al apagarla, volvés a General.
-  const tabsVisibles = TABS.filter(
-    (t) => t.id !== "financiacion" || financiacionActiva,
-  );
+  // Las pestañas de los módulos acompañan a su interruptor sin esperar al
+  // guardado. Sus campos siguen montados (ocultos) para que guardar no borre los
+  // textos ya cargados; si estabas parado en una al apagarla, volvés a General.
+  const tabsVisibles = TABS.filter((t) => {
+    if (t.id === "financiacion") return financiacionActiva;
+    if (t.id === "tasacion") return tasacionActiva;
+    return true;
+  });
 
   const cambiarFinanciacion = (valor: boolean) => {
     setFinanciacionActiva(valor);
     if (!valor && tab === "financiacion") setTab("general");
+  };
+
+  const cambiarTasacion = (valor: boolean) => {
+    setTasacionActiva(valor);
+    if (!valor && tab === "tasacion") setTab("general");
   };
 
   const cambiarColor = (campo: CampoColor, valor: string) =>
@@ -743,12 +752,13 @@ export const SettingsClient = ({
                 label="Tasación de usados"
                 name="tasacionActiva"
                 checked={tasacionActiva}
-                onChange={setTasacionActiva}
+                onChange={cambiarTasacion}
                 helperText="Publica el formulario donde un visitante ofrece su usado, y habilita la bandeja de Tasaciones en el panel. Si lo apagás no se borra nada: las tasaciones recibidas quedan guardadas y vuelven a aparecer al encenderlo."
               />
               {tasacionActiva && (
                 <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                  El formulario queda publicado en{" "}
+                  Los textos se editan en la pestaña &ldquo;Tasación&rdquo;. El
+                  formulario queda publicado en{" "}
                   <Link
                     href="/tasacion"
                     target="_blank"
@@ -1100,6 +1110,72 @@ export const SettingsClient = ({
                 Si dejás una cifra vacía, deja de mostrarse en la página de
                 inicio.
               </p>
+            </Card>
+          </div>
+
+          {/* ── Tasación ────────────────────────────────────────────── */}
+          <div
+            className={
+              tab === "tasacion"
+                ? "grid grid-cols-1 md:grid-cols-2 gap-6"
+                : "hidden"
+            }
+          >
+            <Card
+              title="Textos de Tasación"
+              icon={<Type size={18} color="#b5000b" />}
+            >
+              <FormField
+                label="Volanta"
+                name="tasacionEyebrow"
+                defaultValue={configuracion.tasacionEyebrow}
+                placeholder="Entregá tu usado"
+              />
+              <FormField
+                label="Título"
+                name="tasacionTitulo"
+                defaultValue={configuracion.tasacionTitulo}
+                rows={2}
+                helperText="Cada salto de línea se respeta en la página"
+              />
+              <FormField
+                label="Texto Descriptivo"
+                name="tasacionTexto"
+                defaultValue={configuracion.tasacionTexto}
+                rows={5}
+                helperText="Se usa en la portada y como descripción de la página de tasación"
+              />
+              <FormField
+                label="Texto del Botón"
+                name="tasacionCtaTexto"
+                defaultValue={configuracion.tasacionCtaTexto}
+                placeholder="Cotizar mi usado"
+              />
+            </Card>
+
+            <Card
+              title="Dónde aparece"
+              icon={<Handshake size={18} color="#b5000b" />}
+            >
+              <p className="text-xs text-[hsl(var(--muted-foreground))] leading-relaxed">
+                Con el módulo encendido, estos textos se muestran en la sección de
+                la portada, en el enlace del encabezado y en la página del
+                formulario. La ficha de cada vehículo suma un botón que lleva al
+                formulario con esa unidad ya elegida.
+              </p>
+              <p className="text-xs text-[hsl(var(--muted-foreground))] leading-relaxed">
+                Podés escribir <code>{MARCADOR_CONCESIONARIA}</code> dentro de
+                cualquiera de estos textos y se reemplaza por el nombre de la
+                concesionaria.
+              </p>
+              <Link
+                href="/tasacion"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-bold text-[hsl(var(--primary))] hover:underline"
+              >
+                Ver el formulario publicado →
+              </Link>
             </Card>
           </div>
 

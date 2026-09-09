@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Calendar, Fuel, AlignJustify, Disc, MessageCircle } from "lucide-react";
+import { ArrowLeft, Calendar, Fuel, AlignJustify, Disc, MessageCircle, Handshake } from "lucide-react";
 import { VehicleGallery } from "@/components/catalog/VehicleGallery";
 import { ContactForm } from "@/components/catalog/ContactForm";
 import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
@@ -21,6 +21,11 @@ interface VehicleDetailProps {
   mostrarPrecios?: boolean;
   /** Módulo de financiación encendido en Configuración: muestra el simulador. */
   financiacionActiva?: boolean;
+  /**
+   * Módulo de tasación encendido: ofrece entregar el usado en parte de pago por
+   * esta unidad. El enlace la lleva preseleccionada.
+   */
+  tasacion?: { activa: boolean; ctaTexto: string };
   planes: { id: string; nombre: string; cuotas: number; tasaAnual: number }[];
   contacto: {
     eyebrow: string;
@@ -37,6 +42,7 @@ export const VehicleDetail = ({
   cotizacionDolar,
   mostrarPrecios = true,
   financiacionActiva = false,
+  tasacion,
   planes,
   contacto,
 }: VehicleDetailProps) => {
@@ -96,6 +102,19 @@ export const VehicleDetail = ({
                   Consultar por WhatsApp
                   <MessageCircle size={18} />
                 </a>
+              )}
+
+              {/* Secundario a propósito: el botón principal de la ficha sigue
+                  siendo consultar por la unidad. La permuta es el otro camino,
+                  no el mismo con otro color. */}
+              {tasacion?.activa && (
+                <Link
+                  href={`/tasacion?vehiculo=${vehicle.id}`}
+                  className="bg-[hsl(var(--surface-low))] text-[hsl(var(--foreground))] py-2 px-4 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-[0.1em] rounded hover:bg-[hsl(var(--muted))] transition-colors"
+                >
+                  <Handshake size={18} />
+                  {tasacion.ctaTexto}
+                </Link>
               )}
 
               <div className="bg-[hsl(var(--card))] rounded-lg p-4 lg:p-6 shadow-sm border border-black/5">

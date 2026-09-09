@@ -25,11 +25,22 @@ interface HeaderProps {
   configuracion: SiteConfig;
 }
 
-const NAV_LINKS = [
-  { href: "/", label: "Inicio" },
-  { href: "/#nosotros", label: "Nosotros" },
-  { href: "/#ubicacion", label: "Ubicación" },
-];
+/**
+ * Enlaces del menú. Era una constante hasta que la tasación se sumó al
+ * encabezado: el enlace solo existe con el módulo encendido, y su texto es el
+ * que el administrador cargó en Configuración, así que la lista pasó a
+ * depender de la configuración que el componente ya recibía.
+ */
+function enlacesDeNavegacion(configuracion: SiteConfig) {
+  return [
+    { href: "/", label: "Inicio" },
+    { href: "/#nosotros", label: "Nosotros" },
+    ...(configuracion.tasacionActiva
+      ? [{ href: "/tasacion", label: configuracion.tasacionCtaTexto }]
+      : []),
+    { href: "/#ubicacion", label: "Ubicación" },
+  ];
+}
 
 export function Header({ usuario, configuracion }: HeaderProps) {
   const [open, setOpen] = useState(false);
@@ -38,6 +49,7 @@ export function Header({ usuario, configuracion }: HeaderProps) {
   const parts = configuracion.nombreConcesionaria.split(" ");
   const firstWord = parts[0];
   const restWords = parts.slice(1).join(" ");
+  const navLinks = enlacesDeNavegacion(configuracion);
 
   // Cierra el panel al navegar a otra ruta.
   useEffect(() => {
@@ -93,7 +105,7 @@ export function Header({ usuario, configuracion }: HeaderProps) {
 
         {/* Nav Links (desktop) */}
         <nav className="hidden md:flex items-center gap-6">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -169,7 +181,7 @@ export function Header({ usuario, configuracion }: HeaderProps) {
             className="md:hidden bg-[hsl(var(--card))] border-t border-black/5 shadow-lg animate-slide-down"
           >
             <nav className="flex flex-col px-4 py-3 max-h-[calc(100vh-var(--header-h))] overflow-y-auto">
-              {NAV_LINKS.map((link) => (
+              {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
