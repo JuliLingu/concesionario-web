@@ -106,6 +106,7 @@ export const ConfiguracionSchema = z.object({
   nosotrosMetrica2Label: textoOpcional,
 
   // Financiación
+  financiacionActiva: interruptor(false),
   finanEyebrow: textoOpcional,
   finanTitulo: textoOpcional,
   finanTexto: textoOpcional,

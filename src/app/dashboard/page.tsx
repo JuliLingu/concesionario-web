@@ -50,6 +50,7 @@ export default async function DashboardPage() {
       borradores={borradores}
       consultasPendientes={consultasPendientes}
       ultimasConsultas={ultimasConsultas}
+      financiacionActiva={configuracion.financiacionActiva}
     />
   );
 }

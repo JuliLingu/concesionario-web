@@ -21,6 +21,7 @@ import {
   Baseline,
   RotateCcw,
   Tag,
+  CreditCard,
 } from "lucide-react";
 import { ImageDropzone } from "@/components/dashboard/ImageDropzone";
 import { updateConfiguracion } from "@/actions/configuracion";
@@ -31,12 +32,13 @@ import {
   COLOR_HEX_REGEX,
   type CampoColor,
 } from "@/lib/colores";
-import { FEATURE_FINANCIACION } from "@/lib/features";
 import Link from "next/link";
 import { Facebook, Instagram } from "@/components/icons/Social";
 
 interface SettingsClientProps {
   configuracion: SiteConfig;
+  /** Unidades publicadas marcadas como financiables: si son cero, la portada no muestra la sección. */
+  vehiculosFinanciables: number;
 }
 
 interface FieldProps {
@@ -457,14 +459,10 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
-// La pestaña de financiación queda oculta mientras la feature está en stand by.
-// Sus campos siguen montados (ocultos) para que guardar la configuración no
-// borre los textos ya cargados.
-const TABS_VISIBLES = TABS.filter(
-  (t) => t.id !== "financiacion" || FEATURE_FINANCIACION,
-);
-
-export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
+export const SettingsClient = ({
+  configuracion,
+  vehiculosFinanciables,
+}: SettingsClientProps) => {
   const [isPending, startTransition] = useTransition();
   const [tab, setTab] = useState<TabId>("general");
   const [heroImagenUrl, setHeroImagenUrl] = useState(
@@ -473,6 +471,9 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
   const [logoUrl, setLogoUrl] = useState(configuracion.logoUrl);
   const [mostrarPrecios, setMostrarPrecios] = useState(
     configuracion.mostrarPrecios,
+  );
+  const [financiacionActiva, setFinanciacionActiva] = useState(
+    configuracion.financiacionActiva,
   );
   const [faviconUrl, setFaviconUrl] = useState(configuracion.faviconUrl);
   const [paleta, setPaleta] = useState<Paleta>(() =>
@@ -487,6 +488,18 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
     type: null,
     message: "",
   });
+
+  // La pestaña de financiación acompaña al interruptor sin esperar al guardado.
+  // Sus campos siguen montados (ocultos) para que guardar no borre los textos ya
+  // cargados; si estabas parado en ella al apagarla, volvés a General.
+  const tabsVisibles = TABS.filter(
+    (t) => t.id !== "financiacion" || financiacionActiva,
+  );
+
+  const cambiarFinanciacion = (valor: boolean) => {
+    setFinanciacionActiva(valor);
+    if (!valor && tab === "financiacion") setTab("general");
+  };
 
   const cambiarColor = (campo: CampoColor, valor: string) =>
     setPaleta((actual) => ({ ...actual, [campo]: valor }));
@@ -557,7 +570,7 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
 
         {/* Tabs */}
         <div className="mb-6 flex flex-wrap gap-2 border-b border-[hsl(var(--border))]">
-          {TABS_VISIBLES.map((t) => (
+          {tabsVisibles.map((t) => (
             <button
               key={t.id}
               type="button"
@@ -669,6 +682,59 @@ export const SettingsClient = ({ configuracion }: SettingsClientProps) => {
                   icon={<DollarSign size={16} />}
                 />
               </div>
+            </Card>
+
+            <Card
+              title="Módulos"
+              icon={<CreditCard size={18} color="#b5000b" />}
+            >
+              <ToggleField
+                label="Financiación"
+                name="financiacionActiva"
+                checked={financiacionActiva}
+                onChange={cambiarFinanciacion}
+                helperText="Activa la sección de financiación en la portada, el simulador de cuotas en la ficha de cada vehículo y las pantallas de Planes y Solicitudes de Crédito en el panel. Si lo apagás no se borra nada: los planes y las solicitudes quedan guardados y vuelven a aparecer al encenderlo."
+              />
+              {/* La ficha esconde el simulador sin precios a la vista: la cuota
+                  mensual delataría el importe que se decidió no publicar. Se
+                  avisa acá porque, si no, el módulo queda encendido sin efecto
+                  visible y no hay forma de darse cuenta. */}
+              {financiacionActiva && !mostrarPrecios && (
+                <p className="text-xs font-bold text-amber-600">
+                  Con &ldquo;Mostrar precios&rdquo; apagado el simulador de
+                  cuotas no aparece en ninguna ficha, aunque marques la unidad
+                  como financiable: la cuota dejaría el precio a la vista. La
+                  sección de la portada sí se sigue mostrando.
+                </p>
+              )}
+              {financiacionActiva && vehiculosFinanciables === 0 && (
+                <p className="text-xs font-bold text-amber-600">
+                  Ninguna unidad publicada está marcada como financiable, así que
+                  la sección de financiación no aparece en la portada. Marcalas
+                  una por una desde el{" "}
+                  <Link
+                    href="/dashboard/vehicles"
+                    className="underline hover:text-[hsl(var(--primary))]"
+                  >
+                    inventario
+                  </Link>
+                  , en el bloque &ldquo;Financiación&rdquo; de cada ficha.
+                </p>
+              )}
+              {financiacionActiva && (
+                <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                  Los textos y las cifras se editan en la pestaña
+                  &ldquo;Financiación&rdquo;. Antes de publicar, cargá al menos
+                  un plan en{" "}
+                  <Link
+                    href="/dashboard/planes"
+                    className="font-bold text-[hsl(var(--primary))] hover:underline"
+                  >
+                    Planes de Financiación
+                  </Link>
+                  : sin planes activos el simulador no se muestra.
+                </p>
+              )}
             </Card>
           </div>
 

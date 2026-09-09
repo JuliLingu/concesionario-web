@@ -2,11 +2,12 @@ import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/sesion";
 import { getPlanes } from "@/actions/financiacion";
 import { PlanesClient } from "./PlanesClient";
-import { FEATURE_FINANCIACION } from "@/lib/features";
+import { getConfiguracion } from "@/services/configuracion.service";
 
 export default async function PlanesPage() {
-  // Financiación en stand by: la pantalla existe pero no es alcanzable.
-  if (!FEATURE_FINANCIACION) notFound();
+  // Financiación apagada desde Configuración: la pantalla existe pero no es
+  // alcanzable.
+  if (!(await getConfiguracion()).financiacionActiva) notFound();
 
   await requireAdmin();
 

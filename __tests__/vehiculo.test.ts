@@ -49,6 +49,7 @@ const VEHICULO_VALIDO = {
   transmision: Transmision.AUTOMATICA,
   estado: EstadoVehiculo.USADO,
   publicacion: EstadoPublicacion.PUBLICADO,
+  financiable: false,
   imagenes: [
     "https://res.cloudinary.com/demo/image/upload/uno.jpg",
     "https://res.cloudinary.com/demo/image/upload/dos.jpg",

@@ -105,6 +105,9 @@ export default async function CatalogoPage({
     combustibles: toArray(params.combustible).filter((c) => Object.keys(Combustible).includes(c)),
     anioDesde: anioEnUrl.parse(params.anioDesde),
     anioHasta: anioEnUrl.parse(params.anioHasta),
+    // Con el módulo apagado el parámetro se ignora: filtrar por algo que el
+    // sitio no ofrece dejaría una grilla recortada sin explicación.
+    soloFinanciables: configuracion.financiacionActiva && params.financiable === "1",
   };
 
   // Con los precios ocultos, `?sort=price_asc` escrito a mano volvería a
@@ -126,6 +129,7 @@ export default async function CatalogoPage({
   if (estados.length > 0)       where.estado = { in: estados as EstadoVehiculo[] };
   if (transmisiones.length > 0) where.transmision = { in: transmisiones as Transmision[] };
   if (combustibles.length > 0)  where.combustible = { in: combustibles as Combustible[] };
+  if (filtrosActivos.soloFinanciables) where.financiable = true;
   if (filtrosActivos.anioDesde || filtrosActivos.anioHasta) {
     where.anio = {
       ...(filtrosActivos.anioDesde ? { gte: filtrosActivos.anioDesde } : {}),
@@ -198,6 +202,7 @@ export default async function CatalogoPage({
       opcionesDeOrden={opcionesDeOrden(configuracion.mostrarPrecios)}
       filtros={filtros}
       filtrosActivos={filtrosActivos}
+      financiacionActiva={configuracion.financiacionActiva}
       categorias={categorias}
       isAdmin={isAdmin}
       totalCount={totalCount}

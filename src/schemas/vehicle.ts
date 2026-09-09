@@ -42,6 +42,7 @@ export const VehicleSchema = z.object({
   color: z.string().optional(),
   descripcion: z.string().optional(),
   publicacion: z.nativeEnum(EstadoPublicacion),
+  financiable: z.boolean(),
   imagenes: z
     .array(imagenDeVehiculo)
     .max(MAXIMO_IMAGENES, `No se pueden cargar más de ${MAXIMO_IMAGENES} imágenes`)

@@ -3,7 +3,6 @@ import { ArrowLeft, Calendar, Fuel, AlignJustify, Disc, MessageCircle } from "lu
 import { VehicleGallery } from "@/components/catalog/VehicleGallery";
 import { ContactForm } from "@/components/catalog/ContactForm";
 import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
-import { FEATURE_FINANCIACION } from "@/lib/features";
 import { formatPrecio, precioEnPesos } from "@/lib/precio";
 import type { getVehicleById } from "@/actions/vehicle";
 
@@ -20,6 +19,8 @@ interface VehicleDetailProps {
    * y sin simulador de cuotas, que también lo dejaría a la vista.
    */
   mostrarPrecios?: boolean;
+  /** Módulo de financiación encendido en Configuración: muestra el simulador. */
+  financiacionActiva?: boolean;
   planes: { id: string; nombre: string; cuotas: number; tasaAnual: number }[];
   contacto: {
     eyebrow: string;
@@ -35,6 +36,7 @@ export const VehicleDetail = ({
   whatsappUrl,
   cotizacionDolar,
   mostrarPrecios = true,
+  financiacionActiva = false,
   planes,
   contacto,
 }: VehicleDetailProps) => {
@@ -143,7 +145,12 @@ export const VehicleDetail = ({
           </div>
         </div>
 
-        {FEATURE_FINANCIACION && mostrarPrecios && precioArs !== null && (
+        {/* Sin planes activos el simulador se renderiza vacío: el bloque entero
+            se omite para no dejar el título colgado. */}
+        {financiacionActiva &&
+          mostrarPrecios &&
+          precioArs !== null &&
+          planes.length > 0 && (
         <div className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-black/5">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
             <div className="lg:col-span-5">

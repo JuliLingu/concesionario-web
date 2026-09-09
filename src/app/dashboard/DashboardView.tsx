@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Car, CheckCircle2, FileText, MessageSquare, Plus, LayoutList, ArrowRight, ExternalLink, Tags, Wallet, CreditCard } from "lucide-react";
 import { ConsultaStatusButton } from "@/components/dashboard/ConsultaStatusButton";
-import { FEATURE_FINANCIACION } from "@/lib/features";
 import { formatFechaCorta } from "@/lib/formato";
 import type { EstadoConsulta } from "../../../generated/prisma";
 
@@ -22,6 +21,8 @@ interface DashboardViewProps {
   borradores: number;
   consultasPendientes: number;
   ultimasConsultas: ConsultaResumida[];
+  /** Módulo de financiación encendido en Configuración. */
+  financiacionActiva: boolean;
 }
 
 export const DashboardView = ({
@@ -32,6 +33,7 @@ export const DashboardView = ({
   borradores,
   consultasPendientes,
   ultimasConsultas,
+  financiacionActiva,
 }: DashboardViewProps) => {
   return (
     <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-8">
@@ -72,7 +74,7 @@ export const DashboardView = ({
           <div className="md:col-span-6 lg:col-span-1">
             <QuickAction href="/dashboard/consultas" icon={<MessageSquare size={18} />} label="Ver Consultas" description={consultasPendientes > 0 ? `${consultasPendientes} sin atender` : "Historial completo"} badge={consultasPendientes > 0 ? consultasPendientes : undefined} />
           </div>
-          {FEATURE_FINANCIACION && (
+          {financiacionActiva && (
             <>
               <div className="md:col-span-6 lg:col-span-1">
                 <QuickAction href="/dashboard/solicitudes" icon={<Wallet size={18} />} label="Solicitudes Crédito" description="Ver pedidos de financiación" />

@@ -38,6 +38,7 @@ export default async function NewVehiclePage() {
           categorias={categorias}
           cotizacionDolar={configuracion.cotizacionDolar}
           mostrarPrecios={configuracion.mostrarPrecios}
+          financiacionActiva={configuracion.financiacionActiva}
         />
       </div>
     </div>

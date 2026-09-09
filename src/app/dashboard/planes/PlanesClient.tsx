@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Plus, Edit2, Trash2, X } from "lucide-react";
+import { Plus, Edit2, Trash2, X, ArrowLeft } from "lucide-react";
 import { deletePlan } from "@/actions/financiacion";
 import { PlanForm } from "./PlanForm";
+import Link from "next/link";
 
 export const PlanesClient = ({ planes }: { planes: any[] }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,6 +32,12 @@ export const PlanesClient = ({ planes }: { planes: any[] }) => {
   return (
     <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-8">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 mb-2 text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] text-sm font-medium transition"
+        >
+          <ArrowLeft size={16} /> Volver al Panel
+        </Link>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#b5000b] mb-1">

@@ -92,6 +92,10 @@ model Vehiculo {
   potencia               Int?
   descripcion            String?                 @db.Text
   publicacion            EstadoPublicacion       @default(BORRADOR)
+  // Opt-in a la financiación: los planes son globales, así que sin esta marca
+  // cualquier alta nueva entraría sola al simulador. Apagado por defecto, la
+  // unidad se ofrece solo al contado hasta que el administrador diga lo contrario.
+  financiable            Boolean                 @default(false)
   createdAt              DateTime                @default(now())
   updatedAt              DateTime                @updatedAt
   categoria              Categoria               @relation(fields: [categoriaId], references: [id])
@@ -180,7 +184,10 @@ model Configuracion {
   nosotrosMetrica2Sufijo String?
   nosotrosMetrica2Label  String?
 
-  // Financiación
+  // Financiación. El módulo entero (sección de portada, simulador, planes y
+  // solicitudes) se enciende desde Configuración. Arranca apagado: la
+  // concesionaria que no financia no ve nada del tema en el sitio ni en el panel.
+  financiacionActiva Boolean  @default(false)
   finanEyebrow       String?
   finanTitulo        String?  @db.Text
   finanTexto         String?  @db.Text

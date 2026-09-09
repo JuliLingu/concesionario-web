@@ -104,9 +104,15 @@ export const CONFIGURACION_NUMERIC_DEFAULTS = {
  * publica en el sitio. Arranca en `true` porque es lo que espera una
  * concesionaria común; la que prefiere manejar el precio por consulta lo apaga
  * desde Configuración.
+ *
+ * `financiacionActiva` enciende el módulo de financiación completo: la sección
+ * de la portada, el simulador de la ficha y las pantallas de planes y
+ * solicitudes del panel. Arranca apagado porque no toda concesionaria financia;
+ * apagarlo no borra nada, los planes y las solicitudes quedan en la base.
  */
 export const CONFIGURACION_BOOLEAN_DEFAULTS = {
   mostrarPrecios: true,
+  financiacionActiva: false,
 } as const;
 
 /**

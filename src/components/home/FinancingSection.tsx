@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Building2 } from "lucide-react";
 import type { SiteConfig } from "@/lib/configuracion-defaults";
 
@@ -51,9 +52,15 @@ export function FinancingSection({ configuracion }: FinancingSectionProps) {
               </div>
             )}
 
-            <button className="bg-[hsl(var(--primary-foreground))] text-[hsl(var(--primary))] px-12 py-5 text-[10px] font-black uppercase tracking-[0.3em] rounded shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] hover:bg-[hsl(var(--foreground))] hover:text-[hsl(var(--background))] transition-colors">
+            {/* Lleva al catálogo ya filtrado: los planes son globales pero cada
+                unidad decide si se ofrece en cuotas, así que mandar al catálogo
+                completo mostraría autos que no se financian. */}
+            <Link
+              href="/catalogo?financiable=1"
+              className="inline-block bg-[hsl(var(--primary-foreground))] text-[hsl(var(--primary))] px-12 py-5 text-[10px] font-black uppercase tracking-[0.3em] rounded shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] hover:bg-[hsl(var(--foreground))] hover:text-[hsl(var(--background))] transition-colors"
+            >
               {configuracion.finanCtaTexto}
-            </button>
+            </Link>
           </div>
         </div>
       </div>

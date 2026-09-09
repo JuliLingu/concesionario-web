@@ -8,6 +8,8 @@ import type { FiltrosCatalogo } from "@/services/cache.service";
 interface CatalogFiltersProps {
   /** Opciones derivadas del stock: ver getCachedFiltrosCatalogo. */
   filtros: FiltrosCatalogo;
+  /** Con el módulo apagado no se ofrece filtrar por unidades en cuotas. */
+  financiacionActiva?: boolean;
 }
 
 /** Etiquetas legibles de los enums; el resto se muestra capitalizado. */
@@ -20,7 +22,7 @@ const LABEL_TRANSMISION: Record<string, string> = {
 const capitalizar = (valor: string) =>
   valor.charAt(0) + valor.slice(1).toLowerCase();
 
-export const CatalogFilters = ({ filtros }: CatalogFiltersProps) => {
+export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogFiltersProps) => {
   const { marcas, categorias, estados, transmisiones, combustibles, anios } = filtros;
   const router = useRouter();
   const pathname = usePathname();
@@ -70,6 +72,7 @@ export const CatalogFilters = ({ filtros }: CatalogFiltersProps) => {
   const currentCombustibles = searchParams.getAll("combustible");
   const currentAnioDesde = searchParams.get("anioDesde") || "";
   const currentAnioHasta = searchParams.get("anioHasta") || "";
+  const soloFinanciables = financiacionActiva && searchParams.get("financiable") === "1";
 
   const cantidadFiltros =
     currentMarcas.length +
@@ -78,7 +81,8 @@ export const CatalogFilters = ({ filtros }: CatalogFiltersProps) => {
     currentTransmisiones.length +
     currentCombustibles.length +
     (currentAnioDesde ? 1 : 0) +
-    (currentAnioHasta ? 1 : 0);
+    (currentAnioHasta ? 1 : 0) +
+    (soloFinanciables ? 1 : 0);
 
   const hasFilters = cantidadFiltros > 0;
 
@@ -111,6 +115,22 @@ export const CatalogFilters = ({ filtros }: CatalogFiltersProps) => {
           </button>
         )}
       </div>
+
+      {/* ── Financiación ──
+          Va primero porque es el filtro con el que se llega desde la portada:
+          quien entra por ahí tiene que ver de entrada por qué la grilla está
+          recortada, y poder destildarlo. */}
+      {financiacionActiva && (
+        <FilterSection title="Financiación">
+          <CheckItem
+            label="Solo unidades en cuotas"
+            checked={soloFinanciables}
+            onChange={() =>
+              navigate(buildParams({ financiable: soloFinanciables ? null : "1" }))
+            }
+          />
+        </FilterSection>
+      )}
 
       {/* ── Categoría ── */}
       {categorias.length > 0 && (
