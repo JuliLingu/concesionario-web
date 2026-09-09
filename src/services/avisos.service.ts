@@ -14,6 +14,8 @@ import { prisma } from "@/lib/prisma";
 import { getConfiguracion } from "@/services/configuracion.service";
 import { destinatarioDeAvisos, enviarMail, mailConfigurado } from "@/lib/mail";
 import { registrarError } from "@/lib/log";
+import { formatNumeroAr, formatPrecioOriginal } from "@/lib/precio";
+import type { Moneda } from "../../generated/prisma";
 
 /**
  * Base pública del sitio, para poder enlazar al panel desde el correo.
@@ -214,5 +216,69 @@ export async function avisarSolicitud(datos: DatosSolicitud): Promise<void> {
     });
   } catch (error) {
     registrarError("avisarSolicitud", error);
+  }
+}
+
+export type DatosTasacion = {
+  nombre: string;
+  email: string;
+  telefono: string;
+  marca: string;
+  modelo: string;
+  anio: number;
+  kilometraje: number;
+  precioPretendido: number | null;
+  moneda: Moneda;
+  observaciones: string | null;
+  vehiculoInteresId: string | null;
+};
+
+/**
+ * Aviso de tasación nueva: alguien ofrece su usado.
+ *
+ * Acá sí va el detalle completo, al revés que en la solicitud de crédito. La
+ * diferencia no es el largo del correo sino qué tipo de dato es: una solicitud
+ * trae el DNI y el sueldo de una persona, y una tasación trae la descripción de
+ * un auto. Lo segundo es información comercial, y es justo lo que el vendedor
+ * necesita para decidir en el momento si vale la pena devolver el llamado.
+ *
+ * Por eso el formulario no pide la patente: no hace falta para cotizar, y sería
+ * el único dato de la tasación que no querríamos ver salir por correo.
+ */
+export async function avisarTasacion(datos: DatosTasacion): Promise<void> {
+  try {
+    const destinatario = await preparar();
+    if (!destinatario) return;
+
+    const interes = await describirVehiculo(datos.vehiculoInteresId);
+    const ofrecido = `${datos.marca} ${datos.modelo} (${datos.anio})`;
+
+    const filas: Fila[] = [
+      ["Ofrece", ofrecido],
+      ["Kilometraje", `${formatNumeroAr(datos.kilometraje)} km`],
+      [
+        "Pretende",
+        datos.precioPretendido !== null
+          ? formatPrecioOriginal(datos.precioPretendido, datos.moneda)
+          : "No lo indicó",
+      ],
+      ["Le interesa", interes ?? "No eligió unidad"],
+      ["Nombre", datos.nombre],
+      ["Email", datos.email],
+      ["Teléfono", datos.telefono],
+      ["Comentarios", datos.observaciones],
+    ];
+
+    const enlace = enlaceAlPanel("/dashboard/tasaciones");
+
+    await enviarMail(destinatario.destino, {
+      asunto: `Nueva tasación: ${ofrecido} — ${datos.nombre}`,
+      texto: cuerpoTexto(filas, enlace),
+      html: cuerpoHtml(filas, enlace),
+      // Responder desde el correo le contesta a quien ofrece el auto.
+      responderA: datos.email,
+    });
+  } catch (error) {
+    registrarError("avisarTasacion", error);
   }
 }

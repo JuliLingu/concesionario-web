@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/sesion";
-import { getConsultas } from "@/actions/consulta";
+import { getConsultas, updateConsultaEstado } from "@/actions/consulta";
 import { estadoDeUrl } from "@/lib/estados";
 import { formatFechaLarga } from "@/lib/formato";
-import { ConsultaStatusButton } from "@/components/dashboard/ConsultaStatusButton";
+import { EstadoButton } from "@/components/dashboard/EstadoButton";
 import {
   CeldaVehiculo,
   Contacto,
@@ -75,7 +75,11 @@ export default async function ConsultasPage({ searchParams }: ConsultasPageProps
                   </span>
                 </td>
                 <td className="py-3 px-4">
-                  <ConsultaStatusButton consultaId={c.id} estadoActual={c.estado} />
+                  <EstadoButton
+                    id={c.id}
+                    estadoActual={c.estado}
+                    cambiarEstadoAction={updateConsultaEstado}
+                  />
                 </td>
               </tr>
             ))}

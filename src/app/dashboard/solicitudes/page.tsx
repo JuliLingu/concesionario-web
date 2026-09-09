@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/sesion";
-import { getSolicitudes } from "@/actions/financiacion";
+import { getSolicitudes, updateSolicitudEstado } from "@/actions/financiacion";
 import { estadoDeUrl } from "@/lib/estados";
 import { formatFechaLarga } from "@/lib/formato";
 import { formatArs } from "@/lib/precio";
 import { getConfiguracion } from "@/services/configuracion.service";
-import { SolicitudStatusButton } from "@/components/dashboard/SolicitudStatusButton";
+import { EstadoButton } from "@/components/dashboard/EstadoButton";
 import {
   CeldaVehiculo,
   Contacto,
@@ -96,7 +96,11 @@ export default async function SolicitudesPage({ searchParams }: SolicitudesPageP
                   </span>
                 </td>
                 <td className="py-3 px-4">
-                  <SolicitudStatusButton solicitudId={s.id} estadoActual={s.estado} />
+                  <EstadoButton
+                    id={s.id}
+                    estadoActual={s.estado}
+                    cambiarEstadoAction={updateSolicitudEstado}
+                  />
                 </td>
               </tr>
             ))}

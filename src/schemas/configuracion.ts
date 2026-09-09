@@ -114,6 +114,13 @@ export const ConfiguracionSchema = z.object({
   finanEntregaMinima: numeroOpcional,
   finanCtaTexto: textoOpcional,
 
+  // Tasación de usados
+  tasacionActiva: interruptor(false),
+  tasacionEyebrow: textoOpcional,
+  tasacionTitulo: textoOpcional,
+  tasacionTexto: textoOpcional,
+  tasacionCtaTexto: textoOpcional,
+
   // Consulta por unidad (ficha de vehículo)
   contactoEyebrow: textoOpcional,
   contactoTitulo: textoOpcional,

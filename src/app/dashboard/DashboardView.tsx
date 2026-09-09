@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Car, CheckCircle2, FileText, MessageSquare, Plus, LayoutList, ArrowRight, ExternalLink, Tags, Wallet, CreditCard } from "lucide-react";
-import { ConsultaStatusButton } from "@/components/dashboard/ConsultaStatusButton";
+import { Car, CheckCircle2, FileText, MessageSquare, Plus, LayoutList, ArrowRight, ExternalLink, Tags, Wallet, CreditCard, Handshake } from "lucide-react";
+import { updateConsultaEstado } from "@/actions/consulta";
+import { EstadoButton } from "@/components/dashboard/EstadoButton";
 import { formatFechaCorta } from "@/lib/formato";
 import type { EstadoConsulta } from "../../../generated/prisma";
 
@@ -20,9 +21,12 @@ interface DashboardViewProps {
   publicados: number;
   borradores: number;
   consultasPendientes: number;
+  tasacionesPendientes: number;
   ultimasConsultas: ConsultaResumida[];
   /** Módulo de financiación encendido en Configuración. */
   financiacionActiva: boolean;
+  /** Módulo de tasación de usados encendido en Configuración. */
+  tasacionActiva: boolean;
 }
 
 export const DashboardView = ({
@@ -32,8 +36,10 @@ export const DashboardView = ({
   publicados,
   borradores,
   consultasPendientes,
+  tasacionesPendientes,
   ultimasConsultas,
   financiacionActiva,
+  tasacionActiva,
 }: DashboardViewProps) => {
   return (
     <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-8">
@@ -84,6 +90,11 @@ export const DashboardView = ({
               </div>
             </>
           )}
+          {tasacionActiva && (
+            <div className="md:col-span-6 lg:col-span-1">
+              <QuickAction href="/dashboard/tasaciones" icon={<Handshake size={18} />} label="Tasaciones" description={tasacionesPendientes > 0 ? `${tasacionesPendientes} sin revisar` : "Usados que nos ofrecen"} badge={tasacionesPendientes > 0 ? tasacionesPendientes : undefined} />
+            </div>
+          )}
           <div className="md:col-span-6 lg:col-span-1">
             <QuickAction href="/dashboard/settings" icon={<ExternalLink size={18} />} label="Configuración" description="Ajustes generales del sitio" />
           </div>
@@ -133,7 +144,11 @@ export const DashboardView = ({
                           <span className="text-xs text-[hsl(var(--muted-foreground))] font-medium">{formatFechaCorta(c.createdAt)}</span>
                         </td>
                         <td className="py-3 px-4">
-                          <ConsultaStatusButton consultaId={c.id} estadoActual={c.estado} />
+                          <EstadoButton
+                            id={c.id}
+                            estadoActual={c.estado}
+                            cambiarEstadoAction={updateConsultaEstado}
+                          />
                         </td>
                       </tr>
                     ))}

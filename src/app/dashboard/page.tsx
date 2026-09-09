@@ -12,6 +12,7 @@ export default async function DashboardPage() {
     publicados,
     borradores,
     consultasPendientes,
+    tasacionesPendientes,
     rawUltimasConsultas,
   ] = await Promise.all([
     getConfiguracion(),
@@ -19,6 +20,7 @@ export default async function DashboardPage() {
     prisma.vehiculo.count({ where: { publicacion: "PUBLICADO" } }),
     prisma.vehiculo.count({ where: { publicacion: "BORRADOR"  } }),
     prisma.consulta.count({ where: { estado: "PENDIENTE" } }),
+    prisma.tasacion.count({ where: { estado: "PENDIENTE" } }),
     prisma.consulta.findMany({
       where:   { estado: "PENDIENTE" },
       select:  {
@@ -49,8 +51,10 @@ export default async function DashboardPage() {
       publicados={publicados}
       borradores={borradores}
       consultasPendientes={consultasPendientes}
+      tasacionesPendientes={tasacionesPendientes}
       ultimasConsultas={ultimasConsultas}
       financiacionActiva={configuracion.financiacionActiva}
+      tasacionActiva={configuracion.tasacionActiva}
     />
   );
 }

@@ -475,6 +475,9 @@ export const SettingsClient = ({
   const [financiacionActiva, setFinanciacionActiva] = useState(
     configuracion.financiacionActiva,
   );
+  const [tasacionActiva, setTasacionActiva] = useState(
+    configuracion.tasacionActiva,
+  );
   const [faviconUrl, setFaviconUrl] = useState(configuracion.faviconUrl);
   const [paleta, setPaleta] = useState<Paleta>(() =>
     Object.fromEntries(
@@ -733,6 +736,35 @@ export const SettingsClient = ({
                     Planes de Financiación
                   </Link>
                   : sin planes activos el simulador no se muestra.
+                </p>
+              )}
+
+              <ToggleField
+                label="Tasación de usados"
+                name="tasacionActiva"
+                checked={tasacionActiva}
+                onChange={setTasacionActiva}
+                helperText="Publica el formulario donde un visitante ofrece su usado, y habilita la bandeja de Tasaciones en el panel. Si lo apagás no se borra nada: las tasaciones recibidas quedan guardadas y vuelven a aparecer al encenderlo."
+              />
+              {tasacionActiva && (
+                <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                  El formulario queda publicado en{" "}
+                  <Link
+                    href="/tasacion"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-bold text-[hsl(var(--primary))] hover:underline"
+                  >
+                    /tasacion
+                  </Link>
+                  , y lo que llegue se lee en{" "}
+                  <Link
+                    href="/dashboard/tasaciones"
+                    className="font-bold text-[hsl(var(--primary))] hover:underline"
+                  >
+                    Tasaciones
+                  </Link>
+                  .
                 </p>
               )}
             </Card>

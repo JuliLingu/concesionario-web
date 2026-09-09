@@ -35,6 +35,7 @@ export const REGLAS = {
   REGISTRO_POR_IP: { cupo: 3, ventanaMs: HORA },
   CONSULTA_POR_IP: { cupo: 5, ventanaMs: HORA },
   SOLICITUD_POR_IP: { cupo: 3, ventanaMs: HORA },
+  TASACION_POR_IP: { cupo: 3, ventanaMs: HORA },
 } as const satisfies Record<string, Regla>;
 
 const globalParaLimites = globalThis as unknown as {
