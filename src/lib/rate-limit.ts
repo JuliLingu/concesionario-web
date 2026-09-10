@@ -36,6 +36,16 @@ export const REGLAS = {
   CONSULTA_POR_IP: { cupo: 5, ventanaMs: HORA },
   SOLICITUD_POR_IP: { cupo: 3, ventanaMs: HORA },
   TASACION_POR_IP: { cupo: 3, ventanaMs: HORA },
+
+  /**
+   * Métricas del catálogo: una visita y un click por unidad, origen y media
+   * hora. Acá el límite no defiende de un abuso sino de la aritmética honesta —
+   * quien recarga la ficha cuatro veces mientras decide no son cuatro
+   * interesados, y contarlos así haría que la unidad más dudada pareciera la más
+   * buscada. Que además corte a quien quiera inflar el contador a mano es un
+   * efecto lateral bienvenido.
+   */
+  METRICA_POR_UNIDAD: { cupo: 1, ventanaMs: 30 * MINUTO },
 } as const satisfies Record<string, Regla>;
 
 const globalParaLimites = globalThis as unknown as {

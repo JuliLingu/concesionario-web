@@ -3,6 +3,8 @@ import { ArrowLeft, Calendar, Fuel, AlignJustify, Disc, MessageCircle, Handshake
 import { VehicleGallery } from "@/components/catalog/VehicleGallery";
 import { ContactForm } from "@/components/catalog/ContactForm";
 import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
+import { RegistrarVista } from "@/components/catalog/RegistrarVista";
+import { WhatsappLink } from "@/components/catalog/WhatsappLink";
 import { formatPrecio, precioEnPesos } from "@/lib/precio";
 import type { getVehicleById } from "@/actions/vehicle";
 
@@ -50,6 +52,7 @@ export const VehicleDetail = ({
 
   return (
     <div className="min-h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))] pt-header pb-8">
+      <RegistrarVista vehiculoId={vehicle.id} />
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="h-16 flex items-center mb-4">
           <Link
@@ -93,15 +96,14 @@ export const VehicleDetail = ({
               )}
 
               {whatsappUrl && (
-                <a
+                <WhatsappLink
                   href={whatsappUrl}
-                  target="_blank"
-                  rel="noreferrer"
+                  vehiculoId={vehicle.id}
                   className="bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] py-2 px-4 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-[0.1em] rounded shadow-lg hover:brightness-90 transition-colors"
                 >
                   Consultar por WhatsApp
                   <MessageCircle size={18} />
-                </a>
+                </WhatsappLink>
               )}
 
               {/* Secundario a propósito: el botón principal de la ficha sigue
@@ -207,15 +209,14 @@ export const VehicleDetail = ({
                 {contacto.texto}
               </p>
               {whatsappUrl && (
-                <a
+                <WhatsappLink
                   href={whatsappUrl}
-                  target="_blank"
-                  rel="noreferrer"
+                  vehiculoId={vehicle.id}
                   className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--primary))] transition-colors"
                 >
                   <MessageCircle size={14} />
                   {contacto.whatsappTexto}
-                </a>
+                </WhatsappLink>
               )}
             </div>
 

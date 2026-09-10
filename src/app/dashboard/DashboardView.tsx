@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Car, CheckCircle2, FileText, MessageSquare, Plus, LayoutList, ArrowRight, ExternalLink, Tags, Wallet, CreditCard, Handshake } from "lucide-react";
+import { Car, CheckCircle2, FileText, MessageSquare, Plus, LayoutList, ArrowRight, ExternalLink, Tags, Wallet, CreditCard, Handshake, Timer } from "lucide-react";
 import { updateConsultaEstado } from "@/actions/consulta";
 import { EstadoButton } from "@/components/dashboard/EstadoButton";
 import { formatFechaCorta } from "@/lib/formato";
@@ -22,6 +22,10 @@ interface DashboardViewProps {
   borradores: number;
   consultasPendientes: number;
   tasacionesPendientes: number;
+  /** Unidades con algo para revisar: añejas, caras o que no mira nadie. */
+  unidadesConSenal: number;
+  /** Null mientras no haya stock del que promediar. */
+  diasPromedioEnStock: number | null;
   ultimasConsultas: ConsultaResumida[];
   /** Módulo de financiación encendido en Configuración. */
   financiacionActiva: boolean;
@@ -37,6 +41,8 @@ export const DashboardView = ({
   borradores,
   consultasPendientes,
   tasacionesPendientes,
+  unidadesConSenal,
+  diasPromedioEnStock,
   ultimasConsultas,
   financiacionActiva,
   tasacionActiva,
@@ -59,10 +65,13 @@ export const DashboardView = ({
         </div>
 
         {/* ── Metric Cards ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           <MetricCard label="Total Vehículos" value={totalVehiculos} icon={<Car size={20} />} href="/dashboard/vehicles" />
           <MetricCard label="Publicados" value={publicados} icon={<CheckCircle2 size={20} />} href="/dashboard/vehicles" accent="green" />
           <MetricCard label="Borradores" value={borradores} icon={<FileText size={20} />} href="/dashboard/vehicles" />
+          {/* Con el stock vacío no hay promedio que mostrar: va un guion y no un
+              cero, que se leería como "se venden el mismo día". */}
+          <MetricCard label="Días Promedio En Stock" value={diasPromedioEnStock ?? "—"} icon={<Timer size={20} />} href="/dashboard/metricas" />
           <MetricCard label="Consultas Pendientes" value={consultasPendientes} icon={<MessageSquare size={20} />} href="/dashboard/consultas" accent={consultasPendientes > 0 ? "primary" : undefined} />
         </div>
 
@@ -73,6 +82,15 @@ export const DashboardView = ({
           </div>
           <div className="md:col-span-4 lg:col-span-1">
             <QuickAction href="/dashboard/vehicles" icon={<LayoutList size={18} />} label="Ver Inventario" description="Gestionar y editar el stock" />
+          </div>
+          <div className="md:col-span-4 lg:col-span-1">
+            <QuickAction
+              href="/dashboard/metricas"
+              icon={<Timer size={18} />}
+              label="Rendimiento"
+              description={unidadesConSenal > 0 ? `${unidadesConSenal} unidades para revisar` : "Qué se mira y qué no rota"}
+              badge={unidadesConSenal > 0 ? unidadesConSenal : undefined}
+            />
           </div>
           <div className="md:col-span-4 lg:col-span-1">
             <QuickAction href="/dashboard/categorias" icon={<Tags size={18} />} label="Categorías" description="Administrar tipos de vehículos" />
@@ -181,7 +199,8 @@ const MetricCard = ({
   accent,
 }: {
   label: string;
-  value: number;
+  /** Texto además de número: hay métricas que no tienen valor todavía y van con guion. */
+  value: number | string;
   icon: React.ReactNode;
   href: string;
   accent?: "primary" | "green";

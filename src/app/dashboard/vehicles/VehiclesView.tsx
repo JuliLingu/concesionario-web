@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Plus, Pencil, ArrowLeft } from "lucide-react";
 import { DeleteVehicleButton } from "@/components/dashboard/DeleteVehicleButton";
+import { PublicacionButton } from "@/components/dashboard/PublicacionButton";
+import { cambiarPublicacion } from "@/actions/vehicle";
 import { formatArs, formatPrecioOriginal, precioEnPesos } from "@/lib/precio";
 import { Moneda } from "../../../../generated/prisma";
 import type { getVehicles } from "@/actions/vehicle";
@@ -128,17 +130,11 @@ export const VehiclesView = ({
                     </td>
                     )}
                     <td className="py-3 px-4">
-                      <span
-                        className={`text-[10px] font-black uppercase tracking-widest inline-block px-2 py-1 rounded ${
-                          v.publicacion === "PUBLICADO"
-                            ? "bg-green-100 text-green-700"
-                            : v.publicacion === "VENDIDO"
-                              ? "bg-gray-100 text-gray-500"
-                              : "bg-red-50 text-[hsl(var(--primary))]"
-                        }`}
-                      >
-                        {v.publicacion}
-                      </span>
+                      <PublicacionButton
+                        vehiculoId={v.id}
+                        estadoActual={v.publicacion}
+                        cambiarPublicacionAction={cambiarPublicacion}
+                      />
                     </td>
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end gap-3">
