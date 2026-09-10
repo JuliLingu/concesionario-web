@@ -43,7 +43,20 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
   );
 
   const navigate = (qs: string) => {
-    startTransition(() => router.push(`${pathname}?${qs}`));
+    startTransition(() => router.push(qs ? `${pathname}?${qs}` : pathname));
+  };
+
+  /**
+   * Destilda todo lo del panel pero deja la búsqueda por texto: es de otra
+   * caja, no cuenta para el contador de acá arriba, y borrar de golpe lo que
+   * alguien tipeó desde un botón que ni siquiera la nombra desconcierta. Para
+   * volver al catálogo entero está el enlace de la grilla vacía.
+   */
+  const limpiarFiltros = () => {
+    const params = new URLSearchParams();
+    const busqueda = searchParams.get("q");
+    if (busqueda) params.set("q", busqueda);
+    navigate(params.toString());
   };
 
   // ── Toggle helpers ────────────────────────────────────────────────────
@@ -98,7 +111,7 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
         </div>
         {hasFilters && (
           <button
-            onClick={() => navigate("")}
+            onClick={limpiarFiltros}
             className="flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--primary))] hover:text-[hsl(var(--foreground))] transition-colors p-1"
           >
             <X size={11} />

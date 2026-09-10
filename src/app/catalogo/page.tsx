@@ -8,6 +8,7 @@ import { getCachedFiltrosCatalogo, getCachedCategorias } from "@/services/cache.
 import { getConfiguracion } from "@/services/configuracion.service";
 import { precioEnPesos } from "@/lib/precio";
 import { whatsappUrl } from "@/lib/whatsapp";
+import { condicionesDeBusqueda, terminosDeBusqueda } from "@/lib/busqueda";
 import {
   ITEMS_PER_PAGE,
   SORT_OPTIONS,
@@ -83,6 +84,7 @@ async function idsOrdenadosPorPrecio(
  * orden— de lo que ya está en `/catalogo`.
  */
 const PARAMETROS_DE_VISTA = [
+  "q",
   "marca",
   "categoria",
   "estado",
@@ -106,8 +108,13 @@ export async function generateMetadata({
     (clave) => params[clave] !== undefined,
   );
 
+  // El título refleja lo buscado para que la pestaña y el historial sirvan de
+  // algo con varias búsquedas abiertas. No es un problema de SEO que sea texto
+  // de quien visita: la vista con `?q=` ya sale sin indexar, acá abajo.
+  const busqueda = terminosDeBusqueda(params.q).join(" ");
+
   return {
-    title: "Catálogo de vehículos",
+    title: busqueda ? `${busqueda} · Catálogo de vehículos` : "Catálogo de vehículos",
     description: `Todas las unidades disponibles en ${configuracion.nombreConcesionaria}. Buscá por marca, año, kilometraje y combustible, y consultá por la que te interese.`,
     ...(esVistaFiltrada
       ? {
@@ -146,7 +153,10 @@ export default async function CatalogoPage({
       .slice(0, MAXIMO_VALORES_POR_FILTRO);
   };
 
+  const terminos = terminosDeBusqueda(params.q);
+
   const filtrosActivos: FiltrosActivos = {
+    busqueda: terminos.join(" "),
     marcas: toArray(params.marca),
     categorias: toArray(params.categoria),
     estados: toArray(params.estado).filter((e) => Object.keys(EstadoVehiculo).includes(e)),
@@ -179,6 +189,8 @@ export default async function CatalogoPage({
   if (transmisiones.length > 0) where.transmision = { in: transmisiones as Transmision[] };
   if (combustibles.length > 0)  where.combustible = { in: combustibles as Combustible[] };
   if (filtrosActivos.soloFinanciables) where.financiable = true;
+  // La búsqueda recorta lo que los filtros dejaron pasar, no lo reemplaza.
+  if (terminos.length > 0) where.AND = condicionesDeBusqueda(terminos);
   if (filtrosActivos.anioDesde || filtrosActivos.anioHasta) {
     where.anio = {
       ...(filtrosActivos.anioDesde ? { gte: filtrosActivos.anioDesde } : {}),
