@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/sesion";
 import { getConfiguracion } from "@/services/configuracion.service";
+import { getRendimientoStock } from "@/services/metricas.service";
 import { DashboardView } from "./DashboardView";
 
 export default async function DashboardPage() {
@@ -8,6 +9,7 @@ export default async function DashboardPage() {
 
   const [
     configuracion,
+    rendimiento,
     totalVehiculos,
     publicados,
     borradores,
@@ -16,6 +18,9 @@ export default async function DashboardPage() {
     rawUltimasConsultas,
   ] = await Promise.all([
     getConfiguracion(),
+    // El mismo cálculo que la página de métricas, para que el número del atajo y
+    // el de la tabla no puedan contradecirse.
+    getRendimientoStock(),
     prisma.vehiculo.count(),
     prisma.vehiculo.count({ where: { publicacion: "PUBLICADO" } }),
     prisma.vehiculo.count({ where: { publicacion: "BORRADOR"  } }),
@@ -52,6 +57,12 @@ export default async function DashboardPage() {
       borradores={borradores}
       consultasPendientes={consultasPendientes}
       tasacionesPendientes={tasacionesPendientes}
+      unidadesConSenal={
+        rendimiento.resumen.inmovilizadas +
+        rendimiento.resumen.caras +
+        rendimiento.resumen.invisibles
+      }
+      diasPromedioEnStock={rendimiento.resumen.diasPromedioEnStock}
       ultimasConsultas={ultimasConsultas}
       financiacionActiva={configuracion.financiacionActiva}
       tasacionActiva={configuracion.tasacionActiva}

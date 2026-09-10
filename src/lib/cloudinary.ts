@@ -42,20 +42,31 @@ function yaTieneTransformacion(segmento: string): boolean {
   return segmento.split(",").every((parte) => PARAMETRO.test(parte));
 }
 
-export function getCldUrl(
-  url: string,
-  { modo = "recorte", relacion = "4:3" }: OpcionesImagen = {},
-): string {
-  if (!url || !url.includes("cloudinary.com")) return url;
+/**
+ * Parte la URL en el punto donde se insertan las transformaciones.
+ * Devuelve null si no es una URL de Cloudinary o si ya viene transformada
+ * —en ese caso alguien ya eligió el encuadre y se respeta—.
+ */
+function partir(url: string): { base: string; resto: string } | null {
+  if (!url || !url.includes("cloudinary.com")) return null;
 
   const corte = url.indexOf("/upload/");
-  if (corte === -1) return url;
+  if (corte === -1) return null;
 
   const base = url.slice(0, corte + "/upload/".length);
   const resto = url.slice(corte + "/upload/".length);
 
-  // Si la URL ya viene transformada se respeta: alguien ya eligió el encuadre.
-  if (yaTieneTransformacion(resto.split("/")[0])) return url;
+  return yaTieneTransformacion(resto.split("/")[0]) ? null : { base, resto };
+}
+
+export function getCldUrl(
+  url: string,
+  { modo = "recorte", relacion = "4:3" }: OpcionesImagen = {},
+): string {
+  const partes = partir(url);
+  if (!partes) return url;
+
+  const { base, resto } = partes;
 
   const transformacion =
     modo === "original"
@@ -65,4 +76,25 @@ export function getCldUrl(
         : `c_fill,g_center,ar_${relacion},${OPTIMIZACION}`;
 
   return `${base}${transformacion}/${resto}`;
+}
+
+/**
+ * Foto para la imagen de Open Graph: la que se ve en WhatsApp, Facebook o
+ * Instagram cuando alguien comparte el enlace de una unidad.
+ *
+ * Dos diferencias con `getCldUrl`, y las dos importan:
+ *
+ * - Medida exacta en píxeles en lugar de una relación. La imagen social tiene
+ *   un lienzo fijo de 1200×630, y pedir la foto original —que puede venir de
+ *   4000 px— significaría descargar varios megas para descartarlos al escalar,
+ *   dentro de una ruta que se genera del lado del servidor.
+ * - `f_jpg` en vez de `f_auto`. `f_auto` elige el formato según la cabecera
+ *   `Accept` de quien pide, y acá quien pide es el renderizador de la imagen,
+ *   que no negocia: puede recibir AVIF o WebP y no sabe decodificarlos.
+ */
+export function getCldUrlOg(url: string, ancho: number, alto: number): string {
+  const partes = partir(url);
+  if (!partes) return url;
+
+  return `${partes.base}c_fill,g_center,w_${ancho},h_${alto},f_jpg,q_auto/${partes.resto}`;
 }

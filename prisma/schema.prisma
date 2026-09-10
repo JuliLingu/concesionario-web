@@ -96,6 +96,16 @@ model Vehiculo {
   // cualquier alta nueva entraría sola al simulador. Apagado por defecto, la
   // unidad se ofrece solo al contado hasta que el administrador diga lo contrario.
   financiable            Boolean                 @default(false)
+  // Cuándo se vendió. `publicacion = VENDIDO` decía que la unidad ya no está,
+  // pero no cuándo dejó de estar, y sin esa fecha no hay forma de calcular la
+  // rotación —cuántos días tarda en venderse un auto— que es la medida con la
+  // que el dueño decide qué comprar y a cuánto publicarlo.
+  //
+  // Lo escribe `updateVehicle` al ver el cambio de estado, no el formulario:
+  // es un hecho derivado, y dejarlo a mano sería otro campo que se olvida de
+  // completar. Vuelve a null si la unidad sale de VENDIDO (una venta caída),
+  // así el histórico no arrastra una fecha de una venta que no ocurrió.
+  vendidoAt              DateTime?
   createdAt              DateTime                @default(now())
   updatedAt              DateTime                @updatedAt
   categoria              Categoria               @relation(fields: [categoriaId], references: [id])
@@ -103,11 +113,44 @@ model Vehiculo {
   consultas              Consulta[]
   solicitudesFinanciacion SolicitudFinanciacion[]
   tasaciones             Tasacion[]
+  metricas               MetricaVehiculoDia[]
 
   @@index([categoriaId])
   @@index([publicacion])
   @@index([marca, modelo])
   @@map("vehiculos")
+}
+
+/**
+ * Interés medido por unidad y por día: cuánta gente abrió la ficha y cuánta
+ * apretó el botón de WhatsApp.
+ *
+ * Una fila por unidad y por día, no una por visita. La diferencia no es
+ * estética: la base es TiDB, donde cada INSERT se replica y el costo se cuenta
+ * por fila, y un catálogo con tráfico normal generaría decenas de miles de
+ * filas al mes para responder preguntas que se contestan con dos enteros. Acá
+ * una concesionaria con 40 unidades escribe 40 filas por día en el peor caso.
+ *
+ * Y por día, no un contador acumulado en `vehiculos`: un total histórico crece
+ * con la antigüedad de la publicación, así que compararlo entre una unidad de
+ * seis meses y una de la semana pasada no dice nada. Con el corte diario se
+ * pregunta siempre por la misma ventana. De paso evita que cada visita toque la
+ * fila del vehículo, que tiene `@updatedAt` y quedaría "modificada" por el solo
+ * hecho de que alguien la miró.
+ */
+model MetricaVehiculoDia {
+  vehiculoId String
+  /// Día calendario del concesionario, no UTC. Ver `lib/metricas.ts`.
+  fecha      DateTime @db.Date
+
+  vistas         Int @default(0)
+  clicksWhatsapp Int @default(0)
+
+  vehiculo Vehiculo @relation(fields: [vehiculoId], references: [id], onDelete: Cascade)
+
+  @@id([vehiculoId, fecha])
+  @@index([fecha])
+  @@map("metricas_vehiculo_dia")
 }
 
 model ImagenVehiculo {

@@ -53,7 +53,8 @@ export default async function TasacionPage({ searchParams }: TasacionPageProps) 
   const unidadInicial = unidades.some((u) => u.id === vehiculo) ? vehiculo : undefined;
 
   return (
-    <main className="min-h-screen bg-[hsl(var(--background))] pt-header pb-20">
+    // `div` y no `main`: el elemento principal ya lo pone el layout.
+    <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-20">
       <div className="max-w-3xl mx-auto px-4 md:px-8">
         <header className="pt-10 pb-8">
           <div className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--primary))] mb-3">
@@ -79,6 +80,6 @@ export default async function TasacionPage({ searchParams }: TasacionPageProps) 
           Los datos que dejes se usan solo para contactarte por esta cotización.
         </p>
       </div>
-    </main>
+    </div>
   );
 }

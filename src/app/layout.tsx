@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { auth } from "@/auth";
 import { getConfiguracion } from "@/services/configuracion.service";
 import { construirVariablesTema } from "@/lib/colores";
+import { siteUrl } from "@/lib/site-url";
 
 
 const spaceGrotesk = Space_Grotesk({
@@ -22,8 +23,26 @@ export async function generateMetadata(): Promise<Metadata> {
   const configuracion = await getConfiguracion();
 
   return {
-    title: configuracion.siteTitle,
+    // Base de todas las URLs relativas que se declaran más abajo en el árbol
+    // (canónicas, og:url, og:image). Sin esto, una ruta relativa en cualquier
+    // `generateMetadata` hijo rompe el build. Ver `lib/site-url.ts`.
+    metadataBase: siteUrl(),
+    title: {
+      default: configuracion.siteTitle,
+      // Cada ficha declara solo el nombre de la unidad y el nombre de la
+      // concesionaria se lo agrega esta plantilla: así aparece en el resultado
+      // de búsqueda sin repetirlo en cada página.
+      template: `%s | ${configuracion.nombreConcesionaria}`,
+    },
     description: configuracion.siteDescription,
+    openGraph: {
+      type: "website",
+      siteName: configuracion.nombreConcesionaria,
+      locale: "es_AR",
+      title: configuracion.siteTitle,
+      description: configuracion.siteDescription,
+    },
+    twitter: { card: "summary_large_image" },
     // Solo se declara si el administrador cargó uno. Ojo: un archivo
     // app/icon.* o app/favicon.ico tendría prioridad sobre esto.
     ...(configuracion.faviconUrl && {

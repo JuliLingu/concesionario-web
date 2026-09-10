@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import type { FiltrosCatalogo } from "@/services/cache.service";
+import { etiquetaEnum } from "@/lib/etiquetas";
 
 interface CatalogFiltersProps {
   /** Opciones derivadas del stock: ver getCachedFiltrosCatalogo. */
@@ -11,16 +12,6 @@ interface CatalogFiltersProps {
   /** Con el módulo apagado no se ofrece filtrar por unidades en cuotas. */
   financiacionActiva?: boolean;
 }
-
-/** Etiquetas legibles de los enums; el resto se muestra capitalizado. */
-const LABEL_TRANSMISION: Record<string, string> = {
-  AUTOMATICA: "Automática",
-  MANUAL: "Manual",
-  CVT: "CVT",
-};
-
-const capitalizar = (valor: string) =>
-  valor.charAt(0) + valor.slice(1).toLowerCase();
 
 export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogFiltersProps) => {
   const { marcas, categorias, estados, transmisiones, combustibles, anios } = filtros;
@@ -52,7 +43,20 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
   );
 
   const navigate = (qs: string) => {
-    startTransition(() => router.push(`${pathname}?${qs}`));
+    startTransition(() => router.push(qs ? `${pathname}?${qs}` : pathname));
+  };
+
+  /**
+   * Destilda todo lo del panel pero deja la búsqueda por texto: es de otra
+   * caja, no cuenta para el contador de acá arriba, y borrar de golpe lo que
+   * alguien tipeó desde un botón que ni siquiera la nombra desconcierta. Para
+   * volver al catálogo entero está el enlace de la grilla vacía.
+   */
+  const limpiarFiltros = () => {
+    const params = new URLSearchParams();
+    const busqueda = searchParams.get("q");
+    if (busqueda) params.set("q", busqueda);
+    navigate(params.toString());
   };
 
   // ── Toggle helpers ────────────────────────────────────────────────────
@@ -107,7 +111,7 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
         </div>
         {hasFilters && (
           <button
-            onClick={() => navigate("")}
+            onClick={limpiarFiltros}
             className="flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--primary))] hover:text-[hsl(var(--foreground))] transition-colors p-1"
           >
             <X size={11} />
@@ -152,7 +156,7 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
           {estados.map((e) => (
             <CheckItem
               key={e}
-              label={capitalizar(e)}
+              label={etiquetaEnum(e)}
               checked={currentEstados.includes(e)}
               onChange={() => toggleMulti("estado", e)}
             />
@@ -180,7 +184,7 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
           {transmisiones.map((t) => (
             <CheckItem
               key={t}
-              label={LABEL_TRANSMISION[t] ?? capitalizar(t)}
+              label={etiquetaEnum(t)}
               checked={currentTransmisiones.includes(t)}
               onChange={() => toggleMulti("transmision", t)}
             />
@@ -194,7 +198,7 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
           {combustibles.map((c) => (
             <CheckItem
               key={c}
-              label={capitalizar(c)}
+              label={etiquetaEnum(c)}
               checked={currentCombustibles.includes(c)}
               onChange={() => toggleMulti("combustible", c)}
             />

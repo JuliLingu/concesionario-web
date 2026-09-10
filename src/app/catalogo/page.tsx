@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import * as z from "zod";
 import { prisma } from "@/lib/prisma";
 import { Prisma, Transmision, Combustible, EstadoVehiculo } from "../../../generated/prisma";
@@ -7,6 +8,7 @@ import { getCachedFiltrosCatalogo, getCachedCategorias } from "@/services/cache.
 import { getConfiguracion } from "@/services/configuracion.service";
 import { precioEnPesos } from "@/lib/precio";
 import { whatsappUrl } from "@/lib/whatsapp";
+import { condicionesDeBusqueda, terminosDeBusqueda } from "@/lib/busqueda";
 import {
   ITEMS_PER_PAGE,
   SORT_OPTIONS,
@@ -76,6 +78,60 @@ async function idsOrdenadosPorPrecio(
     .map((v) => v.id);
 }
 
+/**
+ * Parámetros que producen una vista recortada del mismo catálogo. Una URL con
+ * cualquiera de ellos muestra un subconjunto —o el mismo listado en otro
+ * orden— de lo que ya está en `/catalogo`.
+ */
+const PARAMETROS_DE_VISTA = [
+  "q",
+  "marca",
+  "categoria",
+  "estado",
+  "transmision",
+  "combustible",
+  "anioDesde",
+  "anioHasta",
+  "financiable",
+  "sort",
+  "page",
+];
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}): Promise<Metadata> {
+  const [params, configuracion] = await Promise.all([searchParams, getConfiguracion()]);
+
+  const esVistaFiltrada = PARAMETROS_DE_VISTA.some(
+    (clave) => params[clave] !== undefined,
+  );
+
+  // El título refleja lo buscado para que la pestaña y el historial sirvan de
+  // algo con varias búsquedas abiertas. No es un problema de SEO que sea texto
+  // de quien visita: la vista con `?q=` ya sale sin indexar, acá abajo.
+  const busqueda = terminosDeBusqueda(params.q).join(" ");
+
+  return {
+    title: busqueda ? `${busqueda} · Catálogo de vehículos` : "Catálogo de vehículos",
+    description: `Todas las unidades disponibles en ${configuracion.nombreConcesionaria}. Buscá por marca, año, kilometraje y combustible, y consultá por la que te interese.`,
+    ...(esVistaFiltrada
+      ? {
+          // Cada combinación de filtros es una URL distinta con el mismo
+          // contenido barajado: son miles de páginas casi iguales compitiendo
+          // entre sí. Se dejan fuera del índice, pero con `follow`, así el
+          // rastreador igual las recorre para llegar a las fichas.
+          //
+          // No se apunta la canónica a `/catalogo`: la página 3 no es una
+          // versión alternativa de la 1, y declararlo así hace que Google
+          // ignore lo que hay de la 2 en adelante.
+          robots: { index: false, follow: true },
+        }
+      : { alternates: { canonical: "/catalogo" } }),
+  };
+}
+
 export default async function CatalogoPage({
   searchParams,
 }: {
@@ -97,7 +153,10 @@ export default async function CatalogoPage({
       .slice(0, MAXIMO_VALORES_POR_FILTRO);
   };
 
+  const terminos = terminosDeBusqueda(params.q);
+
   const filtrosActivos: FiltrosActivos = {
+    busqueda: terminos.join(" "),
     marcas: toArray(params.marca),
     categorias: toArray(params.categoria),
     estados: toArray(params.estado).filter((e) => Object.keys(EstadoVehiculo).includes(e)),
@@ -130,6 +189,8 @@ export default async function CatalogoPage({
   if (transmisiones.length > 0) where.transmision = { in: transmisiones as Transmision[] };
   if (combustibles.length > 0)  where.combustible = { in: combustibles as Combustible[] };
   if (filtrosActivos.soloFinanciables) where.financiable = true;
+  // La búsqueda recorta lo que los filtros dejaron pasar, no lo reemplaza.
+  if (terminos.length > 0) where.AND = condicionesDeBusqueda(terminos);
   if (filtrosActivos.anioDesde || filtrosActivos.anioHasta) {
     where.anio = {
       ...(filtrosActivos.anioDesde ? { gte: filtrosActivos.anioDesde } : {}),

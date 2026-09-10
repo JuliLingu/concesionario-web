@@ -1,6 +1,7 @@
 import { VehicleCard, type VehiculoDeTarjeta } from "@/components/catalog/VehicleCard";
 import { VehicleCardAdminOverlay } from "@/components/catalog/VehicleCardAdminOverlay";
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
+import { CatalogSearch } from "@/components/catalog/CatalogSearch";
 import { SortSelect } from "@/components/catalog/SortSelect";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -9,6 +10,8 @@ import type { FiltrosCatalogo } from "@/services/cache.service";
 
 /** Filtros activos leídos de la URL. Se usan para reconstruir los enlaces de paginado. */
 export interface FiltrosActivos {
+  /** Texto buscado, ya normalizado. Cadena vacía si no se buscó nada. */
+  busqueda: string;
   marcas: string[];
   categorias: string[];
   estados: string[];
@@ -47,6 +50,7 @@ const construirUrl = (
   nuevos: Record<string, string>,
 ) => {
   const p = new URLSearchParams();
+  if (filtrosActivos.busqueda) p.set("q", filtrosActivos.busqueda);
   filtrosActivos.marcas.forEach((m) => p.append("marca", m));
   filtrosActivos.categorias.forEach((c) => p.append("categoria", c));
   filtrosActivos.estados.forEach((e) => p.append("estado", e));
@@ -114,7 +118,10 @@ export const CatalogoView = ({
             </p>
           </div>
 
-          <SortSelect currentSort={sort} opciones={opcionesDeOrden} />
+          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+            <CatalogSearch busqueda={filtrosActivos.busqueda} />
+            <SortSelect currentSort={sort} opciones={opcionesDeOrden} />
+          </div>
         </div>
       </div>
 
@@ -154,7 +161,11 @@ export const CatalogoView = ({
             ) : (
               <div className="py-10 text-center flex flex-col items-center justify-center bg-black/5 border border-dashed border-black/10 rounded">
                 <h6 className="text-xl font-bold mb-1">No se encontraron vehículos.</h6>
-                <p className="text-sm text-[hsl(var(--muted-foreground))] mb-3 max-w-md">Los filtros aplicados no coinciden con ninguna unidad en stock.</p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))] mb-3 max-w-md">
+                  {filtrosActivos.busqueda
+                    ? `Ninguna unidad en stock coincide con “${filtrosActivos.busqueda}”.`
+                    : "Los filtros aplicados no coinciden con ninguna unidad en stock."}
+                </p>
                 <Link href="/catalogo" className="bg-[hsl(var(--foreground))] text-[hsl(var(--background))] text-[10px] font-black uppercase tracking-[0.1em] px-4 py-1.5 rounded hover:bg-[hsl(var(--primary))] hover:text-[hsl(var(--primary-foreground))] transition">
                   Limpiar Búsqueda
                 </Link>

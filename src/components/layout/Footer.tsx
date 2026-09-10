@@ -1,6 +1,6 @@
 import { Car } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import { LogoConcesionaria } from "@/components/layout/LogoConcesionaria";
 import type { SiteConfig } from "@/lib/configuracion-defaults";
 import { Facebook, Instagram } from "@/components/icons/Social";
 
@@ -29,19 +29,16 @@ export function Footer({ configuracion }: FooterProps) {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            {configuracion.logoUrl ? (
-              <Image
-                src={configuracion.logoUrl}
-                alt={configuracion.nombreConcesionaria}
-                width={120}
-                height={32}
-                className="h-8 w-auto object-contain"
-              />
-            ) : (
-              <div className="p-1.5 rounded-lg bg-[hsl(var(--primary))]/10">
-                <Car className="text-[hsl(var(--primary))] w-5 h-5" />
-              </div>
-            )}
+            <LogoConcesionaria
+              url={configuracion.logoUrl}
+              nombre={configuracion.nombreConcesionaria}
+              className="h-8 w-auto object-contain"
+              respaldo={
+                <div className="p-1.5 rounded-lg bg-[hsl(var(--primary))]/10">
+                  <Car className="text-[hsl(var(--primary))] w-5 h-5" />
+                </div>
+              }
+            />
             <span className="font-extrabold text-[hsl(var(--background))] uppercase tracking-tighter">
               {firstWord}{" "}
               {restWords && <span className="text-[hsl(var(--primary))]">{restWords}</span>}
