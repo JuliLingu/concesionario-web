@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/sesion";
 import { getTasaciones, updateTasacionEstado } from "@/actions/tasacion";
 import { estadoDeUrl } from "@/lib/estados";
+import { etiquetaEnum } from "@/lib/etiquetas";
 import { formatFechaLarga } from "@/lib/formato";
 import { formatNumeroAr, formatPrecioOriginal } from "@/lib/precio";
 import { codigoDeReferencia } from "@/lib/referencia";
@@ -20,15 +21,6 @@ import {
 interface TasacionesPageProps {
   searchParams: Promise<{ estado?: string }>;
 }
-
-/** Etiquetas legibles de los enums; el resto se muestra capitalizado. */
-const LABEL_TRANSMISION: Record<string, string> = {
-  AUTOMATICA: "Automática",
-  MANUAL: "Manual",
-  CVT: "CVT",
-};
-
-const capitalizar = (valor: string) => valor.charAt(0) + valor.slice(1).toLowerCase();
 
 export default async function TasacionesPage({ searchParams }: TasacionesPageProps) {
   // Tasación apagada desde Configuración: las propuestas guardadas siguen en la
@@ -72,8 +64,8 @@ export default async function TasacionesPage({ searchParams }: TasacionesPagePro
             {tasaciones.map((t) => {
               const fichaTecnica = [
                 t.version,
-                t.combustible && capitalizar(t.combustible),
-                t.transmision && LABEL_TRANSMISION[t.transmision],
+                t.combustible && etiquetaEnum(t.combustible),
+                t.transmision && etiquetaEnum(t.transmision),
               ].filter(Boolean);
 
               return (

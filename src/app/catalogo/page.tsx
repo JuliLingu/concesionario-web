@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import * as z from "zod";
 import { prisma } from "@/lib/prisma";
 import { Prisma, Transmision, Combustible, EstadoVehiculo } from "../../../generated/prisma";
@@ -74,6 +75,54 @@ async function idsOrdenadosPorPrecio(
     )
     .slice((pagina - 1) * ITEMS_PER_PAGE, pagina * ITEMS_PER_PAGE)
     .map((v) => v.id);
+}
+
+/**
+ * Parámetros que producen una vista recortada del mismo catálogo. Una URL con
+ * cualquiera de ellos muestra un subconjunto —o el mismo listado en otro
+ * orden— de lo que ya está en `/catalogo`.
+ */
+const PARAMETROS_DE_VISTA = [
+  "marca",
+  "categoria",
+  "estado",
+  "transmision",
+  "combustible",
+  "anioDesde",
+  "anioHasta",
+  "financiable",
+  "sort",
+  "page",
+];
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}): Promise<Metadata> {
+  const [params, configuracion] = await Promise.all([searchParams, getConfiguracion()]);
+
+  const esVistaFiltrada = PARAMETROS_DE_VISTA.some(
+    (clave) => params[clave] !== undefined,
+  );
+
+  return {
+    title: "Catálogo de vehículos",
+    description: `Todas las unidades disponibles en ${configuracion.nombreConcesionaria}. Buscá por marca, año, kilometraje y combustible, y consultá por la que te interese.`,
+    ...(esVistaFiltrada
+      ? {
+          // Cada combinación de filtros es una URL distinta con el mismo
+          // contenido barajado: son miles de páginas casi iguales compitiendo
+          // entre sí. Se dejan fuera del índice, pero con `follow`, así el
+          // rastreador igual las recorre para llegar a las fichas.
+          //
+          // No se apunta la canónica a `/catalogo`: la página 3 no es una
+          // versión alternativa de la 1, y declararlo así hace que Google
+          // ignore lo que hay de la 2 en adelante.
+          robots: { index: false, follow: true },
+        }
+      : { alternates: { canonical: "/catalogo" } }),
+  };
 }
 
 export default async function CatalogoPage({

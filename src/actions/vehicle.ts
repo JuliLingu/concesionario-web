@@ -226,36 +226,7 @@ export const cambiarPublicacion = async (id: string, publicacion: EstadoPublicac
 };
 
 /**
- * Ficha de una unidad. La usa el catálogo público, así que un borrador solo se
- * devuelve si quien mira es el administrador: el listado ya filtraba por
- * publicación, pero entrar por la URL de la ficha esquivaba ese filtro.
+ * La lectura de una ficha se mudó a `services/vehiculo.service.ts`: la piden
+ * `generateMetadata` y la página en el mismo request, y ahí se puede envolver
+ * en `cache()` para que sea una sola consulta. Acá quedan solo las escrituras.
  */
-export const getVehicleById = async (id: string) => {
-  try {
-    const vehicle = await prisma.vehiculo.findUnique({
-      where: { id },
-      include: {
-        categoria: true,
-        imagenes: {
-          orderBy: { orden: "asc" },
-        },
-      },
-    });
-
-    if (!vehicle) return null;
-
-    if (vehicle.publicacion !== "PUBLICADO") {
-      const session = await auth();
-      // Mismo null que un id inexistente: la página responde 404 y no confirma
-      // que la unidad exista.
-      if (session?.user?.role !== "ADMIN") return null;
-    }
-
-    return {
-      ...vehicle,
-      precio: Number(vehicle.precio)
-    };
-  } catch {
-    return null;
-  }
-};

@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import type { FiltrosCatalogo } from "@/services/cache.service";
+import { etiquetaEnum } from "@/lib/etiquetas";
 
 interface CatalogFiltersProps {
   /** Opciones derivadas del stock: ver getCachedFiltrosCatalogo. */
@@ -11,16 +12,6 @@ interface CatalogFiltersProps {
   /** Con el módulo apagado no se ofrece filtrar por unidades en cuotas. */
   financiacionActiva?: boolean;
 }
-
-/** Etiquetas legibles de los enums; el resto se muestra capitalizado. */
-const LABEL_TRANSMISION: Record<string, string> = {
-  AUTOMATICA: "Automática",
-  MANUAL: "Manual",
-  CVT: "CVT",
-};
-
-const capitalizar = (valor: string) =>
-  valor.charAt(0) + valor.slice(1).toLowerCase();
 
 export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogFiltersProps) => {
   const { marcas, categorias, estados, transmisiones, combustibles, anios } = filtros;
@@ -152,7 +143,7 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
           {estados.map((e) => (
             <CheckItem
               key={e}
-              label={capitalizar(e)}
+              label={etiquetaEnum(e)}
               checked={currentEstados.includes(e)}
               onChange={() => toggleMulti("estado", e)}
             />
@@ -180,7 +171,7 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
           {transmisiones.map((t) => (
             <CheckItem
               key={t}
-              label={LABEL_TRANSMISION[t] ?? capitalizar(t)}
+              label={etiquetaEnum(t)}
               checked={currentTransmisiones.includes(t)}
               onChange={() => toggleMulti("transmision", t)}
             />
@@ -194,7 +185,7 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
           {combustibles.map((c) => (
             <CheckItem
               key={c}
-              label={capitalizar(c)}
+              label={etiquetaEnum(c)}
               checked={currentCombustibles.includes(c)}
               onChange={() => toggleMulti("combustible", c)}
             />

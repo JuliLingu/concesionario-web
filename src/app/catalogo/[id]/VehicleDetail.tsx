@@ -6,9 +6,7 @@ import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
 import { RegistrarVista } from "@/components/catalog/RegistrarVista";
 import { WhatsappLink } from "@/components/catalog/WhatsappLink";
 import { formatPrecio, precioEnPesos } from "@/lib/precio";
-import type { getVehicleById } from "@/actions/vehicle";
-
-type Vehiculo = NonNullable<Awaited<ReturnType<typeof getVehicleById>>>;
+import type { VehiculoFicha as Vehiculo } from "@/services/vehiculo.service";
 
 interface VehicleDetailProps {
   vehicle: Vehiculo;
