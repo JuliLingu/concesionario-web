@@ -40,6 +40,8 @@ interface SettingsClientProps {
   configuracion: SiteConfig;
   /** Unidades publicadas marcadas como financiables: si son cero, la portada no muestra la sección. */
   vehiculosFinanciables: number;
+  /** Hay servicio de IA en las variables de entorno; sin él, el interruptor no tiene efecto. */
+  servicioIaConfigurado: boolean;
 }
 
 interface FieldProps {
@@ -464,6 +466,7 @@ type TabId = (typeof TABS)[number]["id"];
 export const SettingsClient = ({
   configuracion,
   vehiculosFinanciables,
+  servicioIaConfigurado,
 }: SettingsClientProps) => {
   const [isPending, startTransition] = useTransition();
   const [tab, setTab] = useState<TabId>("general");
@@ -479,6 +482,9 @@ export const SettingsClient = ({
   );
   const [tasacionActiva, setTasacionActiva] = useState(
     configuracion.tasacionActiva,
+  );
+  const [busquedaIaActiva, setBusquedaIaActiva] = useState(
+    configuracion.busquedaIaActiva,
   );
   const [faviconUrl, setFaviconUrl] = useState(configuracion.faviconUrl);
   const [paleta, setPaleta] = useState<Paleta>(() =>
@@ -775,6 +781,31 @@ export const SettingsClient = ({
                     Tasaciones
                   </Link>
                   .
+                </p>
+              )}
+
+              <ToggleField
+                label="Búsqueda inteligente"
+                name="busquedaIaActiva"
+                checked={busquedaIaActiva}
+                onChange={setBusquedaIaActiva}
+                helperText="Suma al buscador del catálogo un modo donde el visitante describe lo que busca con sus palabras (“SUV automática hasta 45 millones”) y una IA lo convierte en filtros. Cada búsqueda tiene un costo por uso en el proveedor de IA; hay un tope de búsquedas por visitante."
+              />
+              {/* Sin servicio el interruptor no tiene efecto visible: se avisa
+                  para que no parezca roto. */}
+              {busquedaIaActiva && !servicioIaConfigurado && (
+                <p className="text-xs font-bold text-amber-600">
+                  El servicio de búsqueda con IA no está configurado en esta
+                  instalación, así que el modo inteligente no aparece en el
+                  catálogo aunque lo enciendas. Hacen falta las variables
+                  AI_SEARCH_URL y AI_SEARCH_API_KEY.
+                </p>
+              )}
+              {busquedaIaActiva && !mostrarPrecios && (
+                <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                  Con los precios ocultos, la búsqueda inteligente ignora los
+                  montos que escriba el visitante: filtrar por precio dejaría
+                  adivinar cuánto sale cada unidad.
                 </p>
               )}
             </Card>

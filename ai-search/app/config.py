@@ -33,6 +33,8 @@ class Settings:
     inventory_url: str = ""
     inventory_secret: str = ""
     data_path: str = "data/inventario.json"
+    # Tabla de DynamoDB para la caché de embeddings. Vacía = caché en memoria.
+    embedding_cache_table: str = ""
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -47,4 +49,5 @@ class Settings:
             inventory_url=os.getenv("INVENTORY_URL", ""),
             inventory_secret=os.getenv("INVENTORY_SECRET", ""),
             data_path=os.getenv("DATA_PATH", cls.data_path),
+            embedding_cache_table=os.getenv("EMBEDDING_CACHE_TABLE", ""),
         )

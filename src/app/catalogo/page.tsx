@@ -141,7 +141,10 @@ export async function generateMetadata({
   // El título refleja lo buscado para que la pestaña y el historial sirvan de
   // algo con varias búsquedas abiertas. No es un problema de SEO que sea texto
   // de quien visita: la vista con `?q=` ya sale sin indexar, acá abajo.
-  const busqueda = textoDeBusquedaIa(params.ia) || terminosDeBusqueda(params.q).join(" ");
+  // Mismo criterio que la página: con el módulo apagado `?ia=` no existe.
+  const busquedaIa =
+    configuracion.busquedaIaActiva && busquedaIaDisponible() ? textoDeBusquedaIa(params.ia) : "";
+  const busqueda = busquedaIa || terminosDeBusqueda(params.q).join(" ");
 
   return {
     title: busqueda ? `${busqueda} · Catálogo de vehículos` : "Catálogo de vehículos",
@@ -184,9 +187,10 @@ export default async function CatalogoPage({
   };
 
   // Las dos búsquedas son excluyentes: el cuadro manda una u otra. Si una URL
-  // escrita a mano trae las dos, gana la de IA. Sin servicio configurado, `?ia=`
-  // se ignora como cualquier parámetro desconocido.
-  const iaDisponible = busquedaIaDisponible();
+  // escrita a mano trae las dos, gana la de IA. Con el módulo apagado o sin
+  // servicio configurado, `?ia=` se ignora como cualquier parámetro
+  // desconocido: una URL vieja no puede generar gasto con la función apagada.
+  const iaDisponible = configuracion.busquedaIaActiva && busquedaIaDisponible();
   const busquedaIa = iaDisponible ? textoDeBusquedaIa(params.ia) : "";
   const terminos = busquedaIa ? [] : terminosDeBusqueda(params.q);
 

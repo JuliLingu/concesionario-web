@@ -16,7 +16,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Request
 
 from .ai_provider import AIProvider, get_ai_provider
 from .config import Settings
-from .embedding_cache import EmbeddingCache, InMemoryEmbeddingCache
+from .embedding_cache import EmbeddingCache, get_embedding_cache
 from .inventory import InventoryError, load_inventory
 from .schemas import Inventario, SearchRequest, SearchResponse
 from .search_service import VehicleSearchService
@@ -39,7 +39,7 @@ def create_app(settings: Optional[Settings] = None,
 
     service = VehicleSearchService(
         ai=ai or get_ai_provider(settings),
-        cache=cache or InMemoryEmbeddingCache(),
+        cache=cache or get_embedding_cache(settings.embedding_cache_table, settings.aws_region),
         loader=loader or (lambda: load_inventory(settings)),
     )
 
@@ -54,11 +54,17 @@ def create_app(settings: Optional[Settings] = None,
             logger.exception("No se pudo armar el índice al arrancar")
         yield
 
+    # Swagger solo en modo mock. En producción la URL de la Lambda es pública, y
+    # /docs le mostraría a cualquiera qué endpoints hay y qué esperan.
+    docs = settings.use_mock
     app = FastAPI(
         title="Concesionario AI Search",
         description="Búsqueda de vehículos en lenguaje natural con Amazon Bedrock.",
-        version="0.2.0",
+        version="0.3.0",
         lifespan=lifespan,
+        docs_url="/docs" if docs else None,
+        redoc_url="/redoc" if docs else None,
+        openapi_url="/openapi.json" if docs else None,
     )
     app.state.settings = settings
     app.state.search_service = service

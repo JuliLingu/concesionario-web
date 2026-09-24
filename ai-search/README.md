@@ -13,7 +13,7 @@ le manda la búsqueda y recibe los vehículos ordenados por relevancia.
 ```bash
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt   # requirements.txt es solo lo que va a la Lambda
 cp .env.example .env               # por defecto USE_MOCK=true
 
 uvicorn app.main:app --reload
@@ -161,14 +161,138 @@ la caché de embeddings solo se recalculan las unidades cuyo texto cambió.
 
 ---
 
-## 5. Camino a producción
+## 5. Deploy en AWS Lambda
 
-- **Vector store:** reemplazar `InMemoryVectorStore` por OpenSearch Serverless, una Bedrock Knowledge Base o pgvector.
-- **Deploy:** contenedor en ECS/App Runner, o Lambda con un adaptador como Mangum.
-- **Seguridad:** rol IAM con permisos mínimos (solo los modelos usados), API key o auth entre Next.js y el servicio.
+Todo lo de AWS está en [`template.yaml`](template.yaml) (AWS SAM): la función con su
+Function URL, la tabla de DynamoDB de la caché de embeddings, el rol IAM con permisos
+mínimos, el grupo de logs con vencimiento y un ping cada 5 minutos que mantiene el
+contenedor tibio.
+
+### Qué cuesta
+
+| Pieza | Capa gratuita | Uso esperado |
+|---|---|---|
+| Lambda | 1M invocaciones + 400.000 GB-s por mes, permanente | ~9.000 pings + las búsquedas |
+| Function URL | Sin costo propio | — |
+| DynamoDB (aprovisionada 5/5) | 25 RCU/WCU + 25 GB, permanente | Una fila de 2 KB por unidad |
+| EventBridge Scheduler | 14M invocaciones por mes | ~9.000 |
+| CloudWatch Logs | 5 GB por mes | Vencen a los 14 días |
+| **Bedrock** | **No tiene** | ~US$ 0,0007 por búsqueda con Haiku 4.5 |
+
+### Paso 0 — Herramientas (una sola vez)
+
+```bash
+winget install Amazon.AWSCLI
+winget install Amazon.SAM-CLI
+```
+
+Credenciales: lo recomendado es **IAM Identity Center** (`aws configure sso`), que da
+credenciales temporales en lugar de claves permanentes en tu disco. Después de
+configurarlo, `aws sts get-caller-identity --profile <tu-perfil>` tiene que mostrar tu
+cuenta. En los comandos de abajo, agregá `--profile <tu-perfil>` si no es el default.
+
+`sam build` descarga las ruedas de Linux de numpy y compañía aunque estés en Windows:
+**no hace falta Docker**.
+
+### Paso 1 — Alerta de presupuesto
+
+En la consola: **Billing → Budgets → Create budget → "Zero spend budget"** o uno mensual
+de US$ 1 con aviso por mail. Es gratis y es lo primero: Bedrock no tiene capa gratuita.
+
+### Paso 2 — Acceso a los modelos en Bedrock
+
+En la consola, región **us-east-1** → **Bedrock → Model catalog**: abrí **Titan Text
+Embeddings V2** y **Claude Haiku 4.5**. Para los modelos de Anthropic, la primera vez
+AWS pide un formulario corto de caso de uso; completalo y esperá la aprobación (suele
+ser inmediata). Verificá el ID exacto del perfil de inferencia de Haiku en
+**Cross-region inference**: tiene que coincidir con `LlmModelId` del template.
+
+### Paso 3 — Probar Bedrock desde tu máquina (opcional pero recomendado)
+
+En `ai-search/.env` cambiá `USE_MOCK=false` y agregá `AWS_PROFILE=<tu-perfil>`. Corré el
+servicio (`uvicorn app.main:app --port 8000` o la configuración `ai-search` del panel de
+preview) y probá:
+
+```bash
+curl -s -X POST http://localhost:8000/search -H "Content-Type: application/json" -H "X-Api-Key: <tu API_KEY>" -d "{\"consulta\":\"algo familiar para viajar, automático, hasta 50 millones\"}"
+```
+
+Fuera del modo mock `/docs` está apagado a propósito. Volvé a `USE_MOCK=true` al terminar.
+
+### Paso 4 — Secretos y Vercel (antes del deploy)
+
+Generá dos secretos distintos:
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+En Vercel → Settings → Environment Variables (Production) cargá **solo**
+`AI_INVENTARIO_SECRET` y redeployá. La Lambda pide el inventario al arrancar, así que el
+endpoint tiene que existir antes que ella. Sin `AI_SEARCH_URL` el sitio sigue sin IA.
+
+Si el proyecto tiene **Deployment Protection** en producción, la Lambda recibiría la
+página de login de Vercel en lugar del inventario: la protección tiene que cubrir solo
+los previews (es la opción por defecto).
+
+### Paso 5 — Deploy
+
+Desde `ai-search/`:
+
+```bash
+sam build
+sam deploy --guided
+```
+
+Respuestas para la primera vez:
+
+- Stack name: `concesionario-ai-search` · Region: `us-east-1`
+- `ApiKey`: el primer secreto · `InventorySecret`: el segundo (el de Vercel)
+- `InventoryUrl`: `https://<tu-dominio>/api/ia/inventario`
+- Modelos: Enter para dejar los defaults
+- *"SearchFunction Function Url has no authentication. Is this okay?"* → **y**
+  (la autenticación la hace el código con la API key)
+- *Save arguments to configuration file* → **y**: queda `samconfig.toml` y las próximas
+  veces alcanza con `sam build && sam deploy`. **No lo subas al repo**: guarda los
+  secretos en texto plano (ya está en `.gitignore`).
+
+Al terminar muestra `FunctionUrl` en los Outputs.
+
+### Paso 6 — Verificar
+
+```bash
+curl -s <FunctionUrl>health
+curl -s -X POST <FunctionUrl>search -H "Content-Type: application/json" -H "X-Api-Key: <ApiKey>" -d "{\"consulta\":\"suv automática\"}"
+```
+
+`/health` tiene que mostrar `"mock": false` y la cantidad de unidades publicadas.
+
+### Paso 7 — Conectar Next
+
+En Vercel agregá `AI_SEARCH_URL` (la `FunctionUrl`) y `AI_SEARCH_API_KEY` (la `ApiKey`),
+redeployá y encendé **Configuración → Módulos → Búsqueda inteligente**. Guardar la
+configuración dispara un reindexado.
+
+### Día a día
+
+- Actualizar el código: `sam build && sam deploy`.
+- Ver logs en vivo: `sam logs --stack-name concesionario-ai-search --tail`.
+- Borrar todo: `sam delete --stack-name concesionario-ai-search`.
+
+### Si algo falla
+
+| Síntoma | Causa probable |
+|---|---|
+| `/health` responde 403 `Forbidden` | Falta el permiso público de la Function URL. Revisá en Lambda → Configuration → Function URL que el tipo de auth sea NONE y que la política de recursos permita `lambda:InvokeFunctionUrl` (y, en cuentas nuevas, también `lambda:InvokeFunction`) a `*`. |
+| `/search` responde 503 | La Lambda no pudo leer el inventario: `InventoryUrl` mal escrita, `AI_INVENTARIO_SECRET` distinto en Vercel o Deployment Protection. El detalle está en los logs. |
+| `/search` responde 502 | Error de Bedrock: modelo sin acceso habilitado, ID de perfil distinto o permiso IAM. En los logs aparece `AccessDeniedException` o `ValidationException`. |
+| El catálogo muestra "no disponible" solo en la primera búsqueda | Arranque en frío más largo que los 3 s de Next. El ping lo evita casi siempre; si pasa seguido, revisá que la regla `MantenerTibio` esté activa. |
+
+### Más adelante
+
+- **Vector store:** si el stock creciera a miles de unidades, reemplazar `InMemoryVectorStore` por OpenSearch Serverless, una Bedrock Knowledge Base o pgvector.
 - **Guardrails:** Amazon Bedrock Guardrails para filtrar temas fuera de alcance y datos sensibles.
-- **Observabilidad:** CloudWatch para latencia, errores y consumo de tokens.
-- **Caché:** guardar embeddings de búsquedas frecuentes para bajar costo y latencia.
+- **Observabilidad:** métricas de CloudWatch de latencia, errores y consumo de tokens.
 
 ---
 

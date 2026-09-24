@@ -1,9 +1,11 @@
+# Dependencias del servicio. Es lo que empaqueta `sam build` para la Lambda,
+# así que acá va solo lo que corre en producción; lo de desarrollo y tests está
+# en requirements-dev.txt.
 fastapi>=0.110
-uvicorn[standard]>=0.29
 pydantic>=2.6
-boto3>=1.34
+# La Lambda trae boto3 de fábrica, pero con una versión que AWS actualiza
+# cuando quiere. Se fija acá para no depender de que incluya la Converse API.
+boto3>=1.35
 numpy>=1.26
 python-dotenv>=1.0
-# Solo para tests
-pytest>=8.0
-httpx>=0.27
+mangum>=0.19
