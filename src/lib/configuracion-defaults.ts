@@ -121,11 +121,17 @@ export const CONFIGURACION_NUMERIC_DEFAULTS = {
  * bandeja del panel. Mismo criterio, y por la misma razón práctica: sin esto,
  * cada instalación ya entregada empezaría a juntar propuestas de compra en una
  * pantalla que su dueño no sabe que existe.
+ *
+ * `busquedaIaActiva` ofrece la búsqueda inteligente en el catálogo. Apagada por
+ * defecto porque cada búsqueda es una llamada paga a un modelo de IA, y además
+ * necesita el servicio `ai-search` configurado (AI_SEARCH_URL y
+ * AI_SEARCH_API_KEY): sin él, encenderla no cambia nada en el sitio.
  */
 export const CONFIGURACION_BOOLEAN_DEFAULTS = {
   mostrarPrecios: true,
   financiacionActiva: false,
   tasacionActiva: false,
+  busquedaIaActiva: false,
 } as const;
 
 /**

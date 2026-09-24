@@ -1,0 +1,137 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Buscador con IA del concesionario. FastAPI en Lambda (vía Mangum) detrás de una
+  Function URL, caché de embeddings en DynamoDB y modelos de Amazon Bedrock.
+  Todo dimensionado para entrar en la capa gratuita salvo el consumo de Bedrock,
+  que se paga por token.
+
+# Los secretos llegan como parámetros NoEcho: no se muestran en la consola de
+# CloudFormation ni en `sam deploy`. Quedan visibles como variables de entorno
+# de la función para quien tenga acceso a la cuenta, que acá es solo el dueño.
+Parameters:
+  ApiKey:
+    Type: String
+    NoEcho: true
+    MinLength: 32
+    Description: Clave que Next manda en X-Api-Key (AI_SEARCH_API_KEY en Vercel).
+  InventoryUrl:
+    Type: String
+    AllowedPattern: "^https://.+/api/ia/inventario$"
+    Description: URL pública del endpoint de inventario, p. ej. https://tu-sitio.vercel.app/api/ia/inventario
+  InventorySecret:
+    Type: String
+    NoEcho: true
+    MinLength: 32
+    Description: Secreto del inventario (AI_INVENTARIO_SECRET en Vercel).
+  LlmModelId:
+    Type: String
+    Default: us.anthropic.claude-haiku-4-5-20251001-v1:0
+    Description: Perfil de inferencia del LLM que extrae los filtros.
+  LlmFoundationModelId:
+    Type: String
+    Default: anthropic.claude-haiku-4-5-20251001-v1:0
+    Description: El mismo modelo sin el prefijo de región; lo exige el permiso IAM.
+  EmbeddingModelId:
+    Type: String
+    Default: amazon.titan-embed-text-v2:0
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Architectures: [x86_64]
+    # Más memoria también es más CPU: con 1024 MB la importación de numpy y el
+    # arranque en frío tardan bastante menos. 400.000 GB-s gratis al mes son
+    # ~390.000 segundos de ejecución a este tamaño.
+    MemorySize: 1024
+    Timeout: 20
+
+Resources:
+  EmbeddingCacheTable:
+    Type: AWS::DynamoDB::Table
+    # Si se borra el stack, la tabla se va con él: es una caché, se reconstruye sola.
+    DeletionPolicy: Delete
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: k
+          AttributeType: S
+      KeySchema:
+        - AttributeName: k
+          KeyType: HASH
+      # Aprovisionada y no on-demand: la capa gratuita permanente de DynamoDB
+      # cubre 25 unidades de lectura y 25 de escritura aprovisionadas, no el modo
+      # on-demand. Con 5 y 5 sobra para un stock de concesionaria; los picos de
+      # un reindexado completo los absorbe la capacidad de ráfaga.
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  SearchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: app.lambda_handler.handler
+      Description: Buscador con IA del concesionario
+      Environment:
+        Variables:
+          USE_MOCK: "false"
+          API_KEY: !Ref ApiKey
+          INVENTORY_URL: !Ref InventoryUrl
+          INVENTORY_SECRET: !Ref InventorySecret
+          LLM_MODEL_ID: !Ref LlmModelId
+          EMBEDDING_MODEL_ID: !Ref EmbeddingModelId
+          EMBEDDING_DIMENSIONS: "512"
+          EMBEDDING_CACHE_TABLE: !Ref EmbeddingCacheTable
+      # Auth NONE: la autenticación la hace el código con la API key. Firmar con
+      # IAM obligaría a guardar credenciales de AWS en Vercel.
+      FunctionUrlConfig:
+        AuthType: NONE
+      # Con poco tráfico Lambda apaga el contenedor a los pocos minutos, y el
+      # arranque en frío (importar numpy, pedir el inventario) se come el
+      # timeout de 3 s de Next: la búsqueda caería al catálogo sin IA. Un ping
+      # cada 5 minutos lo mantiene tibio. Son ~8.600 invocaciones al mes de unos
+      # milisegundos: gratis dentro del millón mensual.
+      Events:
+        MantenerTibio:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(5 minutes)
+            Input: '{"source": "aws.events"}'
+      LoggingConfig:
+        LogGroup: !Ref SearchFunctionLogs
+      # Permisos mínimos: solo estos modelos y solo esta tabla.
+      Policies:
+        - Statement:
+            - Sid: InvocarModelos
+              Effect: Allow
+              Action: bedrock:InvokeModel
+              Resource:
+                - !Sub arn:aws:bedrock:${AWS::Region}::foundation-model/${EmbeddingModelId}
+                # Un perfil de inferencia "us." reparte las llamadas entre varias
+                # regiones de EE. UU.; el permiso tiene que cubrir el modelo en
+                # todas ellas, además del perfil.
+                - !Sub arn:aws:bedrock:*::foundation-model/${LlmFoundationModelId}
+                - !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${LlmModelId}
+            - Sid: CacheDeEmbeddings
+              Effect: Allow
+              Action:
+                - dynamodb:BatchGetItem
+                - dynamodb:BatchWriteItem
+              Resource: !GetAtt EmbeddingCacheTable.Arn
+
+  # Grupo de logs propio para fijarle vencimiento. El que crea Lambda solo no
+  # vence nunca, y CloudWatch cobra el almacenamiento pasados los 5 GB gratis.
+  SearchFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    Properties:
+      LogGroupName: /aws/lambda/concesionario-ai-search
+      RetentionInDays: 14
+
+Outputs:
+  FunctionUrl:
+    Description: Va en AI_SEARCH_URL en Vercel.
+    Value: !GetAtt SearchFunctionUrl.FunctionUrl
+  FunctionName:
+    Value: !Ref SearchFunction

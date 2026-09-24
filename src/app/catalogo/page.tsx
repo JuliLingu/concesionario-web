@@ -8,7 +8,8 @@ import { getCachedFiltrosCatalogo, getCachedCategorias } from "@/services/cache.
 import { getConfiguracion } from "@/services/configuracion.service";
 import { precioEnPesos } from "@/lib/precio";
 import { whatsappUrl } from "@/lib/whatsapp";
-import { condicionesDeBusqueda, terminosDeBusqueda } from "@/lib/busqueda";
+import { condicionesDeBusqueda, terminosDeBusqueda, textoDeBusquedaIa } from "@/lib/busqueda";
+import { busquedaIaDisponible, buscarConIa } from "@/services/busqueda-ia.service";
 import {
   ITEMS_PER_PAGE,
   SORT_OPTIONS,
@@ -79,12 +80,41 @@ async function idsOrdenadosPorPrecio(
 }
 
 /**
+ * Ids de la página cuando manda la búsqueda con IA.
+ *
+ * El servicio devuelve los ids ya ordenados por parecido, pero son una foto de
+ * su índice: acá se cruzan con el `where` —publicación y filtros del panel—, que
+ * es lo que decide qué se puede mostrar hoy. Lo que se despublicó desde el
+ * último reindexado cae solo. Después se pagina en memoria respetando el orden
+ * del servicio, como en el orden por precio.
+ */
+async function idsOrdenadosPorRelevancia(
+  where: Prisma.VehiculoWhereInput,
+  idsDelServicio: string[],
+  pagina: number,
+): Promise<string[]> {
+  const visibles = new Set(
+    (
+      await prisma.vehiculo.findMany({
+        where: { ...where, id: { in: idsDelServicio } },
+        select: { id: true },
+      })
+    ).map((v) => v.id),
+  );
+
+  return idsDelServicio
+    .filter((id) => visibles.has(id))
+    .slice((pagina - 1) * ITEMS_PER_PAGE, pagina * ITEMS_PER_PAGE);
+}
+
+/**
  * Parámetros que producen una vista recortada del mismo catálogo. Una URL con
  * cualquiera de ellos muestra un subconjunto —o el mismo listado en otro
  * orden— de lo que ya está en `/catalogo`.
  */
 const PARAMETROS_DE_VISTA = [
   "q",
+  "ia",
   "marca",
   "categoria",
   "estado",
@@ -111,7 +141,10 @@ export async function generateMetadata({
   // El título refleja lo buscado para que la pestaña y el historial sirvan de
   // algo con varias búsquedas abiertas. No es un problema de SEO que sea texto
   // de quien visita: la vista con `?q=` ya sale sin indexar, acá abajo.
-  const busqueda = terminosDeBusqueda(params.q).join(" ");
+  // Mismo criterio que la página: con el módulo apagado `?ia=` no existe.
+  const busquedaIa =
+    configuracion.busquedaIaActiva && busquedaIaDisponible() ? textoDeBusquedaIa(params.ia) : "";
+  const busqueda = busquedaIa || terminosDeBusqueda(params.q).join(" ");
 
   return {
     title: busqueda ? `${busqueda} · Catálogo de vehículos` : "Catálogo de vehículos",
@@ -153,10 +186,17 @@ export default async function CatalogoPage({
       .slice(0, MAXIMO_VALORES_POR_FILTRO);
   };
 
-  const terminos = terminosDeBusqueda(params.q);
+  // Las dos búsquedas son excluyentes: el cuadro manda una u otra. Si una URL
+  // escrita a mano trae las dos, gana la de IA. Con el módulo apagado o sin
+  // servicio configurado, `?ia=` se ignora como cualquier parámetro
+  // desconocido: una URL vieja no puede generar gasto con la función apagada.
+  const iaDisponible = configuracion.busquedaIaActiva && busquedaIaDisponible();
+  const busquedaIa = iaDisponible ? textoDeBusquedaIa(params.ia) : "";
+  const terminos = busquedaIa ? [] : terminosDeBusqueda(params.q);
 
   const filtrosActivos: FiltrosActivos = {
     busqueda: terminos.join(" "),
+    busquedaIa,
     marcas: toArray(params.marca),
     categorias: toArray(params.categoria),
     estados: toArray(params.estado).filter((e) => Object.keys(EstadoVehiculo).includes(e)),
@@ -176,6 +216,11 @@ export default async function CatalogoPage({
     !configuracion.mostrarPrecios && esOrdenPorPrecio(sortEnUrl)
       ? "newest"
       : sortEnUrl;
+
+  // Si el servicio no contesta o se agotó el cupo, `resultadoIa` lo dice y el
+  // catálogo se muestra sin la búsqueda, con un aviso: nunca una página rota.
+  const resultadoIa = busquedaIa ? await buscarConIa(busquedaIa) : null;
+  const idsIa = resultadoIa?.estado === "ok" ? resultadoIa.ids : null;
   const currentPage = paginaEnUrl.parse(params.page);
 
   const where: Prisma.VehiculoWhereInput = {
@@ -191,6 +236,7 @@ export default async function CatalogoPage({
   if (filtrosActivos.soloFinanciables) where.financiable = true;
   // La búsqueda recorta lo que los filtros dejaron pasar, no lo reemplaza.
   if (terminos.length > 0) where.AND = condicionesDeBusqueda(terminos);
+  if (idsIa) where.id = { in: idsIa };
   if (filtrosActivos.anioDesde || filtrosActivos.anioHasta) {
     where.anio = {
       ...(filtrosActivos.anioDesde ? { gte: filtrosActivos.anioDesde } : {}),
@@ -203,12 +249,18 @@ export default async function CatalogoPage({
   // Las opciones de los filtros salen del stock real; al administrador se le
   // ofrecen también las de los borradores. Las categorías solo hacen falta para
   // el modal de edición, así que fuera del panel ni se consultan.
+  //
+  // Con búsqueda con IA el orden es el del servicio —del más al menos
+  // parecido—, que es la razón de haber buscado así; el selector de orden no
+  // se muestra.
   const [filtros, categorias, idsDeLaPagina] = await Promise.all([
     getCachedFiltrosCatalogo(isAdmin),
     isAdmin ? getCachedCategorias() : [],
-    ordenaPorPrecio
-      ? idsOrdenadosPorPrecio(where, sort, currentPage, configuracion.cotizacionDolar)
-      : null,
+    idsIa
+      ? idsOrdenadosPorRelevancia(where, idsIa, currentPage)
+      : ordenaPorPrecio
+        ? idsOrdenadosPorPrecio(where, sort, currentPage, configuracion.cotizacionDolar)
+        : null,
   ]);
 
   const [totalCount, rawVehiculos] = await Promise.all([
@@ -271,6 +323,8 @@ export default async function CatalogoPage({
       totalPages={Math.ceil(totalCount / ITEMS_PER_PAGE)}
       sort={sort}
       whatsapp={whatsapp}
+      iaDisponible={iaDisponible}
+      resultadoIa={resultadoIa}
     />
   );
 }

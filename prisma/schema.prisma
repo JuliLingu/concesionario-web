@@ -249,6 +249,12 @@ model Configuracion {
   tasacionTexto    String? @db.Text
   tasacionCtaTexto String?
 
+  // Búsqueda inteligente del catálogo (servicio ai-search). Arranca apagada
+  // como los demás módulos: cada búsqueda se paga por uso, y ninguna
+  // instalación ya entregada debería empezar a generar ese gasto sola por
+  // actualizar el código. Encenderla sin el servicio configurado no hace nada.
+  busquedaIaActiva Boolean @default(false)
+
   // Consulta por unidad (ficha de vehículo)
   contactoEyebrow       String?
   contactoTitulo        String? @db.Text

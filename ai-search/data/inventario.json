@@ -1,0 +1,55 @@
+{
+  "categorias": ["hatchback", "sedan", "suv", "pickup"],
+  "preciosVisibles": true,
+  "cotizacionDolar": 1200,
+  "vehiculos": [
+    {
+      "id": "v001", "marca": "Volkswagen", "modelo": "Golf", "version": "Highline", "anio": 2022,
+      "categoria": "hatchback", "combustible": "NAFTA", "transmision": "AUTOMATICA", "estado": "USADO",
+      "kilometraje": 35000, "precioArs": 38000000,
+      "descripcion": "Hatchback deportivo y equipado, ideal para ciudad. Techo solar, pantalla táctil y sensores de estacionamiento."
+    },
+    {
+      "id": "v002", "marca": "Toyota", "modelo": "Corolla", "version": "XEI", "anio": 2025,
+      "categoria": "sedan", "combustible": "NAFTA", "transmision": "CVT", "estado": "USADO",
+      "kilometraje": 8000, "precioArs": 38000000,
+      "descripcion": "Sedán cómodo y económico, baúl amplio, ideal para ruta y uso familiar. Muy bajo consumo."
+    },
+    {
+      "id": "v003", "marca": "Toyota", "modelo": "RAV4", "version": "Base", "anio": 2026,
+      "categoria": "suv", "combustible": "NAFTA", "transmision": "CVT", "estado": "USADO",
+      "kilometraje": 1500, "precioArs": 45600000,
+      "descripcion": "SUV familiar espaciosa, cinco plazas, gran baúl y posición de manejo alta. Ideal para viajes."
+    },
+    {
+      "id": "v004", "marca": "Toyota", "modelo": "Hilux", "version": "SRV 4x4", "anio": 2021,
+      "categoria": "pickup", "combustible": "DIESEL", "transmision": "MANUAL", "estado": "USADO",
+      "kilometraje": 90000, "precioArs": 42000000,
+      "descripcion": "Pickup robusta para campo y trabajo, tracción 4x4, gran capacidad de carga."
+    },
+    {
+      "id": "v005", "marca": "Jeep", "modelo": "Compass", "version": "Longitude", "anio": 2023,
+      "categoria": "suv", "combustible": "NAFTA", "transmision": "AUTOMATICA", "estado": "USADO",
+      "kilometraje": 22000, "precioArs": 39500000,
+      "descripcion": "SUV familiar con buen equipamiento de seguridad, cámara de retroceso y Android Auto."
+    },
+    {
+      "id": "v006", "marca": "Fiat", "modelo": "Cronos", "version": "Drive", "anio": 2026,
+      "categoria": "sedan", "combustible": "NAFTA", "transmision": "MANUAL", "estado": "NUEVO",
+      "kilometraje": 0, "precioArs": 26000000,
+      "descripcion": "Sedán 0km económico, ideal como primer auto, mantenimiento barato."
+    },
+    {
+      "id": "v007", "marca": "Toyota", "modelo": "Corolla Cross", "version": "Hybrid SEG", "anio": 2024,
+      "categoria": "suv", "combustible": "HIBRIDO", "transmision": "CVT", "estado": "USADO",
+      "kilometraje": 15000, "precioArs": 44000000,
+      "descripcion": "SUV híbrida de muy bajo consumo, silenciosa, ideal para ciudad y familia."
+    },
+    {
+      "id": "v008", "marca": "Peugeot", "modelo": "208", "version": "Allure", "anio": 2023,
+      "categoria": "hatchback", "combustible": "NAFTA", "transmision": "MANUAL", "estado": "USADO",
+      "kilometraje": 30000, "precioArs": 24500000,
+      "descripcion": "Hatchback compacto, fácil de estacionar, pantalla táctil y buen consumo urbano."
+    }
+  ]
+}

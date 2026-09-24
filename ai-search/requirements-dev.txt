@@ -1,0 +1,6 @@
+-r requirements.txt
+# Servidor local (en Lambda lo reemplaza Mangum)
+uvicorn[standard]>=0.29
+# Tests
+pytest>=8.0
+httpx>=0.27

@@ -47,15 +47,17 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
   };
 
   /**
-   * Destilda todo lo del panel pero deja la búsqueda por texto: es de otra
-   * caja, no cuenta para el contador de acá arriba, y borrar de golpe lo que
-   * alguien tipeó desde un botón que ni siquiera la nombra desconcierta. Para
-   * volver al catálogo entero está el enlace de la grilla vacía.
+   * Destilda todo lo del panel pero deja la búsqueda —por texto o con IA—: es
+   * de otra caja, no cuenta para el contador de acá arriba, y borrar de golpe
+   * lo que alguien tipeó desde un botón que ni siquiera la nombra desconcierta.
+   * Para volver al catálogo entero está el enlace de la grilla vacía.
    */
   const limpiarFiltros = () => {
     const params = new URLSearchParams();
     const busqueda = searchParams.get("q");
     if (busqueda) params.set("q", busqueda);
+    const busquedaIa = searchParams.get("ia");
+    if (busquedaIa) params.set("ia", busquedaIa);
     navigate(params.toString());
   };
 

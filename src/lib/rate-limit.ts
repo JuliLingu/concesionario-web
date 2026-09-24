@@ -46,6 +46,16 @@ export const REGLAS = {
    * efecto lateral bienvenido.
    */
   METRICA_POR_UNIDAD: { cupo: 1, ventanaMs: 30 * MINUTO },
+
+  /**
+   * Búsqueda con IA. Cada búsqueda nueva es una llamada a un modelo que se paga
+   * por token, así que el cupo defiende la factura, no un formulario. Se cuentan
+   * búsquedas distintas: paginar o volver atrás sobre la misma frase no gasta
+   * nada —sale de la caché— y no debe consumir cupo. Para eso está la segunda
+   * regla, que marca una frase como "ya contada" por origen durante una hora.
+   */
+  BUSQUEDA_IA_POR_IP: { cupo: 20, ventanaMs: HORA },
+  BUSQUEDA_IA_REPETIDA: { cupo: 1, ventanaMs: HORA },
 } as const satisfies Record<string, Regla>;
 
 const globalParaLimites = globalThis as unknown as {
