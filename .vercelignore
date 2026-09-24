@@ -1,0 +1,3 @@
+# El buscador con IA se despliega aparte (AWS Lambda); Vercel no tiene nada
+# que hacer con él.
+/ai-search

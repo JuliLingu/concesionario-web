@@ -1,0 +1,50 @@
+[
+  {
+    "id": "v001", "brand": "Volkswagen", "model": "Golf", "version": "Highline", "year": 2022,
+    "category": "hatchback", "fuel": "nafta", "transmission": "automatica", "condition": "usado",
+    "km": 35000, "price": 38000000,
+    "description": "Hatchback deportivo y equipado, ideal para ciudad. Techo solar, pantalla táctil y sensores de estacionamiento."
+  },
+  {
+    "id": "v002", "brand": "Toyota", "model": "Corolla", "version": "XEI", "year": 2025,
+    "category": "sedan", "fuel": "nafta", "transmission": "cvt", "condition": "usado",
+    "km": 8000, "price": 38000000,
+    "description": "Sedán cómodo y económico, baúl amplio, ideal para ruta y uso familiar. Muy bajo consumo."
+  },
+  {
+    "id": "v003", "brand": "Toyota", "model": "RAV4", "version": "Base", "year": 2026,
+    "category": "suv", "fuel": "nafta", "transmission": "cvt", "condition": "usado",
+    "km": 1500, "price": 45600000,
+    "description": "SUV familiar espaciosa, cinco plazas, gran baúl y posición de manejo alta. Ideal para viajes."
+  },
+  {
+    "id": "v004", "brand": "Toyota", "model": "Hilux", "version": "SRV 4x4", "year": 2021,
+    "category": "pickup", "fuel": "diesel", "transmission": "manual", "condition": "usado",
+    "km": 90000, "price": 42000000,
+    "description": "Pickup robusta para campo y trabajo, tracción 4x4, gran capacidad de carga."
+  },
+  {
+    "id": "v005", "brand": "Jeep", "model": "Compass", "version": "Longitude", "year": 2023,
+    "category": "suv", "fuel": "nafta", "transmission": "automatica", "condition": "usado",
+    "km": 22000, "price": 39500000,
+    "description": "SUV familiar con buen equipamiento de seguridad, cámara de retroceso y Android Auto."
+  },
+  {
+    "id": "v006", "brand": "Fiat", "model": "Cronos", "version": "Drive", "year": 2026,
+    "category": "sedan", "fuel": "nafta", "transmission": "manual", "condition": "nuevo",
+    "km": 0, "price": 26000000,
+    "description": "Sedán 0km económico, ideal como primer auto, mantenimiento barato."
+  },
+  {
+    "id": "v007", "brand": "Toyota", "model": "Corolla Cross", "version": "Hybrid SEG", "year": 2024,
+    "category": "suv", "fuel": "hibrido", "transmission": "cvt", "condition": "usado",
+    "km": 15000, "price": 44000000,
+    "description": "SUV híbrida de muy bajo consumo, silenciosa, ideal para ciudad y familia."
+  },
+  {
+    "id": "v008", "brand": "Peugeot", "model": "208", "version": "Allure", "year": 2023,
+    "category": "hatchback", "fuel": "nafta", "transmission": "manual", "condition": "usado",
+    "km": 30000, "price": 24500000,
+    "description": "Hatchback compacto, fácil de estacionar, pantalla táctil y buen consumo urbano."
+  }
+]
