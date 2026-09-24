@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { CACHE_TAGS } from "@/services/cache.service";
+import { reindexarDespuesDeResponder } from "@/services/busqueda-ia.service";
 import { ConfiguracionSchema } from "@/schemas/configuracion";
 import { registrarError } from "@/lib/log";
 
@@ -39,6 +40,9 @@ export async function updateConfiguracion(values: unknown) {
     revalidateTag(CACHE_TAGS.CONFIGURACION, "max");
     // ...y el render de todas las rutas, ya que la config afecta al layout.
     revalidatePath("/", "layout");
+    // La cotización y los precios a la vista cambian lo que el buscador con IA
+    // puede filtrar por precio.
+    reindexarDespuesDeResponder();
 
     return { success: true };
   } catch (error) {

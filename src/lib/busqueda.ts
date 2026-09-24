@@ -65,6 +65,33 @@ export function textoDeBusqueda(valor: string | string[] | undefined): string {
   return terminosDeBusqueda(valor).join(" ");
 }
 
+/** Por debajo no hay nada que interpretar; el servicio de IA exige lo mismo. */
+export const LARGO_MINIMO_BUSQUEDA_IA = 3;
+
+/**
+ * Una frase describiendo lo que uno busca entra holgada. El servicio acepta
+ * hasta 300; el techo más bajo acota los tokens que puede gastar una URL.
+ */
+export const LARGO_MAXIMO_BUSQUEDA_IA = 200;
+
+/**
+ * La búsqueda con IA tal como se escribe en la URL (`?ia=`) y se manda al
+ * servicio. Vive acá y no en `busqueda-ia.ts` por lo mismo que la de texto: el
+ * cuadro de búsqueda —de cliente— normaliza con esta misma función antes de
+ * navegar, y aquel archivo es solo de servidor.
+ *
+ * A diferencia de la búsqueda por texto no se parte en palabras: la frase
+ * entera es lo que el modelo tiene que leer. Solo se colapsan los espacios,
+ * así "suv  familiar" y "suv familiar" comparten la caché.
+ */
+export function textoDeBusquedaIa(valor: string | string[] | undefined): string {
+  const texto = Array.isArray(valor) ? valor[0] : valor;
+  if (!texto) return "";
+
+  const normalizado = texto.replace(/\s+/g, " ").trim().slice(0, LARGO_MAXIMO_BUSQUEDA_IA).trim();
+  return normalizado.length >= LARGO_MINIMO_BUSQUEDA_IA ? normalizado : "";
+}
+
 /**
  * Condiciones de la búsqueda, una por término, para combinar con `AND`.
  *
