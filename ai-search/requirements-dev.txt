@@ -1,6 +1,9 @@
 -r requirements.txt
 # Servidor local (en Lambda lo reemplaza Mangum)
 uvicorn[standard]>=0.29
+# Probar Bedrock desde la máquina con credenciales de `aws login` (la Lambda
+# usa su rol IAM y no lo necesita)
+botocore[crt]
 # Tests
 pytest>=8.0
 httpx>=0.27

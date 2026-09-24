@@ -35,10 +35,18 @@ Parameters:
   EmbeddingModelId:
     Type: String
     Default: amazon.titan-embed-text-v2:0
+  UseMock:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+    Description: >
+      "true" corre el servicio sin Bedrock (filtros por reglas y embeddings
+      simulados). Sirve para probar la infraestructura sin costo o mientras la
+      cuenta no tiene acceso a los modelos.
 
 Globals:
   Function:
-    Runtime: python3.13
+    Runtime: python3.14
     Architectures: [x86_64]
     # Más memoria también es más CPU: con 1024 MB la importación de numpy y el
     # arranque en frío tardan bastante menos. 400.000 GB-s gratis al mes son
@@ -75,7 +83,7 @@ Resources:
       Description: Buscador con IA del concesionario
       Environment:
         Variables:
-          USE_MOCK: "false"
+          USE_MOCK: !Ref UseMock
           API_KEY: !Ref ApiKey
           INVENTORY_URL: !Ref InventoryUrl
           INVENTORY_SECRET: !Ref InventorySecret
