@@ -98,7 +98,7 @@ jobs:
       # La misma versión que el runtime de Lambda donde se despliega.
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.14"
           cache: pip
           cache-dependency-path: |
             ai-search/requirements.txt

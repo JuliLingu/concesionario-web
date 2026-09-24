@@ -9,6 +9,7 @@ con la clave en `X-Api-Key`. Por eso no hay CORS.
 """
 import hmac
 import logging
+import os
 from contextlib import asynccontextmanager
 from typing import Callable, Optional
 
@@ -54,9 +55,10 @@ def create_app(settings: Optional[Settings] = None,
             logger.exception("No se pudo armar el índice al arrancar")
         yield
 
-    # Swagger solo en modo mock. En producción la URL de la Lambda es pública, y
-    # /docs le mostraría a cualquiera qué endpoints hay y qué esperan.
-    docs = settings.use_mock
+    # Swagger solo en desarrollo local. La URL de la Lambda es pública —aunque
+    # corra en modo mock— y /docs le mostraría a cualquiera qué endpoints hay y
+    # qué esperan. Lambda define AWS_LAMBDA_FUNCTION_NAME en todo contenedor.
+    docs = settings.use_mock and not os.getenv("AWS_LAMBDA_FUNCTION_NAME")
     app = FastAPI(
         title="Concesionario AI Search",
         description="Búsqueda de vehículos en lenguaje natural con Amazon Bedrock.",
