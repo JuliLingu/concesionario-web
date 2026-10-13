@@ -121,9 +121,6 @@ export const ConfiguracionSchema = z.object({
   tasacionTexto: textoOpcional,
   tasacionCtaTexto: textoOpcional,
 
-  // Búsqueda inteligente del catálogo
-  busquedaIaActiva: interruptor(false),
-
   // Consulta por unidad (ficha de vehículo)
   contactoEyebrow: textoOpcional,
   contactoTitulo: textoOpcional,

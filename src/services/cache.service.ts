@@ -7,7 +7,6 @@ export const CACHE_TAGS = {
   FILTROS: "catalogo-filtros",
   CATEGORIAS: "categorias",
   CONFIGURACION: "configuracion",
-  BUSQUEDA_IA: "busqueda-ia",
 };
 
 // Revalidar cada 1 hora (3600 segundos)
