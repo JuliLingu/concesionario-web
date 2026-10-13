@@ -6,7 +6,6 @@ import { VehicleSchema } from "@/schemas/vehicle";
 import { auth } from "@/auth";
 import { revalidatePath, updateTag } from "next/cache";
 import { CACHE_TAGS } from "@/services/cache.service";
-import { reindexarDespuesDeResponder } from "@/services/busqueda-ia.service";
 import { registrarError } from "@/lib/log";
 import { EstadoPublicacion } from "../../generated/prisma";
 
@@ -23,7 +22,6 @@ function revalidarCatalogo() {
   updateTag(CACHE_TAGS.FILTROS);
   revalidatePath("/dashboard/vehicles");
   revalidatePath("/catalogo");
-  reindexarDespuesDeResponder();
 }
 
 /**

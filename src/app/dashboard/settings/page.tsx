@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/sesion";
 import { getConfiguracion } from "@/services/configuracion.service";
-import { busquedaIaDisponible } from "@/services/busqueda-ia.service";
 import { SettingsClient } from "./SettingsClient";
 
 export const metadata = {
@@ -22,7 +21,6 @@ export default async function SettingsPage() {
     <SettingsClient
       configuracion={configuracion}
       vehiculosFinanciables={vehiculosFinanciables}
-      servicioIaConfigurado={busquedaIaDisponible()}
     />
   );
 }
