@@ -1,8 +1,7 @@
 "use server";
 
-import * as z from "zod";
 import { prisma } from "@/lib/prisma";
-import { ConsultaSchema } from "@/schemas/consulta";
+import { ConsultaSchema, type ConsultaInput } from "@/schemas/consulta";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
@@ -17,7 +16,7 @@ import {
 } from "@/lib/rate-limit";
 
 // ── Crear consulta (acción pública, sin auth requerida) ──────────────────────
-export const createConsulta = async (values: z.infer<typeof ConsultaSchema>) => {
+export const createConsulta = async (values: ConsultaInput) => {
   const validated = ConsultaSchema.safeParse(values);
 
   if (!validated.success) {
@@ -38,6 +37,8 @@ export const createConsulta = async (values: z.infer<typeof ConsultaSchema>) => 
         email:     validated.data.email,
         telefono:  validated.data.telefono,
         mensaje:   validated.data.mensaje,
+        medioContacto: validated.data.medioContacto,
+        franjaHoraria: validated.data.franjaHoraria,
         vehiculoId: validated.data.vehiculoId || null,
       },
     });
@@ -54,6 +55,8 @@ export const createConsulta = async (values: z.infer<typeof ConsultaSchema>) => 
         email:     validated.data.email,
         telefono:  validated.data.telefono,
         mensaje:   validated.data.mensaje,
+        medioContacto: validated.data.medioContacto,
+        franjaHoraria: validated.data.franjaHoraria,
         vehiculoId: validated.data.vehiculoId || null,
       }),
     );

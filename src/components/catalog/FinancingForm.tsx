@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import { SolicitudFinanciacionSchema } from "@/schemas/financiacion";
 import { createSolicitud } from "@/actions/financiacion";
 import { Send, CheckCircle2 } from "lucide-react";
+import { AYUDA_TELEFONO, Campo, claseCampo } from "@/components/forms/Campo";
 
 interface FinancingFormProps {
   vehiculoId: string;
@@ -19,7 +20,7 @@ export const FinancingForm = ({ vehiculoId, anticipo, cuotas }: FinancingFormPro
   const [success, setSuccess] = useState<string | undefined>();
   const [isPending, start] = useTransition();
 
-  const form = useForm<z.input<typeof SolicitudFinanciacionSchema>, any, z.infer<typeof SolicitudFinanciacionSchema>>({
+  const form = useForm<z.input<typeof SolicitudFinanciacionSchema>, unknown,z.infer<typeof SolicitudFinanciacionSchema>>({
     resolver: zodResolver(SolicitudFinanciacionSchema),
     defaultValues: {
       vehiculoId,
@@ -34,6 +35,8 @@ export const FinancingForm = ({ vehiculoId, anticipo, cuotas }: FinancingFormPro
       mensaje: "",
     },
   });
+
+  const errores = form.formState.errors;
 
   const onSubmit = (values: z.infer<typeof SolicitudFinanciacionSchema>) => {
     setError(undefined);
@@ -72,90 +75,75 @@ export const FinancingForm = ({ vehiculoId, anticipo, cuotas }: FinancingFormPro
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1 flex flex-col gap-1">
+        <Campo label="Nombre *" error={errores.nombre?.message} className="flex-1">
           <input
             {...form.register("nombre")}
-            placeholder="Nombre *"
+            autoComplete="given-name"
             disabled={isPending}
-            className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full disabled:opacity-50 ${form.formState.errors.nombre ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+            className={claseCampo({ error: !!errores.nombre })}
           />
-          {form.formState.errors.nombre && (
-            <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.nombre.message}</span>
-          )}
-        </div>
-        <div className="flex-1 flex flex-col gap-1">
+        </Campo>
+        <Campo label="Apellido *" error={errores.apellido?.message} className="flex-1">
           <input
             {...form.register("apellido")}
-            placeholder="Apellido *"
+            autoComplete="family-name"
             disabled={isPending}
-            className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full disabled:opacity-50 ${form.formState.errors.apellido ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+            className={claseCampo({ error: !!errores.apellido })}
           />
-          {form.formState.errors.apellido && (
-            <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.apellido.message}</span>
-          )}
-        </div>
+        </Campo>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1 flex flex-col gap-1">
+        <Campo label="DNI *" error={errores.dni?.message} className="flex-1">
           <input
             {...form.register("dni")}
-            placeholder="DNI *"
+            inputMode="numeric"
+            autoComplete="off"
+            placeholder="Sin puntos"
             disabled={isPending}
-            className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full disabled:opacity-50 ${form.formState.errors.dni ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+            className={claseCampo({ error: !!errores.dni })}
           />
-          {form.formState.errors.dni && (
-            <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.dni.message}</span>
-          )}
-        </div>
-        <div className="flex-1 flex flex-col gap-1">
+        </Campo>
+        <Campo label="Teléfono *" error={errores.telefono?.message} ayuda={AYUDA_TELEFONO} className="flex-1">
           <input
             {...form.register("telefono")}
-            placeholder="Teléfono *"
+            type="tel"
+            autoComplete="tel"
+            placeholder="Ej: 11 2345-6789"
             disabled={isPending}
-            className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full disabled:opacity-50 ${form.formState.errors.telefono ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+            className={claseCampo({ error: !!errores.telefono })}
           />
-          {form.formState.errors.telefono && (
-            <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.telefono.message}</span>
-          )}
-        </div>
+        </Campo>
       </div>
 
-      <div className="flex flex-col gap-1">
+      <Campo label="Email *" error={errores.email?.message}>
         <input
           {...form.register("email")}
           type="email"
-          placeholder="Email *"
+          autoComplete="email"
           disabled={isPending}
-          className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full disabled:opacity-50 ${form.formState.errors.email ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+          className={claseCampo({ error: !!errores.email })}
         />
-        {form.formState.errors.email && (
-          <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.email.message}</span>
-        )}
-      </div>
+      </Campo>
 
-      <div className="flex flex-col gap-1">
+      <Campo label="Ingresos demostrables (opcional)" error={errores.ingresos?.message}>
         <input
           {...form.register("ingresos")}
           type="number"
-          placeholder="Ingresos demostrables (opcional)"
+          inputMode="numeric"
           disabled={isPending}
-          className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full disabled:opacity-50 ${form.formState.errors.ingresos ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+          className={claseCampo({ error: !!errores.ingresos })}
         />
-        {form.formState.errors.ingresos && (
-          <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.ingresos.message}</span>
-        )}
-      </div>
+      </Campo>
 
-      <div className="flex flex-col gap-1">
+      <Campo label="Comentarios (opcional)" error={errores.mensaje?.message}>
         <textarea
           {...form.register("mensaje")}
-          placeholder="Comentarios adicionales"
           disabled={isPending}
           rows={3}
-          className={`bg-[hsl(var(--surface-low))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full resize-none disabled:opacity-50`}
+          className={`${claseCampo({ error: !!errores.mensaje })} resize-none`}
         />
-      </div>
+      </Campo>
 
       {error && (
         <div className="bg-red-50 text-[hsl(var(--primary))] text-[10px] font-black uppercase tracking-[0.1em] p-3 rounded border-l-4 border-[hsl(var(--primary))]">

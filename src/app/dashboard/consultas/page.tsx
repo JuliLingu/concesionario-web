@@ -10,8 +10,10 @@ import {
   PanelListado,
   SinResultados,
   TablaPanel,
+  TelefonoCliente,
   Th,
 } from "@/components/dashboard/PanelListado";
+import { describirPreferencia } from "@/lib/preferencia-contacto";
 
 interface ConsultasPageProps {
   searchParams: Promise<{ estado?: string }>;
@@ -59,7 +61,12 @@ export default async function ConsultasPage({ searchParams }: ConsultasPageProps
                 <td className="py-3 px-4">
                   <div className="font-bold text-sm text-[hsl(var(--foreground))]">{c.nombre}</div>
                   <Contacto href={`mailto:${c.email}`} texto={c.email} />
-                  {c.telefono && <Contacto href={`tel:${c.telefono}`} texto={c.telefono} tenue />}
+                  <TelefonoCliente telefono={c.telefono} />
+                  {describirPreferencia(c.medioContacto, c.franjaHoraria) && (
+                    <div className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--foreground))] mt-1">
+                      Prefiere {describirPreferencia(c.medioContacto, c.franjaHoraria)}
+                    </div>
+                  )}
                 </td>
                 <td className="py-3 px-4 hidden lg:table-cell">
                   <CeldaVehiculo vehiculo={c.vehiculo} />

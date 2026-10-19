@@ -15,6 +15,7 @@ import {
   PanelListado,
   SinResultados,
   TablaPanel,
+  TelefonoCliente,
   Th,
 } from "@/components/dashboard/PanelListado";
 
@@ -84,7 +85,7 @@ export default async function TasacionesPage({ searchParams }: TasacionesPagePro
                       {codigoDeReferencia(t.id)}
                     </div>
                     <Contacto href={`mailto:${t.email}`} texto={t.email} />
-                    <Contacto href={`tel:${t.telefono}`} texto={t.telefono} tenue />
+                    <TelefonoCliente telefono={t.telefono} />
                   </td>
 
                   <td className="py-3 px-4">

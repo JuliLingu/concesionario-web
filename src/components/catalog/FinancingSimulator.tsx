@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { Calculator } from "lucide-react";
 import { FinancingForm } from "./FinancingForm";
 import { formatArs } from "@/lib/precio";
+import { ANTICIPO_POR_DEFECTO, cuotaMensual as calcularCuota } from "@/lib/vitrina";
 
 interface Plan {
   id: string;
@@ -20,7 +21,7 @@ interface FinancingSimulatorProps {
 }
 
 export const FinancingSimulator = ({ vehiculoId, precioArs, planes }: FinancingSimulatorProps) => {
-  const [anticipoPercent, setAnticipoPercent] = useState<number>(50);
+  const [anticipoPercent, setAnticipoPercent] = useState<number>(ANTICIPO_POR_DEFECTO);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(planes.length > 0 ? planes[0].id : null);
   const [showForm, setShowForm] = useState(false);
 
@@ -30,12 +31,8 @@ export const FinancingSimulator = ({ vehiculoId, precioArs, planes }: FinancingS
 
   const cuotaMensual = useMemo(() => {
     if (!selectedPlan) return 0;
-    const capitalAFinanciar = precioArs - anticipoArs;
-    const tasaDecimal = selectedPlan.tasaAnual / 100;
-    const años = selectedPlan.cuotas / 12;
-    const totalAPagar = capitalAFinanciar + (capitalAFinanciar * tasaDecimal * años);
-    return totalAPagar / selectedPlan.cuotas;
-  }, [precioArs, anticipoArs, selectedPlan]);
+    return calcularCuota(precioArs, anticipoPercent, selectedPlan);
+  }, [precioArs, anticipoPercent, selectedPlan]);
 
   if (planes.length === 0) {
     return null; // No financing available

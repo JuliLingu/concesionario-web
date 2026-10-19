@@ -8,6 +8,7 @@ import { getCachedFiltrosCatalogo, getCachedCategorias } from "@/services/cache.
 import { getConfiguracion } from "@/services/configuracion.service";
 import { precioEnPesos } from "@/lib/precio";
 import { whatsappUrl } from "@/lib/whatsapp";
+import { getPlanes } from "@/actions/financiacion";
 import { condicionesDeBusqueda, terminosDeBusqueda } from "@/lib/busqueda";
 import {
   ITEMS_PER_PAGE,
@@ -26,6 +27,9 @@ import {
  */
 const anioEnUrl = z.coerce.number().int().min(1900).max(2100).optional().catch(undefined);
 const paginaEnUrl = z.coerce.number().int().min(1).max(500).catch(1);
+/** Precio en dólares y kilómetros: enteros positivos con un techo que ningún auto real pasa. */
+const precioEnUrl = z.coerce.number().int().min(0).max(10_000_000).optional().catch(undefined);
+const kmEnUrl = z.coerce.number().int().min(0).max(2_000_000).optional().catch(undefined);
 const ordenEnUrl = z
   .enum(SORT_OPTIONS.map((opcion) => opcion.value) as [SortValue, ...SortValue[]])
   .catch("newest");
@@ -34,6 +38,47 @@ const ordenEnUrl = z
 const MAXIMO_VALORES_POR_FILTRO = 20;
 /** Ninguna marca, categoría ni enum legítimo se acerca a este largo. */
 const MAXIMO_LARGO_VALOR = 60;
+
+/**
+ * Días que una unidad vendida sigue a la vista en el catálogo público, con la
+ * etiqueta "Vendido". Muestra que el stock rota; pasado ese plazo ya es una
+ * grilla llena de autos que no se pueden comprar.
+ */
+const DIAS_VENDIDO_VISIBLE = 30;
+
+function visibleAlPublico(): Prisma.VehiculoWhereInput {
+  const vendidoDesde = new Date(Date.now() - DIAS_VENDIDO_VISIBLE * 86_400_000);
+  return {
+    OR: [
+      { publicacion: "PUBLICADO" },
+      { publicacion: "VENDIDO", vendidoAt: { gte: vendidoDesde } },
+    ],
+  };
+}
+
+/**
+ * Rango de precio en dólares, que es como compara quien compra un usado.
+ *
+ * Cada unidad guarda su precio en la moneda en que se publicó, así que el rango
+ * se traduce a pesos para las que están en pesos. Sin cotización cargada esas
+ * no tienen con qué compararse y quedan afuera: el filtro promete un techo, y
+ * mostrar una unidad que quizás lo pasa es peor que no mostrarla.
+ */
+function condicionDePrecio(
+  desde: number | undefined,
+  hasta: number | undefined,
+  cotizacionDolar: number | null,
+): Prisma.VehiculoWhereInput {
+  const rango = (factor: number) => ({
+    ...(desde !== undefined ? { gte: desde * factor } : {}),
+    ...(hasta !== undefined ? { lte: hasta * factor } : {}),
+  });
+
+  const enDolares: Prisma.VehiculoWhereInput = { moneda: "USD", precio: rango(1) };
+  if (!cotizacionDolar || cotizacionDolar <= 0) return enDolares;
+
+  return { OR: [enDolares, { moneda: "ARS", precio: rango(cotizacionDolar) }] };
+}
 
 /** El orden por precio no pasa por acá: se resuelve en pesos más abajo. */
 function getOrderBy(sort: SortValue): Prisma.VehiculoOrderByWithRelationInput {
@@ -62,17 +107,23 @@ async function idsOrdenadosPorPrecio(
 ): Promise<string[]> {
   const candidatos = await prisma.vehiculo.findMany({
     where,
-    select: { id: true, precio: true, moneda: true },
+    select: { id: true, precio: true, moneda: true, publicacion: true },
   });
 
   return candidatos
     .map((v) => ({
       id: v.id,
+      vendido: v.publicacion === "VENDIDO",
       precioArs:
         precioEnPesos(Number(v.precio), v.moneda, cotizacionDolar) ?? Number(v.precio),
     }))
+    // Las vendidas van al final, igual que en el resto de los órdenes.
     .sort((a, b) =>
-      sort === "price_asc" ? a.precioArs - b.precioArs : b.precioArs - a.precioArs,
+      a.vendido !== b.vendido
+        ? Number(a.vendido) - Number(b.vendido)
+        : sort === "price_asc"
+          ? a.precioArs - b.precioArs
+          : b.precioArs - a.precioArs,
     )
     .slice((pagina - 1) * ITEMS_PER_PAGE, pagina * ITEMS_PER_PAGE)
     .map((v) => v.id);
@@ -92,6 +143,10 @@ const PARAMETROS_DE_VISTA = [
   "combustible",
   "anioDesde",
   "anioHasta",
+  "precioDesde",
+  "precioHasta",
+  "kmDesde",
+  "kmHasta",
   "financiable",
   "sort",
   "page",
@@ -164,6 +219,12 @@ export default async function CatalogoPage({
     combustibles: toArray(params.combustible).filter((c) => Object.keys(Combustible).includes(c)),
     anioDesde: anioEnUrl.parse(params.anioDesde),
     anioHasta: anioEnUrl.parse(params.anioHasta),
+    // Con los precios ocultos el rango de precio se ignora: recortar la grilla
+    // por importe dejaría deducir cuánto sale cada unidad.
+    precioDesde: configuracion.mostrarPrecios ? precioEnUrl.parse(params.precioDesde) : undefined,
+    precioHasta: configuracion.mostrarPrecios ? precioEnUrl.parse(params.precioHasta) : undefined,
+    kmDesde: kmEnUrl.parse(params.kmDesde),
+    kmHasta: kmEnUrl.parse(params.kmHasta),
     // Con el módulo apagado el parámetro se ignora: filtrar por algo que el
     // sitio no ofrece dejaría una grilla recortada sin explicación.
     soloFinanciables: configuracion.financiacionActiva && params.financiable === "1",
@@ -178,9 +239,12 @@ export default async function CatalogoPage({
       : sortEnUrl;
   const currentPage = paginaEnUrl.parse(params.page);
 
-  const where: Prisma.VehiculoWhereInput = {
-    publicacion: isAdmin ? undefined : "PUBLICADO",
-  };
+  const where: Prisma.VehiculoWhereInput = {};
+  // Condiciones que llevan su propio OR y no pueden ir sueltas en `where`.
+  const condiciones: Prisma.VehiculoWhereInput[] = [];
+
+  // El público ve lo publicado y, por un tiempo, lo vendido: ver DIAS_VENDIDO_VISIBLE.
+  if (!isAdmin) condiciones.push(visibleAlPublico());
 
   const { marcas, categorias: slugsCategoria, estados, transmisiones, combustibles } = filtrosActivos;
   if (marcas.length > 0)        where.marca = { in: marcas };
@@ -190,26 +254,41 @@ export default async function CatalogoPage({
   if (combustibles.length > 0)  where.combustible = { in: combustibles as Combustible[] };
   if (filtrosActivos.soloFinanciables) where.financiable = true;
   // La búsqueda recorta lo que los filtros dejaron pasar, no lo reemplaza.
-  if (terminos.length > 0) where.AND = condicionesDeBusqueda(terminos);
+  if (terminos.length > 0) condiciones.push(...condicionesDeBusqueda(terminos));
   if (filtrosActivos.anioDesde || filtrosActivos.anioHasta) {
     where.anio = {
       ...(filtrosActivos.anioDesde ? { gte: filtrosActivos.anioDesde } : {}),
       ...(filtrosActivos.anioHasta ? { lte: filtrosActivos.anioHasta } : {}),
     };
   }
+  const { kmDesde, kmHasta, precioDesde, precioHasta } = filtrosActivos;
+  if (kmDesde !== undefined || kmHasta !== undefined) {
+    where.kilometraje = {
+      ...(kmDesde !== undefined ? { gte: kmDesde } : {}),
+      ...(kmHasta !== undefined ? { lte: kmHasta } : {}),
+    };
+  }
+  if (precioDesde !== undefined || precioHasta !== undefined) {
+    condiciones.push(condicionDePrecio(precioDesde, precioHasta, configuracion.cotizacionDolar));
+  }
+  if (condiciones.length > 0) where.AND = condiciones;
 
   const ordenaPorPrecio = esOrdenPorPrecio(sort);
 
   // Las opciones de los filtros salen del stock real; al administrador se le
   // ofrecen también las de los borradores. Las categorías solo hacen falta para
   // el modal de edición, así que fuera del panel ni se consultan.
-  const [filtros, categorias, idsDeLaPagina] = await Promise.all([
+  // Los planes alimentan la etiqueta "Financiable" y el "desde $X/mes" de cada
+  // tarjeta; con el módulo apagado no se consultan.
+  const [filtros, categorias, idsDeLaPagina, rawPlanes] = await Promise.all([
     getCachedFiltrosCatalogo(isAdmin),
     isAdmin ? getCachedCategorias() : [],
     ordenaPorPrecio
       ? idsOrdenadosPorPrecio(where, sort, currentPage, configuracion.cotizacionDolar)
       : null,
+    configuracion.financiacionActiva ? getPlanes(false) : [],
   ]);
+  const planes = rawPlanes.map((p) => ({ cuotas: p.cuotas, tasaAnual: p.tasaAnual.toNumber() }));
 
   const [totalCount, rawVehiculos] = await Promise.all([
     prisma.vehiculo.count({ where }),
@@ -221,7 +300,9 @@ export default async function CatalogoPage({
       ...(idsDeLaPagina
         ? {}
         : {
-            orderBy: getOrderBy(sort),
+            // Las vendidas, al final: `vendidoAt` es null en todo lo que sigue
+            // a la venta, y MySQL ordena los null primero en ascendente.
+            orderBy: [{ vendidoAt: "asc" }, getOrderBy(sort)],
             skip: (currentPage - 1) * ITEMS_PER_PAGE,
             take: ITEMS_PER_PAGE,
           }),
@@ -264,6 +345,7 @@ export default async function CatalogoPage({
       filtros={filtros}
       filtrosActivos={filtrosActivos}
       financiacionActiva={configuracion.financiacionActiva}
+      planes={planes}
       categorias={categorias}
       isAdmin={isAdmin}
       totalCount={totalCount}

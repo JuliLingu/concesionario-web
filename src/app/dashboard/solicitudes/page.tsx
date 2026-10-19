@@ -13,6 +13,7 @@ import {
   PanelListado,
   SinResultados,
   TablaPanel,
+  TelefonoCliente,
   Th,
 } from "@/components/dashboard/PanelListado";
 
@@ -69,7 +70,7 @@ export default async function SolicitudesPage({ searchParams }: SolicitudesPageP
                     DNI: {s.dni}
                   </div>
                   <Contacto href={`mailto:${s.email}`} texto={s.email} />
-                  {s.telefono && <Contacto href={`tel:${s.telefono}`} texto={s.telefono} tenue />}
+                  <TelefonoCliente telefono={s.telefono} />
                 </td>
                 <td className="py-3 px-4 hidden lg:table-cell">
                   <CeldaVehiculo vehiculo={s.vehiculo} />

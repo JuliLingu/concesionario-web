@@ -9,6 +9,16 @@
 
 export const ITEMS_PER_PAGE = 9;
 
+/**
+ * Escalones de los filtros de precio (en dólares) y de kilometraje. Son listas
+ * fijas y no un input libre: "hasta USD 15.000" o "menos de 80.000 km" son los
+ * cortes con los que piensa quien compra, y un desplegable no exige tipear.
+ */
+export const ESCALONES_PRECIO_USD = [
+  5_000, 10_000, 15_000, 20_000, 25_000, 30_000, 40_000, 50_000, 75_000, 100_000,
+];
+export const ESCALONES_KM = [10_000, 30_000, 50_000, 80_000, 100_000, 150_000, 200_000];
+
 export const SORT_OPTIONS = [
   { value: "newest",     label: "Más Recientes"    },
   { value: "oldest",     label: "Más Antiguos"     },
