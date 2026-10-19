@@ -3,10 +3,13 @@ import { VehicleCardAdminOverlay } from "@/components/catalog/VehicleCardAdminOv
 import { CatalogFilters } from "@/components/catalog/CatalogFilters";
 import { CatalogSearch } from "@/components/catalog/CatalogSearch";
 import { SortSelect } from "@/components/catalog/SortSelect";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Link from "next/link";
 import { ITEMS_PER_PAGE, type SortOption, type SortValue } from "@/lib/catalogo";
 import type { FiltrosCatalogo } from "@/services/cache.service";
+import { etiquetaEnum } from "@/lib/etiquetas";
+import { formatNumeroAr, formatUsd } from "@/lib/precio";
+import type { PlanDeCuotas } from "@/lib/vitrina";
 
 /** Filtros activos leídos de la URL. Se usan para reconstruir los enlaces de paginado. */
 export interface FiltrosActivos {
@@ -19,6 +22,11 @@ export interface FiltrosActivos {
   combustibles: string[];
   anioDesde?: number;
   anioHasta?: number;
+  /** En dólares. */
+  precioDesde?: number;
+  precioHasta?: number;
+  kmDesde?: number;
+  kmHasta?: number;
   soloFinanciables: boolean;
 }
 
@@ -40,6 +48,8 @@ interface CatalogoViewProps {
   mostrarPrecios: boolean;
   /** Módulo de financiación encendido: habilita el filtro de unidades en cuotas. */
   financiacionActiva: boolean;
+  /** Planes activos; vacío con el módulo apagado. Ver VehicleCard. */
+  planes: PlanDeCuotas[];
   /** Null cuando la concesionaria todavía no cargó un teléfono. */
   whatsapp: { importacion: string; asesor: string } | null;
 }
@@ -58,11 +68,86 @@ const construirUrl = (
   filtrosActivos.combustibles.forEach((c) => p.append("combustible", c));
   if (filtrosActivos.anioDesde) p.set("anioDesde", String(filtrosActivos.anioDesde));
   if (filtrosActivos.anioHasta) p.set("anioHasta", String(filtrosActivos.anioHasta));
+  for (const clave of ["precioDesde", "precioHasta", "kmDesde", "kmHasta"] as const) {
+    const valor = filtrosActivos[clave];
+    if (valor !== undefined) p.set(clave, String(valor));
+  }
   if (filtrosActivos.soloFinanciables) p.set("financiable", "1");
   if (sort !== "newest") p.set("sort", sort);
   for (const [k, v] of Object.entries(nuevos)) p.set(k, v);
   const qs = p.toString();
   return `/catalogo${qs ? `?${qs}` : ""}`;
+};
+
+interface Chip {
+  key: string;
+  label: string;
+  /** La misma vista sin este filtro, desde la página 1. */
+  href: string;
+}
+
+/**
+ * Un chip por cada filtro aplicado, con el enlace que lo quita.
+ *
+ * Se arman en el servidor y no en el panel porque tienen que verse arriba de la
+ * grilla: en mobile el panel queda lejos, y sin esto no hay forma de saber por
+ * qué la grilla muestra lo que muestra.
+ */
+const chipsDeFiltros = (
+  f: FiltrosActivos,
+  sort: SortValue,
+  filtros: FiltrosCatalogo,
+): Chip[] => {
+  const sin = (cambios: Partial<FiltrosActivos>) => construirUrl({ ...f, ...cambios }, sort, {});
+  const nombreCategoria = (slug: string) =>
+    filtros.categorias.find((c) => c.slug === slug)?.nombre ?? slug;
+  const km = (v: number) => `${formatNumeroAr(v)} km`;
+
+  const chips: Chip[] = [];
+  if (f.busqueda) chips.push({ key: "q", label: `“${f.busqueda}”`, href: sin({ busqueda: "" }) });
+  if (f.soloFinanciables)
+    chips.push({ key: "fin", label: "En cuotas", href: sin({ soloFinanciables: false }) });
+
+  // Un rango con las dos puntas es un solo chip: son un mismo filtro.
+  const rango = (
+    key: string,
+    desde: number | undefined,
+    hasta: number | undefined,
+    fmt: (v: number) => string,
+    quitar: Partial<FiltrosActivos>,
+  ) => {
+    if (desde === undefined && hasta === undefined) return;
+    const label =
+      desde !== undefined && hasta !== undefined
+        ? `${fmt(desde)} – ${fmt(hasta)}`
+        : desde !== undefined
+          ? `Desde ${fmt(desde)}`
+          : `Hasta ${fmt(hasta!)}`;
+    chips.push({ key, label, href: sin(quitar) });
+  };
+  rango("precio", f.precioDesde, f.precioHasta, formatUsd, { precioDesde: undefined, precioHasta: undefined });
+  rango("km", f.kmDesde, f.kmHasta, km, { kmDesde: undefined, kmHasta: undefined });
+  rango("anio", f.anioDesde, f.anioHasta, String, { anioDesde: undefined, anioHasta: undefined });
+
+  const multi = (
+    clave: "marcas" | "categorias" | "estados" | "transmisiones" | "combustibles",
+    etiqueta: (v: string) => string,
+  ) => {
+    for (const valor of f[clave]) {
+      chips.push({
+        key: `${clave}-${valor}`,
+        label: etiqueta(valor),
+        href: sin({ [clave]: f[clave].filter((v) => v !== valor) }),
+      });
+    }
+  };
+  multi("categorias", nombreCategoria);
+  multi("estados", etiquetaEnum);
+  multi("marcas", (v) => v);
+  multi("transmisiones", etiquetaEnum);
+  multi("combustibles", etiquetaEnum);
+
+  return chips;
 };
 
 /** Números de página con elipsis: 1 … 4 5 6 … 20 */
@@ -93,10 +178,12 @@ export const CatalogoView = ({
   cotizacionDolar,
   mostrarPrecios,
   financiacionActiva,
+  planes,
   whatsapp,
 }: CatalogoViewProps) => {
   const urlDePagina = (pagina: number) =>
     construirUrl(filtrosActivos, sort, { page: String(pagina) });
+  const chips = chipsDeFiltros(filtrosActivos, sort, filtros);
 
   return (
     <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-8 flex flex-col">
@@ -114,7 +201,7 @@ export const CatalogoView = ({
             <p className="text-[hsl(var(--muted-foreground))] font-medium italic">
               {totalCount === 0
                 ? "No hay vehículos que coincidan con tu búsqueda."
-                : `Mostrando ${(currentPage - 1) * ITEMS_PER_PAGE + 1}–${Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} de ${totalCount} vehículos disponibles.`}
+                : `Mostrando ${(currentPage - 1) * ITEMS_PER_PAGE + 1}–${Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} de ${totalCount} vehículos.`}
             </p>
           </div>
 
@@ -130,11 +217,39 @@ export const CatalogoView = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           {/* Filters */}
           <div className="lg:col-span-3">
-            <CatalogFilters filtros={filtros} financiacionActiva={financiacionActiva} />
+            <CatalogFilters
+              filtros={filtros}
+              financiacionActiva={financiacionActiva}
+              mostrarPrecios={mostrarPrecios}
+            />
           </div>
 
           {/* Vehicles */}
           <div className="lg:col-span-9">
+            {chips.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 mb-5">
+                {chips.map((chip) => (
+                  <Link
+                    key={chip.key}
+                    href={chip.href}
+                    aria-label={`Quitar filtro: ${chip.label}`}
+                    className="inline-flex items-center gap-1.5 bg-[hsl(var(--card))] border border-black/10 rounded-full pl-3 pr-2 py-1 text-xs font-bold text-[hsl(var(--foreground))] hover:border-[hsl(var(--primary))] hover:text-[hsl(var(--primary))] transition-colors"
+                  >
+                    {chip.label}
+                    <X size={12} aria-hidden />
+                  </Link>
+                ))}
+                {chips.length > 1 && (
+                  <Link
+                    href="/catalogo"
+                    className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--primary))] hover:text-[hsl(var(--foreground))] transition-colors px-1"
+                  >
+                    Limpiar todo
+                  </Link>
+                )}
+              </div>
+            )}
+
             {vehiculos.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {vehiculos.map((v, index) => (
@@ -144,6 +259,7 @@ export const CatalogoView = ({
                       priority={index < 2}
                       cotizacionDolar={cotizacionDolar}
                       mostrarPrecios={mostrarPrecios}
+                      planes={planes}
                       accionAdmin={
                         isAdmin ? (
                           <VehicleCardAdminOverlay

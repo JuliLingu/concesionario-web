@@ -1,5 +1,7 @@
 import * as z from "zod";
 import { Combustible, Moneda, Transmision } from "../../generated/prisma";
+import { canonizarMarca, canonizarModelo } from "@/lib/marcas";
+import { telefonoAr } from "./telefono";
 
 /**
  * Usado que un visitante ofrece al concesionario.
@@ -69,10 +71,17 @@ export const TasacionSchema = z.object({
   // Quién ofrece
   nombre: z.string().trim().min(2, "El nombre es requerido").max(120, "El nombre es demasiado largo"),
   email: z.string().trim().email("Debe ser un email válido").max(160, "El email es demasiado largo"),
-  telefono: z.string().trim().min(8, "El teléfono no es válido").max(40, "El teléfono no es válido"),
+  telefono: telefonoAr,
 
-  // Qué ofrece
-  marca: z.string().trim().min(1, "La marca es obligatoria").max(60, "La marca es demasiado larga"),
+  // Qué ofrece. La marca se lleva a su forma conocida ("vw" → "Volkswagen")
+  // para que la bandeja no tenga cuatro grafías del mismo auto; el modelo se
+  // corrige más abajo, porque depende de la marca.
+  marca: z
+    .string()
+    .trim()
+    .min(1, "La marca es obligatoria")
+    .max(60, "La marca es demasiado larga")
+    .transform(canonizarMarca),
   modelo: z.string().trim().min(1, "El modelo es obligatorio").max(60, "El modelo es demasiado largo"),
   anio: z.coerce
     .number()
@@ -95,7 +104,7 @@ export const TasacionSchema = z.object({
   // Unidad del catálogo por la que quiere permutar. Llega de la URL o de un
   // desplegable, así que la acción lo verifica contra la base antes de guardar.
   vehiculoInteresId: textoOpcional(40, "La unidad"),
-});
+}).transform((datos) => ({ ...datos, modelo: canonizarModelo(datos.marca, datos.modelo) }));
 
 export type TasacionInput = z.input<typeof TasacionSchema>;
 export type TasacionData = z.output<typeof TasacionSchema>;

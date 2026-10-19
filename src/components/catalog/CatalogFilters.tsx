@@ -1,19 +1,27 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useTransition } from "react";
+import { useCallback, useId, useTransition } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import type { FiltrosCatalogo } from "@/services/cache.service";
 import { etiquetaEnum } from "@/lib/etiquetas";
+import { formatNumeroAr, formatUsd } from "@/lib/precio";
+import { ESCALONES_KM, ESCALONES_PRECIO_USD } from "@/lib/catalogo";
 
 interface CatalogFiltersProps {
   /** Opciones derivadas del stock: ver getCachedFiltrosCatalogo. */
   filtros: FiltrosCatalogo;
   /** Con el módulo apagado no se ofrece filtrar por unidades en cuotas. */
   financiacionActiva?: boolean;
+  /** Con los precios ocultos no se ofrece el rango de precio. */
+  mostrarPrecios?: boolean;
 }
 
-export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogFiltersProps) => {
+export const CatalogFilters = ({
+  filtros,
+  financiacionActiva = false,
+  mostrarPrecios = true,
+}: CatalogFiltersProps) => {
   const { marcas, categorias, estados, transmisiones, combustibles, anios } = filtros;
   const router = useRouter();
   const pathname = usePathname();
@@ -77,8 +85,13 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
   const currentAnioDesde = searchParams.get("anioDesde") || "";
   const currentAnioHasta = searchParams.get("anioHasta") || "";
   const soloFinanciables = financiacionActiva && searchParams.get("financiable") === "1";
+  const currentPrecioDesde = mostrarPrecios ? searchParams.get("precioDesde") || "" : "";
+  const currentPrecioHasta = mostrarPrecios ? searchParams.get("precioHasta") || "" : "";
+  const currentKmDesde = searchParams.get("kmDesde") || "";
+  const currentKmHasta = searchParams.get("kmHasta") || "";
 
   const cantidadFiltros =
+    [currentPrecioDesde, currentPrecioHasta, currentKmDesde, currentKmHasta].filter(Boolean).length +
     currentMarcas.length +
     currentCategorias.length +
     currentEstados.length +
@@ -135,6 +148,33 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
           />
         </FilterSection>
       )}
+
+      {/* ── Precio ──
+          Precio y kilometraje van arriba: son los cortes con los que más se
+          filtra. Con los precios ocultos el de precio no se ofrece, porque
+          recortar por importe dejaría deducir cuánto sale cada unidad. */}
+      {mostrarPrecios && (
+        <FilterSection title="Precio (USD)">
+          <Rango
+            desde={currentPrecioDesde}
+            hasta={currentPrecioHasta}
+            opciones={ESCALONES_PRECIO_USD.map((v) => ({ value: String(v), label: formatUsd(v) }))}
+            onDesde={(v) => navigate(buildParams({ precioDesde: v || null }))}
+            onHasta={(v) => navigate(buildParams({ precioHasta: v || null }))}
+          />
+        </FilterSection>
+      )}
+
+      {/* ── Kilometraje ── */}
+      <FilterSection title="Kilometraje">
+        <Rango
+          desde={currentKmDesde}
+          hasta={currentKmHasta}
+          opciones={ESCALONES_KM.map((v) => ({ value: String(v), label: `${formatNumeroAr(v)} km` }))}
+          onDesde={(v) => navigate(buildParams({ kmDesde: v || null }))}
+          onHasta={(v) => navigate(buildParams({ kmHasta: v || null }))}
+        />
+      </FilterSection>
 
       {/* ── Categoría ── */}
       {categorias.length > 0 && (
@@ -209,38 +249,13 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
       {/* ── Año ── */}
       {anios.length > 0 && (
       <FilterSection title="Año" noBorder>
-        <div className="flex gap-4">
-          <div className="flex-1 flex flex-col gap-1.5">
-            <label className="text-[9px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))]">
-              Desde
-            </label>
-            <select
-              value={currentAnioDesde}
-              onChange={(e) => navigate(buildParams({ anioDesde: e.target.value || null }))}
-              className="bg-[hsl(var(--input))] text-xs font-medium px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 text-[hsl(var(--foreground))] w-full appearance-none cursor-pointer"
-            >
-              <option value="">Todos</option>
-              {anios.map((y) => (
-                <option key={y} value={y.toString()}>{y}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex-1 flex flex-col gap-1.5">
-            <label className="text-[9px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))]">
-              Hasta
-            </label>
-            <select
-              value={currentAnioHasta}
-              onChange={(e) => navigate(buildParams({ anioHasta: e.target.value || null }))}
-              className="bg-[hsl(var(--input))] text-xs font-medium px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 text-[hsl(var(--foreground))] w-full appearance-none cursor-pointer"
-            >
-              <option value="">Todos</option>
-              {anios.map((y) => (
-                <option key={y} value={y.toString()}>{y}</option>
-              ))}
-            </select>
-          </div>
-        </div>
+        <Rango
+          desde={currentAnioDesde}
+          hasta={currentAnioHasta}
+          opciones={anios.map((y) => ({ value: String(y), label: String(y) }))}
+          onDesde={(v) => navigate(buildParams({ anioDesde: v || null }))}
+          onHasta={(v) => navigate(buildParams({ anioHasta: v || null }))}
+        />
       </FilterSection>
       )}
     </div>
@@ -248,6 +263,66 @@ export const CatalogFilters = ({ filtros, financiacionActiva = false }: CatalogF
 };
 
 // ── Sub-components ──────────────────────────────────────────────────────
+
+/** Par de desplegables "Desde / Hasta" que comparten las mismas opciones. */
+const Rango = ({
+  desde,
+  hasta,
+  opciones,
+  onDesde,
+  onHasta,
+}: {
+  desde: string;
+  hasta: string;
+  opciones: { value: string; label: string }[];
+  onDesde: (valor: string) => void;
+  onHasta: (valor: string) => void;
+}) => (
+  <div className="flex gap-4">
+    <RangoSelect etiqueta="Desde" valor={desde} opciones={opciones} onChange={onDesde} />
+    <RangoSelect etiqueta="Hasta" valor={hasta} opciones={opciones} onChange={onHasta} />
+  </div>
+);
+
+const RangoSelect = ({
+  etiqueta,
+  valor,
+  opciones,
+  onChange,
+}: {
+  etiqueta: string;
+  valor: string;
+  opciones: { value: string; label: string }[];
+  onChange: (valor: string) => void;
+}) => {
+  const id = useId();
+  // Un valor escrito a mano en la URL que no es ninguno de los escalones se
+  // agrega como opción: si no, el desplegable mostraría "Todos" mientras la
+  // grilla sigue filtrada por él.
+  const fueraDeLista = valor && !opciones.some((o) => o.value === valor);
+  return (
+    <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+      <label
+        htmlFor={id}
+        className="text-[9px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))]"
+      >
+        {etiqueta}
+      </label>
+      <select
+        id={id}
+        value={valor}
+        onChange={(e) => onChange(e.target.value)}
+        className="bg-[hsl(var(--input))] text-xs font-medium px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 text-[hsl(var(--foreground))] w-full appearance-none cursor-pointer"
+      >
+        <option value="">Todos</option>
+        {fueraDeLista && <option value={valor}>{formatNumeroAr(Number(valor))}</option>}
+        {opciones.map((o) => (
+          <option key={o.value} value={o.value}>{o.label}</option>
+        ))}
+      </select>
+    </div>
+  );
+};
 
 const FilterSection = ({
   title,

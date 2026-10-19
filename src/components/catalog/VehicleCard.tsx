@@ -1,9 +1,26 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Vehiculo, ImagenVehiculo } from "../../../generated/prisma";
-import { Calendar, Car, Fuel, AlignJustify, ArrowRight } from "lucide-react";
+import { Calendar, Car, Fuel, AlignJustify, ArrowRight, Gauge } from "lucide-react";
 import { getCldUrl } from "@/lib/cloudinary";
-import { formatPrecio } from "@/lib/precio";
+import { formatArs, formatNumeroAr, precioEnPesos } from "@/lib/precio";
+import { etiquetaEnum } from "@/lib/etiquetas";
+import {
+  ANTICIPO_POR_DEFECTO,
+  ETIQUETA_INSIGNIA,
+  cuotaDesde,
+  insigniasDeVehiculo,
+  precioDeVitrina,
+  type Insignia,
+  type PlanDeCuotas,
+} from "@/lib/vitrina";
+
+const ESTILO_INSIGNIA: Record<Insignia, string> = {
+  VENDIDO: "bg-[hsl(var(--foreground))] text-[hsl(var(--background))]",
+  NUEVO_INGRESO: "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]",
+  FINANCIABLE: "bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))]",
+  BAJO_KM: "bg-emerald-600/10 text-emerald-700",
+};
 
 export type VehiculoDeTarjeta = Omit<Vehiculo, "precio"> & {
   imagenes: ImagenVehiculo[];
@@ -23,6 +40,11 @@ interface VehicleCardProps {
    * bundle de una página pública. Ver VehicleCardAdminOverlay.
    */
   accionAdmin?: React.ReactNode;
+  /**
+   * Planes de financiación activos. Vacío con el módulo apagado: sin planes no
+   * hay ni etiqueta "Financiable" ni cuota en la tarjeta.
+   */
+  planes?: PlanDeCuotas[];
 }
 
 export const VehicleCard = ({
@@ -31,9 +53,17 @@ export const VehicleCard = ({
   cotizacionDolar,
   mostrarPrecios = true,
   accionAdmin,
+  planes = [],
 }: VehicleCardProps) => {
   const imagenPrincipal =
     vehiculo.imagenes.find((img) => img.esPrincipal)?.url || vehiculo.imagenes[0]?.url || "";
+
+  const insignias = insigniasDeVehiculo(vehiculo, planes.length > 0);
+  const vendido = insignias.includes("VENDIDO");
+  const precio = precioDeVitrina(vehiculo.precio, vehiculo.moneda, cotizacionDolar);
+  const cuota = vehiculo.financiable
+    ? cuotaDesde(precioEnPesos(vehiculo.precio, vehiculo.moneda, cotizacionDolar), planes)
+    : null;
 
   return (
     <div className="group relative flex flex-col h-full bg-[hsl(var(--card))] shadow-[0_4px_20px_rgba(26,28,30,0.06)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(26,28,30,0.12)]">
@@ -55,18 +85,35 @@ export const VehicleCard = ({
           </div>
         )}
 
+        {vendido && (
+          <div className="absolute inset-0 bg-black/45 flex items-center justify-center pointer-events-none">
+            <span className="bg-[hsl(var(--foreground))] text-[hsl(var(--background))] text-xs font-black uppercase tracking-[0.3em] px-4 py-2 -rotate-6 shadow-lg">
+              Vendido
+            </span>
+          </div>
+        )}
+
         {accionAdmin}
       </div>
 
       {/* Content Section */}
       <div className="flex flex-col p-5 flex-grow">
         {/* Badges row */}
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[hsl(var(--primary))]">
-            Nuevo Ingreso
-          </span>
-          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] px-2 py-0.5 bg-[hsl(var(--surface-low))]">
-            {vehiculo.estado}
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <div className="flex flex-wrap gap-1.5">
+            {insignias
+              .filter((i) => i !== "VENDIDO")
+              .map((i) => (
+                <span
+                  key={i}
+                  className={`text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 ${ESTILO_INSIGNIA[i]}`}
+                >
+                  {ETIQUETA_INSIGNIA[i]}
+                </span>
+              ))}
+          </div>
+          <span className="shrink-0 text-[9px] font-black uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] px-2 py-0.5 bg-[hsl(var(--surface-low))]">
+            {etiquetaEnum(vehiculo.estado)}
           </span>
         </div>
 
@@ -87,28 +134,60 @@ export const VehicleCard = ({
             <span className="text-[11px] font-bold">{vehiculo.anio}</span>
           </div>
           <div className="flex items-center gap-1">
-            <Fuel size={14} className="opacity-40" />
-            <span className="text-[11px] font-bold capitalize">{vehiculo.combustible?.toLowerCase()}</span>
+            <Gauge size={14} className="opacity-40" />
+            <span className="text-[11px] font-bold tabular-nums">{formatNumeroAr(vehiculo.kilometraje)} km</span>
           </div>
-          <div className="flex items-center gap-1">
-            <AlignJustify size={14} className="opacity-40" />
-            <span className="text-[11px] font-bold capitalize">{vehiculo.transmision?.toLowerCase()}</span>
-          </div>
+          {vehiculo.combustible && (
+            <div className="flex items-center gap-1">
+              <Fuel size={14} className="opacity-40" />
+              <span className="text-[11px] font-bold">{etiquetaEnum(vehiculo.combustible)}</span>
+            </div>
+          )}
+          {vehiculo.transmision && (
+            <div className="flex items-center gap-1">
+              <AlignJustify size={14} className="opacity-40" />
+              <span className="text-[11px] font-bold">{etiquetaEnum(vehiculo.transmision)}</span>
+            </div>
+          )}
         </div>
 
         {/* Price and CTA */}
         <div className="mt-auto pt-4 border-t border-[hsl(var(--border))]">
-          {mostrarPrecios && (
-            <span className="block text-2xl font-black text-[hsl(var(--primary))] tracking-[-0.05em] leading-none tabular-nums">
-              {formatPrecio(vehiculo.precio, vehiculo.moneda, cotizacionDolar)}
-            </span>
+          {/* Una vendida no lleva precio ni cuota: ya no se puede comprar. */}
+          {mostrarPrecios && !vendido && (
+            <div className="mb-4">
+              <span className="block text-2xl font-black text-[hsl(var(--primary))] tracking-[-0.05em] leading-none tabular-nums">
+                {precio.principal}
+              </span>
+              {precio.secundario && (
+                <span className="block mt-1 text-xs font-bold text-[hsl(var(--muted-foreground))] tabular-nums">
+                  {precio.secundario}
+                </span>
+              )}
+              {cuota !== null && (
+                <span
+                  className="block mt-2 text-xs font-bold text-[hsl(var(--foreground))]"
+                  title={`Con ${ANTICIPO_POR_DEFECTO}% de anticipo`}
+                >
+                  Cuotas desde <span className="tabular-nums">{formatArs(cuota)}</span>/mes
+                </span>
+              )}
+            </div>
           )}
-          <Link
-            href={`/catalogo/${vehiculo.id}`}
-            className={`w-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-3 text-[11px] font-black uppercase tracking-[0.1em] flex items-center justify-center gap-1.5 hover:brightness-90 active:scale-95 transition-all shadow-[0_4px_6px_-1px_hsl(var(--primary)/0.2)] ${mostrarPrecios ? "mt-4" : ""}`}
-          >
-            Ver Detalles <ArrowRight size={14} />
-          </Link>
+          {vendido && !accionAdmin ? (
+            // La ficha de una vendida responde 404 al público: no se enlaza.
+            // El administrador —el único que recibe `accionAdmin`— sí la abre.
+            <span className="w-full bg-[hsl(var(--surface-low))] text-[hsl(var(--muted-foreground))] px-4 py-3 text-[11px] font-black uppercase tracking-[0.1em] flex items-center justify-center">
+              Unidad vendida
+            </span>
+          ) : (
+            <Link
+              href={`/catalogo/${vehiculo.id}`}
+              className="w-full bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-3 text-[11px] font-black uppercase tracking-[0.1em] flex items-center justify-center gap-1.5 hover:brightness-90 active:scale-95 transition-all shadow-[0_4px_6px_-1px_hsl(var(--primary)/0.2)]"
+            >
+              Ver Detalles <ArrowRight size={14} />
+            </Link>
+          )}
         </div>
       </div>
     </div>

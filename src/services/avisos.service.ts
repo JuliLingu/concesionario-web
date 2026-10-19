@@ -15,7 +15,8 @@ import { getConfiguracion } from "@/services/configuracion.service";
 import { destinatarioDeAvisos, enviarMail, mailConfigurado } from "@/lib/mail";
 import { registrarError } from "@/lib/log";
 import { formatNumeroAr, formatPrecioOriginal } from "@/lib/precio";
-import type { Moneda } from "../../generated/prisma";
+import { describirPreferencia } from "@/lib/preferencia-contacto";
+import type { FranjaHoraria, MedioContacto, Moneda } from "../../generated/prisma";
 
 /**
  * Base pública del sitio, para poder enlazar al panel desde el correo.
@@ -127,6 +128,8 @@ export type DatosConsulta = {
   email: string;
   telefono?: string | null;
   mensaje?: string | null;
+  medioContacto?: MedioContacto | null;
+  franjaHoraria?: FranjaHoraria | null;
   vehiculoId: string | null;
 };
 
@@ -147,6 +150,7 @@ export async function avisarConsulta(datos: DatosConsulta): Promise<void> {
       ["Nombre", datos.nombre],
       ["Email", datos.email],
       ["Teléfono", datos.telefono],
+      ["Prefiere", describirPreferencia(datos.medioContacto, datos.franjaHoraria)],
       ["Vehículo", vehiculo ?? "Consulta general"],
       ["Mensaje", datos.mensaje],
     ];

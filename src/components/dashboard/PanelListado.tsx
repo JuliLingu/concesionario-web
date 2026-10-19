@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, ExternalLink, MessageSquare } from "lucide-react";
 import { TABS_ESTADO } from "@/lib/estados";
+import { whatsappDeCliente } from "@/lib/telefono";
 import type { EstadoConsulta } from "../../../generated/prisma";
 
 /**
@@ -134,6 +135,37 @@ export const Contacto = ({
     {texto}
   </a>
 );
+
+/**
+ * Teléfono del cliente: para llamar y, si el número se puede interpretar, un
+ * enlace directo a WhatsApp. Los números nuevos ya llegan normalizados; los
+ * viejos se intentan normalizar al vuelo y, si no se puede, queda solo el
+ * teléfono en vez de un enlace que abre un chat con nadie.
+ */
+export const TelefonoCliente = ({ telefono }: { telefono: string | null | undefined }) => {
+  if (!telefono) return null;
+  const whatsapp = whatsappDeCliente(telefono);
+  return (
+    <div className="flex items-center gap-2 mt-0.5">
+      <a
+        href={`tel:${telefono.replace(/[^\d+]/g, "")}`}
+        className="text-xs font-medium hover:underline text-[hsl(var(--muted-foreground))]"
+      >
+        {telefono}
+      </a>
+      {whatsapp && (
+        <a
+          href={whatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] font-black uppercase tracking-[0.1em] text-[#1a9e4b] hover:underline"
+        >
+          WhatsApp
+        </a>
+      )}
+    </div>
+  );
+};
 
 /**
  * Celda "Vehículo": enlace a la ficha, o un texto tenue si la fila no apunta a

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getConfiguracion } from "@/services/configuracion.service";
 import { TasacionForm, type UnidadDeInteres } from "@/components/tasacion/TasacionForm";
+import { armarSugerencias } from "@/lib/marcas";
 
 /**
  * Formulario público de tasación: un visitante ofrece su usado.
@@ -52,6 +53,16 @@ export default async function TasacionPage({ searchParams }: TasacionPageProps) 
   // vuelve a verificar contra la base antes de guardarlo.
   const unidadInicial = unidades.some((u) => u.id === vehiculo) ? vehiculo : undefined;
 
+  // Marcas y modelos que pasaron por el stock, vendidos incluidos: son los que
+  // el concesionario toma y conoce, y van primero en el autocompletado.
+  const stock = await prisma.vehiculo
+    .findMany({
+      select: { marca: true, modelo: true },
+      distinct: ["marca", "modelo"],
+    })
+    .catch(() => []);
+  const sugerencias = armarSugerencias(stock);
+
   return (
     // `div` y no `main`: el elemento principal ya lo pone el layout.
     <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-20">
@@ -73,6 +84,7 @@ export default async function TasacionPage({ searchParams }: TasacionPageProps) 
             unidades={unidades}
             unidadInicial={unidadInicial}
             telefono={configuracion.telefono}
+            sugerencias={sugerencias}
           />
         </div>
 

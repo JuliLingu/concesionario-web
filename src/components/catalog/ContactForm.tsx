@@ -1,12 +1,14 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useState, useTransition } from "react";
-import { ConsultaSchema } from "@/schemas/consulta";
+import { ConsultaSchema, type ConsultaData, type ConsultaInput } from "@/schemas/consulta";
 import { createConsulta } from "@/actions/consulta";
 import { Send, CheckCircle2 } from "lucide-react";
+import { AYUDA_TELEFONO, Campo, claseCampo } from "@/components/forms/Campo";
+import { Opciones } from "@/components/forms/Opciones";
+import { FRANJAS_HORARIAS, MEDIOS_CONTACTO } from "@/lib/preferencia-contacto";
 
 interface ContactFormProps {
   vehiculoId?: string;
@@ -18,18 +20,27 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
   const [success, setSuccess] = useState<string | undefined>();
   const [isPending, start] = useTransition();
 
-  const form = useForm<z.infer<typeof ConsultaSchema>>({
+  const form = useForm<ConsultaInput, unknown, ConsultaData>({
     resolver: zodResolver(ConsultaSchema),
     defaultValues: {
       nombre: "",
       email: "",
       telefono: "",
+      // WhatsApp de entrada: es por donde se cierra la mayoría de las ventas.
+      medioContacto: "WHATSAPP",
+      franjaHoraria: "CUALQUIERA",
       mensaje: vehiculoNombre ? `Hola, me interesa el ${vehiculoNombre}. ` : "",
       vehiculoId: vehiculoId || "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof ConsultaSchema>) => {
+  const errores = form.formState.errors;
+  const medio = useWatch({ control: form.control, name: "medioContacto" });
+
+  const etiquetaTelefono =
+    medio === "WHATSAPP" ? "Celular con WhatsApp *" : medio === "LLAMADA" ? "Teléfono *" : "Teléfono (opcional)";
+
+  const onSubmit = (values: ConsultaData) => {
     setError(undefined);
     setSuccess(undefined);
 
@@ -68,50 +79,64 @@ export const ContactForm = ({ vehiculoId, vehiculoNombre }: ContactFormProps) =>
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1 flex flex-col gap-1">
+        <Campo label="Nombre *" error={errores.nombre?.message} className="flex-1">
           <input
             {...form.register("nombre")}
-            placeholder="Nombre *"
+            autoComplete="name"
             disabled={isPending}
-            className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full disabled:opacity-50 ${form.formState.errors.nombre ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+            className={claseCampo({ error: !!errores.nombre, fondo: "input" })}
           />
-          {form.formState.errors.nombre && (
-            <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.nombre.message}</span>
-          )}
-        </div>
+        </Campo>
 
-        <div className="flex-1 flex flex-col gap-1">
+        <Campo label="Email *" error={errores.email?.message} className="flex-1">
           <input
             {...form.register("email")}
             type="email"
-            placeholder="Email *"
+            autoComplete="email"
             disabled={isPending}
-            className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full disabled:opacity-50 ${form.formState.errors.email ? 'ring-1 ring-red-500 bg-red-50' : ''}`}
+            className={claseCampo({ error: !!errores.email, fondo: "input" })}
           />
-          {form.formState.errors.email && (
-            <span className="text-xs font-bold text-red-500 px-1">{form.formState.errors.email.message}</span>
-          )}
-        </div>
+        </Campo>
       </div>
 
-      <div className="flex flex-col gap-1">
+      <Opciones
+        leyenda="¿Cómo preferís que te contactemos?"
+        opciones={MEDIOS_CONTACTO}
+        registro={form.register("medioContacto")}
+        error={errores.medioContacto?.message}
+        disabled={isPending}
+      />
+
+      <Campo label={etiquetaTelefono} error={errores.telefono?.message} ayuda={AYUDA_TELEFONO}>
         <input
           {...form.register("telefono")}
-          placeholder="Teléfono (opcional)"
+          type="tel"
+          autoComplete="tel"
+          placeholder="Ej: 11 2345-6789"
           disabled={isPending}
-          className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full disabled:opacity-50`}
+          className={claseCampo({ error: !!errores.telefono, fondo: "input" })}
         />
-      </div>
+      </Campo>
 
-      <div className="flex flex-col gap-1">
+      {/* Con email la franja no aplica: el correo se lee cuando se puede. */}
+      {medio !== "EMAIL" && (
+        <Opciones
+          leyenda="¿En qué horario?"
+          opciones={FRANJAS_HORARIAS}
+          registro={form.register("franjaHoraria")}
+          error={errores.franjaHoraria?.message}
+          disabled={isPending}
+        />
+      )}
+
+      <Campo label="Mensaje (opcional)" error={errores.mensaje?.message}>
         <textarea
           {...form.register("mensaje")}
-          placeholder="Mensaje (opcional)"
           disabled={isPending}
           rows={4}
-          className={`bg-[hsl(var(--input))] px-4 py-3 text-sm rounded focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]/20 w-full resize-none disabled:opacity-50`}
+          className={`${claseCampo({ error: !!errores.mensaje, fondo: "input" })} resize-none`}
         />
-      </div>
+      </Campo>
 
       {error && (
         <div className="bg-red-50 text-[hsl(var(--primary))] text-[10px] font-black uppercase tracking-[0.1em] p-3 rounded border-l-4 border-[hsl(var(--primary))]">

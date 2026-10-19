@@ -5,7 +5,9 @@ import { ContactForm } from "@/components/catalog/ContactForm";
 import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
 import { RegistrarVista } from "@/components/catalog/RegistrarVista";
 import { WhatsappLink } from "@/components/catalog/WhatsappLink";
-import { formatPrecio, precioEnPesos } from "@/lib/precio";
+import { precioEnPesos } from "@/lib/precio";
+import { precioDeVitrina } from "@/lib/vitrina";
+import { etiquetaEnum } from "@/lib/etiquetas";
 import type { VehiculoFicha as Vehiculo } from "@/services/vehiculo.service";
 
 interface VehicleDetailProps {
@@ -47,9 +49,14 @@ export const VehicleDetail = ({
   contacto,
 }: VehicleDetailProps) => {
   const precioArs = precioEnPesos(vehicle.precio, vehicle.moneda, cotizacionDolar);
+  const precio = mostrarPrecios
+    ? precioDeVitrina(vehicle.precio, vehicle.moneda, cotizacionDolar)
+    : null;
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))] pt-header pb-8">
+    // En mobile el pie deja lugar a la barra fija de WhatsApp, que si no tapa
+    // lo último de la página.
+    <div className={`min-h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))] pt-header ${whatsappUrl ? "pb-28 lg:pb-8" : "pb-8"}`}>
       <RegistrarVista vehiculoId={vehicle.id} />
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="h-16 flex items-center mb-4">
@@ -72,7 +79,7 @@ export const VehicleDetail = ({
               <div>
                 <div className="flex items-center gap-1 mb-2">
                   <span className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10 px-1 py-0.5 rounded">
-                    {vehicle.estado}
+                    {etiquetaEnum(vehicle.estado)}
                   </span>
                   <span className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] bg-[hsl(var(--muted))] px-1 py-0.5 rounded">
                     {vehicle.categoria.nombre}
@@ -87,10 +94,17 @@ export const VehicleDetail = ({
                 </p>
               </div>
 
-              {mostrarPrecios && (
-                <p className="text-[2.5rem] font-black text-[hsl(var(--primary))] tracking-tighter">
-                  {formatPrecio(vehicle.precio, vehicle.moneda, cotizacionDolar)}
-                </p>
+              {precio && (
+                <div>
+                  <p className="text-[2.5rem] font-black text-[hsl(var(--primary))] tracking-tighter leading-none">
+                    {precio.principal}
+                  </p>
+                  {precio.secundario && (
+                    <p className="mt-1 text-sm font-bold text-[hsl(var(--muted-foreground))] tabular-nums">
+                      {precio.secundario}
+                    </p>
+                  )}
+                </div>
               )}
 
               {whatsappUrl && (
@@ -119,11 +133,17 @@ export const VehicleDetail = ({
 
               <div className="bg-[hsl(var(--card))] rounded-lg p-4 lg:p-6 shadow-sm border border-black/5">
                 <p className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] mb-4">Ficha Rápida</p>
-                <div className="flex flex-col gap-3">
+                {/* El separador va entre filas y no en cada una: con un dato sin
+                    cargar la última fila cambia, y un borde fijo quedaba colgando. */}
+                <div className="flex flex-col gap-3 [&>*:not(:last-child)]:pb-3 [&>*:not(:last-child)]:border-b [&>*:not(:last-child)]:border-black/5">
                   <SpecItem icon={<Calendar size={16} />} label="Año" value={vehicle.anio} />
                   <SpecItem icon={<Disc size={16} />} label="KM" value={vehicle.kilometraje.toLocaleString("es-AR")} />
-                  <SpecItem icon={<AlignJustify size={16} />} label="Transmisión" value={vehicle.transmision?.toLowerCase() ?? "N/A"} capitalize />
-                  <SpecItem icon={<Fuel size={16} />} label="Combustible" value={vehicle.combustible?.toLowerCase() ?? "N/A"} capitalize border={false} />
+                  {vehicle.transmision && (
+                    <SpecItem icon={<AlignJustify size={16} />} label="Transmisión" value={etiquetaEnum(vehicle.transmision)} />
+                  )}
+                  {vehicle.combustible && (
+                    <SpecItem icon={<Fuel size={16} />} label="Combustible" value={etiquetaEnum(vehicle.combustible)} />
+                  )}
                 </div>
               </div>
             </div>
@@ -136,14 +156,17 @@ export const VehicleDetail = ({
               <h2 className="text-lg font-black uppercase tracking-tight mb-3">
                 Especificaciones
               </h2>
+              {/* Los datos opcionales que no se cargaron no se listan: un "N/A"
+                  le habla a una planilla, no a quien está por comprar el auto. */}
               <div className="flex flex-col">
                 <SpecRow label="Año" value={vehicle.anio} />
                 <SpecRow label="Kilometraje" value={`${vehicle.kilometraje.toLocaleString("es-AR")} KM`} />
-                <SpecRow label="Combustible" value={vehicle.combustible || "N/A"} />
-                <SpecRow label="Transmisión" value={vehicle.transmision || "N/A"} />
-                <SpecRow label="Potencia" value={vehicle.potencia ? `${vehicle.potencia} CV` : "N/A"} />
-                <SpecRow label="Color" value={vehicle.color || "N/A"} />
-                <SpecRow label="Puertas" value={vehicle.puertas || "N/A"} />
+                {vehicle.combustible && <SpecRow label="Combustible" value={etiquetaEnum(vehicle.combustible)} />}
+                {vehicle.transmision && <SpecRow label="Transmisión" value={etiquetaEnum(vehicle.transmision)} />}
+                {vehicle.motor && <SpecRow label="Motor" value={vehicle.motor} />}
+                {vehicle.potencia ? <SpecRow label="Potencia" value={`${vehicle.potencia} CV`} /> : null}
+                {vehicle.color && <SpecRow label="Color" value={vehicle.color} />}
+                {vehicle.puertas ? <SpecRow label="Puertas" value={vehicle.puertas} /> : null}
               </div>
             </div>
 
@@ -225,6 +248,35 @@ export const VehicleDetail = ({
         </div>
 
       </div>
+
+      {/* Barra fija en mobile: el botón de arriba queda fuera de pantalla en
+          cuanto se baja a ver las fotos y las especificaciones, que es justo
+          cuando se decide consultar. En escritorio la columna lateral ya lo
+          deja a la vista. */}
+      {whatsappUrl && (
+        <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 bg-[hsl(var(--card))]/95 backdrop-blur border-t border-black/10 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(26,28,30,0.08)]">
+          <div className="flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-black uppercase truncate">
+                {vehicle.marca} {vehicle.modelo}
+              </p>
+              {precio && (
+                <p className="text-sm font-black text-[hsl(var(--primary))] tabular-nums truncate">
+                  {precio.principal}
+                </p>
+              )}
+            </div>
+            <WhatsappLink
+              href={whatsappUrl}
+              vehiculoId={vehicle.id}
+              className="shrink-0 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] py-3 px-4 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-[0.1em] rounded shadow-lg hover:brightness-90 transition-colors"
+            >
+              <MessageCircle size={16} />
+              WhatsApp
+            </WhatsappLink>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -233,21 +285,17 @@ const SpecItem = ({
   icon,
   label,
   value,
-  capitalize = false,
-  border = true,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string | number;
-  capitalize?: boolean;
-  border?: boolean;
 }) => (
-  <div className={`flex flex-row items-center justify-between ${border ? 'pb-3 border-b border-black/5' : ''}`}>
+  <div className="flex flex-row items-center justify-between">
     <div className="flex items-center gap-2 text-[hsl(var(--muted-foreground))]">
       {icon}
       <span className="text-sm font-bold">{label}</span>
     </div>
-    <span className={`text-sm font-black ${capitalize ? 'capitalize' : ''}`}>{value}</span>
+    <span className="text-sm font-black">{value}</span>
   </div>
 );
 

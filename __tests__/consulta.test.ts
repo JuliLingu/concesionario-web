@@ -49,7 +49,9 @@ import { createConsulta } from "@/actions/consulta";
 const CONSULTA_VALIDA = {
   nombre: "Ana Gómez",
   email: "ana@ejemplo.com",
-  telefono: "1155550000",
+  telefono: "11 5555-0000",
+  medioContacto: "WHATSAPP" as const,
+  franjaHoraria: "TARDE" as const,
   mensaje: "¿Sigue disponible?",
   vehiculoId: "veh_1",
 };
@@ -96,10 +98,44 @@ describe("createConsulta", () => {
     expect(mocks.avisarConsulta).toHaveBeenCalledWith({
       nombre: "Ana Gómez",
       email: "ana@ejemplo.com",
-      telefono: "1155550000",
+      telefono: "+5491155550000",
       mensaje: "¿Sigue disponible?",
+      medioContacto: "WHATSAPP",
+      franjaHoraria: "TARDE",
       vehiculoId: "veh_1",
     });
+  });
+
+  it("guarda el teléfono normalizado y la preferencia de contacto", async () => {
+    await enviar({ ...CONSULTA_VALIDA, telefono: "011 15 5555-0000" });
+
+    expect(mocks.crearConsulta.mock.calls[0][0].data).toMatchObject({
+      telefono: "+5491155550000",
+      medioContacto: "WHATSAPP",
+      franjaHoraria: "TARDE",
+    });
+  });
+
+  it("pide teléfono si eligió WhatsApp o llamada", async () => {
+    for (const medioContacto of ["WHATSAPP", "LLAMADA"] as const) {
+      const resultado = await enviar({ ...CONSULTA_VALIDA, medioContacto, telefono: "" });
+      expect(resultado.error).toBeTruthy();
+    }
+    expect(mocks.crearConsulta).not.toHaveBeenCalled();
+  });
+
+  it("con email el teléfono es opcional", async () => {
+    const resultado = await enviar({ ...CONSULTA_VALIDA, medioContacto: "EMAIL", telefono: "" });
+
+    expect(resultado.success).toBeTruthy();
+    expect(mocks.crearConsulta.mock.calls[0][0].data.telefono).toBeNull();
+  });
+
+  it("rechaza un teléfono sin código de área", async () => {
+    const resultado = await enviar({ ...CONSULTA_VALIDA, telefono: "5555-0000" });
+
+    expect(resultado.error).toBeTruthy();
+    expect(mocks.crearConsulta).not.toHaveBeenCalled();
   });
 
   it("no avisa de una consulta que no se pudo guardar", async () => {
