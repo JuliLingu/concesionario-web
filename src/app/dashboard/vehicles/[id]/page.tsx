@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { conPreciosEnNumero } from "@/lib/precio";
 import { VehicleForm } from "@/components/dashboard/VehicleForm";
 import { requireAdmin } from "@/lib/sesion";
 import { notFound } from "next/navigation";
@@ -33,10 +34,7 @@ export default async function EditVehiclePage({ params }: EditVehiclePageProps) 
   }
 
   // Los Decimal de Prisma no son serializables hacia el formulario, que es de cliente.
-  const initialData = {
-    ...vehiculo,
-    precio: Number(vehiculo.precio),
-  };
+  const initialData = conPreciosEnNumero(vehiculo);
 
   return (
     <div className="max-w-5xl mx-auto pt-header pb-16 px-6 min-h-screen">

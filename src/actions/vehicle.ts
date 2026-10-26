@@ -7,6 +7,8 @@ import { auth } from "@/auth";
 import { revalidatePath, updateTag } from "next/cache";
 import { CACHE_TAGS } from "@/services/cache.service";
 import { registrarError } from "@/lib/log";
+import { conPreciosEnNumero } from "@/lib/precio";
+import { cambioElPrecio, seguimientoTrasCambio } from "@/lib/baja-precio";
 import { EstadoPublicacion } from "../../generated/prisma";
 
 /**
@@ -110,10 +112,7 @@ export const getVehicles = async () => {
         createdAt: "desc",
       },
     });
-    return vehicles.map(v => ({
-      ...v,
-      precio: Number(v.precio)
-    }));
+    return vehicles.map((v) => conPreciosEnNumero(v));
   } catch {
     return [];
   }
@@ -148,31 +147,59 @@ export const updateVehicle = async (id: string, values: z.infer<typeof VehicleSc
   const { imagenes, ...data } = validatedFields.data;
 
   try {
-    // La fecha de venta depende de la que ya tenga guardada, así que hay que
-    // leerla antes: es lo que distingue "se vendió recién" de "se editó una
-    // unidad que ya estaba vendida".
-    const actual = await prisma.vehiculo.findUnique({
+    // La fecha de venta y la baja de precio dependen de lo que ya está
+    // guardado, así que hay que leerlo antes: es lo que distingue "se vendió
+    // recién" de "se editó una unidad que ya estaba vendida", y "bajó el
+    // precio" de "se guardó sin tocarlo".
+    const fila = await prisma.vehiculo.findUnique({
       where: { id },
-      select: { vendidoAt: true },
-    });
-
-    if (!actual) return { error: "El vehículo ya no existe" };
-
-    await prisma.vehiculo.update({
-      where: { id },
-      data: {
-        ...data,
-        vendidoAt: fechaDeVenta(data.publicacion, actual.vendidoAt),
-        imagenes: {
-          deleteMany: {},
-          create: imagenes?.map((url, index) => ({
-            url,
-            esPrincipal: index === 0,
-            orden: index,
-          })),
-        },
+      select: {
+        vendidoAt: true,
+        precio: true,
+        moneda: true,
+        precioAnterior: true,
+        precioBajoAt: true,
       },
     });
+
+    if (!fila) return { error: "El vehículo ya no existe" };
+
+    const actual = conPreciosEnNumero(fila);
+    const nuevo = { precio: data.precio, moneda: data.moneda };
+
+    // En una transacción: el historial es lo que respalda el precio anterior
+    // que se anuncia, así que no puede quedar uno sin el otro.
+    await prisma.$transaction([
+      prisma.vehiculo.update({
+        where: { id },
+        data: {
+          ...data,
+          vendidoAt: fechaDeVenta(data.publicacion, actual.vendidoAt),
+          ...seguimientoTrasCambio(actual, nuevo),
+          imagenes: {
+            deleteMany: {},
+            create: imagenes?.map((url, index) => ({
+              url,
+              esPrincipal: index === 0,
+              orden: index,
+            })),
+          },
+        },
+      }),
+      ...(cambioElPrecio(actual, nuevo)
+        ? [
+            prisma.cambioPrecio.create({
+              data: {
+                vehiculoId: id,
+                precioAnterior: actual.precio,
+                monedaAnterior: actual.moneda,
+                precioNuevo: nuevo.precio,
+                monedaNueva: nuevo.moneda,
+              },
+            }),
+          ]
+        : []),
+    ]);
 
     revalidarCatalogo();
     return { success: "Vehículo actualizado con éxito" };

@@ -106,6 +106,13 @@ model Vehiculo {
   // completar. Vuelve a null si la unidad sale de VENDIDO (una venta caída),
   // así el histórico no arrastra una fecha de una venta que no ocurrió.
   vendidoAt              DateTime?
+  // Última baja de precio, para el "Bajó USD 1.000" de la tarjeta. Copia
+  // desnormalizada de lo que ya está en `cambios_precio`: con ella cada listado
+  // —catálogo, portada, guardados, similares— trae el dato en la misma fila,
+  // sin un join por unidad. La mantiene `updateVehicle` (ver `lib/baja-precio.ts`):
+  // se borra si el precio sube o cambia de moneda, porque la baja deja de ser cierta.
+  precioAnterior         Decimal?                @db.Decimal(12, 2)
+  precioBajoAt           DateTime?
   createdAt              DateTime                @default(now())
   updatedAt              DateTime                @updatedAt
   categoria              Categoria               @relation(fields: [categoriaId], references: [id])
@@ -114,6 +121,7 @@ model Vehiculo {
   solicitudesFinanciacion SolicitudFinanciacion[]
   tasaciones             Tasacion[]
   metricas               MetricaVehiculoDia[]
+  cambiosPrecio          CambioPrecio[]
 
   @@index([categoriaId])
   @@index([publicacion])
@@ -151,6 +159,31 @@ model MetricaVehiculoDia {
   @@id([vehiculoId, fecha])
   @@index([fecha])
   @@map("metricas_vehiculo_dia")
+}
+
+/**
+ * Cada cambio de precio de una unidad, tal como quedó registrado.
+ *
+ * Es lo que respalda el "Bajó USD 1.000" de la vitrina: mostrar un precio
+ * anterior es una afirmación hacia el comprador, y tiene que poder probarse que
+ * ese precio existió. También deja ver en el panel cuántas veces y cuándo se
+ * tocó el precio de un auto que no se vende.
+ *
+ * Se guardan las dos monedas porque el administrador puede pasar una unidad de
+ * pesos a dólares: eso es un cambio de precio, pero no una baja comparable.
+ */
+model CambioPrecio {
+  id             String   @id @default(cuid())
+  vehiculoId     String
+  precioAnterior Decimal  @db.Decimal(12, 2)
+  monedaAnterior Moneda
+  precioNuevo    Decimal  @db.Decimal(12, 2)
+  monedaNueva    Moneda
+  createdAt      DateTime @default(now())
+  vehiculo       Vehiculo @relation(fields: [vehiculoId], references: [id], onDelete: Cascade)
+
+  @@index([vehiculoId, createdAt])
+  @@map("cambios_precio")
 }
 
 model ImagenVehiculo {

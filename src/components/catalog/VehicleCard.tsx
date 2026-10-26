@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Vehiculo, ImagenVehiculo } from "../../../generated/prisma";
-import { Calendar, Car, Fuel, AlignJustify, ArrowRight, Gauge } from "lucide-react";
+import { Calendar, Car, Fuel, AlignJustify, ArrowRight, Gauge, TrendingDown } from "lucide-react";
 import { getCldUrl } from "@/lib/cloudinary";
-import { formatArs, formatNumeroAr, precioEnPesos } from "@/lib/precio";
+import { formatArs, formatNumeroAr, formatPrecioOriginal, precioEnPesos } from "@/lib/precio";
+import { bajaVigente } from "@/lib/baja-precio";
 import { etiquetaEnum } from "@/lib/etiquetas";
 import { AccionesTarjeta } from "./BotonesSeleccion";
 import {
@@ -23,9 +24,10 @@ const ESTILO_INSIGNIA: Record<Insignia, string> = {
   BAJO_KM: "bg-emerald-600/10 text-emerald-700",
 };
 
-export type VehiculoDeTarjeta = Omit<Vehiculo, "precio"> & {
+export type VehiculoDeTarjeta = Omit<Vehiculo, "precio" | "precioAnterior"> & {
   imagenes: ImagenVehiculo[];
   precio: number;
+  precioAnterior: number | null;
 };
 
 interface VehicleCardProps {
@@ -62,6 +64,7 @@ export const VehicleCard = ({
   const insignias = insigniasDeVehiculo(vehiculo, planes.length > 0);
   const vendido = insignias.includes("VENDIDO");
   const precio = precioDeVitrina(vehiculo.precio, vehiculo.moneda, cotizacionDolar);
+  const baja = bajaVigente(vehiculo);
   const cuota = vehiculo.financiable
     ? cuotaDesde(precioEnPesos(vehiculo.precio, vehiculo.moneda, cotizacionDolar), planes)
     : null;
@@ -158,6 +161,12 @@ export const VehicleCard = ({
           {/* Una vendida no lleva precio ni cuota: ya no se puede comprar. */}
           {mostrarPrecios && !vendido && (
             <div className="mb-4">
+              {baja !== null && (
+                <span className="inline-flex items-center gap-1 mb-1.5 text-[10px] font-black uppercase tracking-[0.1em] text-emerald-700 bg-emerald-600/10 px-2 py-0.5">
+                  <TrendingDown size={12} aria-hidden />
+                  Bajó <span className="tabular-nums">{formatPrecioOriginal(baja, vehiculo.moneda)}</span>
+                </span>
+              )}
               <span className="block text-2xl font-black text-[hsl(var(--primary))] tracking-[-0.05em] leading-none tabular-nums">
                 {precio.principal}
               </span>

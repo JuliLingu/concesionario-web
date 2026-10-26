@@ -76,3 +76,25 @@ export function formatPrecio(
 export function formatPrecioOriginal(precio: number, moneda: Moneda): string {
   return moneda === Moneda.ARS ? formatArs(precio) : formatUsd(precio);
 }
+
+/**
+ * Una fila de `vehiculos` con los importes como número.
+ *
+ * Prisma devuelve los `Decimal` como objetos que no se serializan hacia un
+ * componente de cliente (el formulario de edición, el modal del catálogo). El
+ * precio se convertía a mano en cada lectura; con `precioAnterior` eran dos
+ * campos para acordarse en siete lugares, y olvidarse de uno rompe la página
+ * entera del administrador. Se convierte acá, una vez.
+ */
+export function conPreciosEnNumero<T extends { precio: unknown; precioAnterior: unknown }>(
+  vehiculo: T,
+): Omit<T, "precio" | "precioAnterior"> & { precio: number; precioAnterior: number | null } {
+  return {
+    ...vehiculo,
+    precio: Number(vehiculo.precio),
+    // `== null` y no `=== null`: una fila leída con un `select` que no lo pide,
+    // o con un cliente generado antes de la columna, lo trae `undefined`, y
+    // `Number(undefined)` es NaN, que la vitrina tomaría por una baja.
+    precioAnterior: vehiculo.precioAnterior == null ? null : Number(vehiculo.precioAnterior),
+  };
+}

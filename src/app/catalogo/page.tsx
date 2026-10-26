@@ -7,7 +7,7 @@ import { CatalogoView, type FiltrosActivos } from "./CatalogoView";
 import { getCachedFiltrosCatalogo, getCachedCategorias } from "@/services/cache.service";
 import { getConfiguracion } from "@/services/configuracion.service";
 import { visibleAlPublico } from "@/services/vehiculo.service";
-import { precioEnPesos } from "@/lib/precio";
+import { conPreciosEnNumero, precioEnPesos } from "@/lib/precio";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { getPlanes } from "@/actions/financiacion";
 import { condicionesDeBusqueda, terminosDeBusqueda } from "@/lib/busqueda";
@@ -300,7 +300,7 @@ export default async function CatalogoPage({
         .filter((v) => v !== undefined)
     : rawVehiculos;
 
-  const vehiculos = ordenados.map((v) => ({ ...v, precio: Number(v.precio) }));
+  const vehiculos = ordenados.map((v) => conPreciosEnNumero(v));
 
   /**
    * Banner de cierre: los dos botones abren WhatsApp con el número de la

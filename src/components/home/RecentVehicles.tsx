@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { conPreciosEnNumero } from "@/lib/precio";
 import { RecentVehiclesUI } from "./RecentVehiclesUI";
 
 export async function RecentVehicles({
@@ -23,10 +24,7 @@ export async function RecentVehicles({
     },
   });
 
-  const recentVehicles = rawVehicles.map((v) => ({
-    ...v,
-    precio: Number(v.precio),
-  }));
+  const recentVehicles = rawVehicles.map((v) => conPreciosEnNumero(v));
 
   return (
     <RecentVehiclesUI

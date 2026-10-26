@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Calendar, Fuel, AlignJustify, Disc, MessageCircle, Handshake } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Fuel, AlignJustify, Disc, MessageCircle, Handshake, TrendingDown } from "lucide-react";
+import { bajaVigente } from "@/lib/baja-precio";
 import { VehicleCard } from "@/components/catalog/VehicleCard";
 import { VehicleGallery } from "@/components/catalog/VehicleGallery";
 import { ContactForm } from "@/components/catalog/ContactForm";
@@ -7,7 +8,7 @@ import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
 import { RegistrarVista } from "@/components/catalog/RegistrarVista";
 import { WhatsappLink } from "@/components/catalog/WhatsappLink";
 import { AccionesFicha } from "@/components/catalog/BotonesSeleccion";
-import { precioEnPesos } from "@/lib/precio";
+import { formatPrecioOriginal, precioEnPesos } from "@/lib/precio";
 import { precioDeVitrina, type PlanDeCuotas } from "@/lib/vitrina";
 import { etiquetaEnum } from "@/lib/etiquetas";
 import type { VehiculoElegido, VehiculoFicha as Vehiculo } from "@/services/vehiculo.service";
@@ -63,6 +64,7 @@ export const VehicleDetail = ({
   const precio = mostrarPrecios
     ? precioDeVitrina(vehicle.precio, vehicle.moneda, cotizacionDolar)
     : null;
+  const baja = bajaVigente(vehicle);
 
   return (
     // En mobile el pie deja lugar a la barra fija de WhatsApp, que si no tapa
@@ -107,6 +109,18 @@ export const VehicleDetail = ({
 
               {precio && (
                 <div>
+                  {baja !== null && vehicle.precioAnterior !== null && (
+                    <p className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.1em] text-emerald-700 bg-emerald-600/10 px-2 py-0.5">
+                        <TrendingDown size={12} aria-hidden />
+                        Bajó <span className="tabular-nums">{formatPrecioOriginal(baja, vehicle.moneda)}</span>
+                      </span>
+                      <span className="text-sm font-bold text-[hsl(var(--muted-foreground))] line-through tabular-nums">
+                        <span className="sr-only">Antes: </span>
+                        {formatPrecioOriginal(vehicle.precioAnterior, vehicle.moneda)}
+                      </span>
+                    </p>
+                  )}
                   <p className="text-[2.5rem] font-black text-[hsl(var(--primary))] tracking-tighter leading-none">
                     {precio.principal}
                   </p>

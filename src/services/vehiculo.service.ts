@@ -2,6 +2,7 @@ import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { registrarError } from "@/lib/log";
+import { conPreciosEnNumero } from "@/lib/precio";
 import { elegirSimilares } from "@/lib/similares";
 import type { Moneda, Prisma } from "../../generated/prisma";
 
@@ -54,7 +55,7 @@ export async function getVehiculosPorIds(ids: string[]) {
   return ids
     .map((id) => porId.get(id))
     .filter((v) => v !== undefined)
-    .map((v) => ({ ...v, precio: Number(v.precio) }));
+    .map((v) => conPreciosEnNumero(v));
 }
 
 export type VehiculoElegido = Awaited<ReturnType<typeof getVehiculosPorIds>>[number];
@@ -130,10 +131,7 @@ export const getVehiculoPorId = cache(async (id: string) => {
       if (session?.user?.role !== "ADMIN") return null;
     }
 
-    return {
-      ...vehicle,
-      precio: Number(vehicle.precio),
-    };
+    return conPreciosEnNumero(vehicle);
   } catch {
     return null;
   }
@@ -159,7 +157,7 @@ export const getVehiculoPublicado = cache(async (id: string) => {
       },
     });
 
-    return vehiculo ? { ...vehiculo, precio: Number(vehiculo.precio) } : null;
+    return vehiculo ? conPreciosEnNumero(vehiculo) : null;
   } catch {
     return null;
   }

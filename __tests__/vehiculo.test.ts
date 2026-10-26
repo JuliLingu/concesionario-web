@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => ({
   crearVehiculo: vi.fn(),
   buscarVehiculo: vi.fn(),
   actualizarVehiculo: vi.fn(),
+  registrarCambioPrecio: vi.fn(),
 }));
 
 vi.mock("@/auth", () => ({ auth: mocks.auth }));
@@ -29,6 +30,9 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: mocks.buscarVehiculo,
       update: mocks.actualizarVehiculo,
     },
+    cambioPrecio: { create: mocks.registrarCambioPrecio },
+    // La transacción en arreglo recibe las operaciones ya armadas.
+    $transaction: (operaciones: Promise<unknown>[]) => Promise.all(operaciones),
   },
 }));
 
@@ -43,7 +47,7 @@ vi.mock("next/cache", () => ({
   unstable_cache: (fn: unknown) => fn,
 }));
 
-import { cambiarPublicacion, createVehicle } from "@/actions/vehicle";
+import { cambiarPublicacion, createVehicle, updateVehicle } from "@/actions/vehicle";
 
 const VEHICULO_VALIDO = {
   categoriaId: "cat_1",
@@ -233,5 +237,57 @@ describe("cambiarPublicacion", () => {
 
     expect(resultado.error).toBeTruthy();
     expect(mocks.actualizarVehiculo).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * El historial de precio respalda el "Bajó USD 1.000" de la vitrina: si una
+ * baja se anuncia sin quedar registrada, o se registra un cambio que no hubo,
+ * el precio anterior que se le muestra al comprador no tiene respaldo.
+ */
+describe("updateVehicle: historial de precio", () => {
+  const datosGuardados = () => mocks.actualizarVehiculo.mock.calls[0][0].data;
+  const guardadoComo = (precio: number, extra: Record<string, unknown> = {}) =>
+    mocks.buscarVehiculo.mockResolvedValue({
+      vendidoAt: null,
+      precio,
+      moneda: Moneda.USD,
+      precioAnterior: null,
+      precioBajoAt: null,
+      ...extra,
+    });
+
+  it("una baja queda en el historial y como precio anterior de la unidad", async () => {
+    guardadoComo(26_000);
+
+    await updateVehicle("veh_1", VEHICULO_VALIDO);
+
+    expect(mocks.registrarCambioPrecio.mock.calls[0][0].data).toMatchObject({
+      vehiculoId: "veh_1",
+      precioAnterior: 26_000,
+      precioNuevo: 25_000,
+    });
+    expect(datosGuardados().precioAnterior).toBe(26_000);
+    expect(datosGuardados().precioBajoAt).toBeInstanceOf(Date);
+  });
+
+  it("guardar sin tocar el precio no registra nada ni toca la baja", async () => {
+    const bajo = new Date();
+    guardadoComo(25_000, { precioAnterior: 27_000, precioBajoAt: bajo });
+
+    await updateVehicle("veh_1", VEHICULO_VALIDO);
+
+    expect(mocks.registrarCambioPrecio).not.toHaveBeenCalled();
+    expect(datosGuardados().precioAnterior).toBe(27_000);
+    expect(datosGuardados().precioBajoAt).toBe(bajo);
+  });
+
+  it("una suba queda registrada y borra la baja anunciada", async () => {
+    guardadoComo(24_000, { precioAnterior: 27_000, precioBajoAt: new Date() });
+
+    await updateVehicle("veh_1", VEHICULO_VALIDO);
+
+    expect(mocks.registrarCambioPrecio).toHaveBeenCalledOnce();
+    expect(datosGuardados().precioAnterior).toBeNull();
   });
 });
