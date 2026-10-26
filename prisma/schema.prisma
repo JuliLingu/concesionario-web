@@ -215,10 +215,65 @@ model Consulta {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
   vehiculo   Vehiculo?      @relation(fields: [vehiculoId], references: [id], onDelete: SetNull)
+  // Ver `Contacto`. Opcional: si vincular falla, la consulta se guarda igual.
+  contactoId String?
+  contacto   Contacto?      @relation(fields: [contactoId], references: [id], onDelete: SetNull)
 
   @@index([vehiculoId])
   @@index([estado])
+  @@index([contactoId])
   @@map("consultas")
+}
+
+/**
+ * Una persona que se comunicó con la concesionaria, sea por una consulta, una
+ * tasación o una solicitud de crédito.
+ *
+ * Existe para responder "¿quién es este?" sin abrir tres bandejas: la misma
+ * persona que pregunta por un auto suele, días después, ofrecer el suyo en
+ * parte de pago o pedir financiación, y el vendedor necesita ver las tres cosas
+ * juntas — y lo que ya habló con ella.
+ *
+ * Se identifica por email, el único dato obligatorio en los tres formularios,
+ * guardado en minúsculas y sin espacios (`lib/contacto.ts`). Quien escribe con
+ * dos direcciones distintas queda como dos contactos: es el costo de no pedir
+ * una cuenta, y mezclar por nombre o teléfono uniría a desconocidos.
+ *
+ * El estado sigue siendo el de cada pedido, no el del contacto.
+ */
+model Contacto {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  // Los datos del último pedido: es lo más probable que siga vigente.
+  nombre    String
+  telefono  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  consultas   Consulta[]
+  tasaciones  Tasacion[]
+  solicitudes SolicitudFinanciacion[]
+  notas       NotaContacto[]
+
+  @@map("contactos")
+}
+
+/**
+ * Nota interna del equipo sobre un contacto: "llamé, no atendió", "viene el
+ * sábado con la esposa". Nunca se muestra fuera del panel.
+ */
+model NotaContacto {
+  id         String   @id @default(cuid())
+  contactoId String
+  texto      String   @db.Text
+  // Nombre de quien la escribió, copiado al guardar: si el usuario se da de
+  // baja, la nota sigue diciendo de quién era.
+  autor      String?
+  createdAt  DateTime @default(now())
+  contacto   Contacto @relation(fields: [contactoId], references: [id], onDelete: Cascade)
+
+  @@index([contactoId, createdAt])
+  @@map("notas_contacto")
 }
 
 enum MedioContacto {
@@ -423,8 +478,12 @@ model Tasacion {
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
 
+  contactoId String?
+  contacto   Contacto?     @relation(fields: [contactoId], references: [id], onDelete: SetNull)
+
   @@index([vehiculoInteresId])
   @@index([estado])
+  @@index([contactoId])
   @@map("tasaciones")
 }
 
@@ -444,8 +503,11 @@ model SolicitudFinanciacion {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
   vehiculo   Vehiculo?      @relation(fields: [vehiculoId], references: [id], onDelete: SetNull)
+  contactoId String?
+  contacto   Contacto?      @relation(fields: [contactoId], references: [id], onDelete: SetNull)
 
   @@index([vehiculoId])
   @@index([estado])
+  @@index([contactoId])
   @@map("solicitudes_financiacion")
 }
