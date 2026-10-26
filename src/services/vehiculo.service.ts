@@ -1,7 +1,9 @@
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
-import type { Prisma } from "../../generated/prisma";
+import { registrarError } from "@/lib/log";
+import { elegirSimilares } from "@/lib/similares";
+import type { Moneda, Prisma } from "../../generated/prisma";
 
 /**
  * Días que una unidad vendida sigue a la vista en el catálogo público, con la
@@ -56,6 +58,42 @@ export async function getVehiculosPorIds(ids: string[]) {
 }
 
 export type VehiculoElegido = Awaited<ReturnType<typeof getVehiculosPorIds>>[number];
+
+/**
+ * Las unidades para el bloque "similares" al pie de una ficha. El criterio vive
+ * en `lib/similares.ts`.
+ *
+ * Dos lecturas en vez de una: primero lo justo para decidir (id, categoría y
+ * precio de todo lo publicado, que en una concesionaria son decenas de filas
+ * angostas), y después las fotos solo de las elegidas. Traer el stock entero
+ * con imágenes para mostrar tres sería pagar por todas.
+ *
+ * Solo lo publicado: una vendida no es una alternativa. No lanza — es un
+ * extra de la ficha, y si falla la ficha se muestra igual, sin el bloque.
+ */
+export async function getSimilares(
+  vehiculo: { id: string; categoriaId: string; precio: number; moneda: Moneda },
+  cotizacionDolar: number | null,
+) {
+  try {
+    const candidatos = await prisma.vehiculo.findMany({
+      where: { publicacion: "PUBLICADO", id: { not: vehiculo.id } },
+      select: { id: true, categoriaId: true, precio: true, moneda: true },
+      // A igual cercanía de precio gana la más nueva (ver `elegirSimilares`).
+      orderBy: { createdAt: "desc" },
+    });
+
+    const ids = elegirSimilares(
+      vehiculo,
+      candidatos.map((c) => ({ ...c, precio: Number(c.precio) })),
+      cotizacionDolar,
+    );
+    return await getVehiculosPorIds(ids);
+  } catch (error) {
+    registrarError("getSimilares", error);
+    return [];
+  }
+}
 
 /**
  * Ficha de una unidad. La usa el catálogo público, así que un borrador solo se

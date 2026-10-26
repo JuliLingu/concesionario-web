@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft, Calendar, Fuel, AlignJustify, Disc, MessageCircle, Handshake } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Fuel, AlignJustify, Disc, MessageCircle, Handshake } from "lucide-react";
+import { VehicleCard } from "@/components/catalog/VehicleCard";
 import { VehicleGallery } from "@/components/catalog/VehicleGallery";
 import { ContactForm } from "@/components/catalog/ContactForm";
 import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
@@ -7,9 +8,9 @@ import { RegistrarVista } from "@/components/catalog/RegistrarVista";
 import { WhatsappLink } from "@/components/catalog/WhatsappLink";
 import { AccionesFicha } from "@/components/catalog/BotonesSeleccion";
 import { precioEnPesos } from "@/lib/precio";
-import { precioDeVitrina } from "@/lib/vitrina";
+import { precioDeVitrina, type PlanDeCuotas } from "@/lib/vitrina";
 import { etiquetaEnum } from "@/lib/etiquetas";
-import type { VehiculoFicha as Vehiculo } from "@/services/vehiculo.service";
+import type { VehiculoElegido, VehiculoFicha as Vehiculo } from "@/services/vehiculo.service";
 
 interface VehicleDetailProps {
   vehicle: Vehiculo;
@@ -36,6 +37,13 @@ interface VehicleDetailProps {
     texto: string;
     whatsappTexto: string;
   };
+  /** Ver `getSimilares`. Vacío si no hay ninguna que se parezca. */
+  similares: VehiculoElegido[];
+  /**
+   * Planes activos para la cuota de las tarjetas de similares. No son `planes`:
+   * esos llegan vacíos si esta unidad es solo contado, y las otras pueden no serlo.
+   */
+  planesDeTarjeta: PlanDeCuotas[];
 }
 
 export const VehicleDetail = ({
@@ -48,6 +56,8 @@ export const VehicleDetail = ({
   tasacion,
   planes,
   contacto,
+  similares,
+  planesDeTarjeta,
 }: VehicleDetailProps) => {
   const precioArs = precioEnPesos(vehicle.precio, vehicle.moneda, cotizacionDolar);
   const precio = mostrarPrecios
@@ -249,6 +259,40 @@ export const VehicleDetail = ({
             </div>
           </div>
         </div>
+
+        {/* La ficha terminaba en el formulario: quien no se convenció con esta
+            unidad no tenía a dónde seguir. Sin similares, el bloque no va. */}
+        {similares.length > 0 && (
+          <section className="mt-8 lg:mt-12 pt-6 lg:pt-8 border-t border-black/5" aria-labelledby="similares">
+            <div className="flex items-end justify-between gap-3 mb-5">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[hsl(var(--primary))] mb-2">
+                  Seguí mirando
+                </p>
+                <h2 id="similares" className="text-3xl font-black tracking-tight uppercase">
+                  Unidades similares
+                </h2>
+              </div>
+              <Link
+                href={`/catalogo?categoria=${vehicle.categoria.slug}`}
+                className="shrink-0 inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-[0.1em] text-[hsl(var(--primary))] hover:text-[hsl(var(--foreground))] transition-colors"
+              >
+                Ver más <ArrowRight size={14} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {similares.map((v) => (
+                <VehicleCard
+                  key={v.id}
+                  vehiculo={v}
+                  cotizacionDolar={cotizacionDolar}
+                  mostrarPrecios={mostrarPrecios}
+                  planes={planesDeTarjeta}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
       </div>
 

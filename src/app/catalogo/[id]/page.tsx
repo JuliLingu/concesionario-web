@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getVehiculoPorId } from "@/services/vehiculo.service";
+import { getSimilares, getVehiculoPorId } from "@/services/vehiculo.service";
 import { getConfiguracion } from "@/services/configuracion.service";
 import { getPlanes } from "@/actions/financiacion";
 import { notFound } from "next/navigation";
@@ -86,14 +86,13 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
     notFound();
   }
 
-  // Los planes son globales, así que la unidad tiene que estar marcada como
-  // financiable para ofrecerlos: sin eso, un alta nueva entraría sola al
-  // simulador. Si el módulo está apagado o la unidad es solo contado, los planes
-  // ni se consultan.
-  const rawPlanes =
-    configuracion.financiacionActiva && vehicle.financiable
-      ? await getPlanes(false) // solo activos
-      : [];
+  // Con el módulo apagado los planes ni se consultan. Encendido hacen falta
+  // aunque esta unidad sea solo contado: las tarjetas de similares muestran su
+  // propia cuota.
+  const [rawPlanes, similares] = await Promise.all([
+    configuracion.financiacionActiva ? getPlanes(false) : [], // solo activos
+    getSimilares(vehicle, configuracion.cotizacionDolar),
+  ]);
 
   const vehiculoNombre = nombreVehiculo(vehicle);
   const whatsappHref = whatsappUrl(
@@ -101,12 +100,16 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
     `Hola, me interesa el ${vehiculoNombre}. ¿Podría darme más información?`,
   );
 
-  const planes = rawPlanes.map((p) => ({
+  const planesActivos = rawPlanes.map((p) => ({
     id: p.id,
     nombre: p.nombre,
     cuotas: p.cuotas,
     tasaAnual: p.tasaAnual.toNumber(),
   }));
+  // Los planes son globales, así que la unidad tiene que estar marcada como
+  // financiable para ofrecerlos en el simulador: sin eso, un alta nueva
+  // entraría sola.
+  const planes = vehicle.financiable ? planesActivos : [];
 
   // Textos de la sección de consulta: se editan en /dashboard/settings. El
   // marcador {concesionaria} ya viene resuelto por el service.
@@ -145,6 +148,8 @@ export default async function VehicleDetailPage({ params }: VehiclePageProps) {
         }}
         planes={planes}
         contacto={contacto}
+        similares={similares}
+        planesDeTarjeta={planesActivos}
       />
     </>
   );
