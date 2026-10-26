@@ -3,6 +3,7 @@ import { Space_Grotesk, Manrope } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { BandejaComparar } from "@/components/catalog/BandejaComparar";
 import { auth } from "@/auth";
 import { getConfiguracion } from "@/services/configuracion.service";
 import { construirVariablesTema } from "@/lib/colores";
@@ -88,6 +89,7 @@ export default async function RootLayout({
         <Header usuario={usuario} configuracion={configuracion} />
         <main>{children}</main>
         <Footer configuracion={configuracion} />
+        <BandejaComparar />
       </body>
     </html>
   );

@@ -1,6 +1,61 @@
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import type { Prisma } from "../../generated/prisma";
+
+/**
+ * Días que una unidad vendida sigue a la vista en el catálogo público, con la
+ * etiqueta "Vendido". Muestra que el stock rota; pasado ese plazo ya es una
+ * grilla llena de autos que no se pueden comprar.
+ */
+const DIAS_VENDIDO_VISIBLE = 30;
+
+/**
+ * Qué puede ver el público: lo publicado y, por un tiempo, lo vendido.
+ *
+ * Vive acá y no en la página del catálogo porque la usan también los guardados
+ * y el comparador, que reciben ids desde el navegador: sin este filtro, pegar en
+ * la URL el id de un borrador lo mostraría.
+ */
+export function visibleAlPublico(): Prisma.VehiculoWhereInput {
+  const vendidoDesde = new Date(Date.now() - DIAS_VENDIDO_VISIBLE * 86_400_000);
+  return {
+    OR: [
+      { publicacion: "PUBLICADO" },
+      { publicacion: "VENDIDO", vendidoAt: { gte: vendidoDesde } },
+    ],
+  };
+}
+
+/**
+ * Las unidades de una lista de ids que el público puede ver, en el mismo orden
+ * de la lista. Para "Mis guardados" y el comparador.
+ *
+ * Los ids llegan de la URL, así que quien llama tiene que haberlos depurado
+ * (`lib/seleccion.ts`): acá se confía en que son pocos y con forma de id. Lo que
+ * no aparece —dado de baja, pausado, vuelto a borrador— simplemente no vuelve,
+ * y quien llama decide qué hacer con el faltante.
+ */
+export async function getVehiculosPorIds(ids: string[]) {
+  if (ids.length === 0) return [];
+
+  const vehiculos = await prisma.vehiculo.findMany({
+    where: { id: { in: ids }, AND: [visibleAlPublico()] },
+    include: {
+      categoria: true,
+      imagenes: { orderBy: { orden: "asc" } },
+    },
+  });
+
+  // El `in` no conserva el orden: se reordena según la lista recibida.
+  const porId = new Map(vehiculos.map((v) => [v.id, v]));
+  return ids
+    .map((id) => porId.get(id))
+    .filter((v) => v !== undefined)
+    .map((v) => ({ ...v, precio: Number(v.precio) }));
+}
+
+export type VehiculoElegido = Awaited<ReturnType<typeof getVehiculosPorIds>>[number];
 
 /**
  * Ficha de una unidad. La usa el catálogo público, así que un borrador solo se

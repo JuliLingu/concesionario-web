@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { CatalogoView, type FiltrosActivos } from "./CatalogoView";
 import { getCachedFiltrosCatalogo, getCachedCategorias } from "@/services/cache.service";
 import { getConfiguracion } from "@/services/configuracion.service";
+import { visibleAlPublico } from "@/services/vehiculo.service";
 import { precioEnPesos } from "@/lib/precio";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { getPlanes } from "@/actions/financiacion";
@@ -38,23 +39,6 @@ const ordenEnUrl = z
 const MAXIMO_VALORES_POR_FILTRO = 20;
 /** Ninguna marca, categoría ni enum legítimo se acerca a este largo. */
 const MAXIMO_LARGO_VALOR = 60;
-
-/**
- * Días que una unidad vendida sigue a la vista en el catálogo público, con la
- * etiqueta "Vendido". Muestra que el stock rota; pasado ese plazo ya es una
- * grilla llena de autos que no se pueden comprar.
- */
-const DIAS_VENDIDO_VISIBLE = 30;
-
-function visibleAlPublico(): Prisma.VehiculoWhereInput {
-  const vendidoDesde = new Date(Date.now() - DIAS_VENDIDO_VISIBLE * 86_400_000);
-  return {
-    OR: [
-      { publicacion: "PUBLICADO" },
-      { publicacion: "VENDIDO", vendidoAt: { gte: vendidoDesde } },
-    ],
-  };
-}
 
 /**
  * Rango de precio en dólares, que es como compara quien compra un usado.

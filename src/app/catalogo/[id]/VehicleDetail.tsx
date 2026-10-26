@@ -5,6 +5,7 @@ import { ContactForm } from "@/components/catalog/ContactForm";
 import { FinancingSimulator } from "@/components/catalog/FinancingSimulator";
 import { RegistrarVista } from "@/components/catalog/RegistrarVista";
 import { WhatsappLink } from "@/components/catalog/WhatsappLink";
+import { AccionesFicha } from "@/components/catalog/BotonesSeleccion";
 import { precioEnPesos } from "@/lib/precio";
 import { precioDeVitrina } from "@/lib/vitrina";
 import { etiquetaEnum } from "@/lib/etiquetas";
@@ -130,6 +131,8 @@ export const VehicleDetail = ({
                   {tasacion.ctaTexto}
                 </Link>
               )}
+
+              <AccionesFicha vehiculoId={vehicle.id} vendido={vehicle.publicacion === "VENDIDO"} />
 
               <div className="bg-[hsl(var(--card))] rounded-lg p-4 lg:p-6 shadow-sm border border-black/5">
                 <p className="text-[10px] font-black uppercase tracking-[0.1em] text-[hsl(var(--muted-foreground))] mb-4">Ficha Rápida</p>

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { handleSignOut } from "@/actions/auth-actions";
 import { LogoConcesionaria } from "@/components/layout/LogoConcesionaria";
+import { EnlaceGuardados } from "@/components/layout/EnlaceGuardados";
 import type { SiteConfig } from "@/lib/configuracion-defaults";
 
 /**
@@ -114,6 +115,7 @@ export function Header({ usuario, configuracion }: HeaderProps) {
               Administrador
             </Link>
           )}
+          <EnlaceGuardados className="text-[hsl(var(--foreground))]/60 hover:text-[hsl(var(--foreground))] transition-colors" />
           <Link
             href="/catalogo"
             className="bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--accent))] hover:brightness-90 text-[hsl(var(--primary-foreground))] px-5 py-2.5 rounded text-xs font-black uppercase tracking-widest transition-all shadow-md"
@@ -195,6 +197,11 @@ export function Header({ usuario, configuracion }: HeaderProps) {
                   Administrador
                 </Link>
               )}
+              <EnlaceGuardados
+                conTexto
+                onClick={() => setOpen(false)}
+                className="py-3 text-[hsl(var(--foreground))] font-semibold border-b border-black/5"
+              />
 
               <Link
                 href="/catalogo"

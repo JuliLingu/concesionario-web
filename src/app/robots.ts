@@ -18,7 +18,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/dashboard/", "/admin/", "/api/", "/login", "/register"],
+      // Guardados y comparador son vistas personales armadas con `?ids=`: cada
+      // combinación es una URL nueva con lo que ya está en las fichas.
+      disallow: ["/dashboard/", "/admin/", "/api/", "/login", "/register", "/guardados", "/comparar"],
     },
     sitemap: urlAbsoluta("/sitemap.xml"),
   };

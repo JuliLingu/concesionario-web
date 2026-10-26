@@ -5,6 +5,7 @@ import { Calendar, Car, Fuel, AlignJustify, ArrowRight, Gauge } from "lucide-rea
 import { getCldUrl } from "@/lib/cloudinary";
 import { formatArs, formatNumeroAr, precioEnPesos } from "@/lib/precio";
 import { etiquetaEnum } from "@/lib/etiquetas";
+import { AccionesTarjeta } from "./BotonesSeleccion";
 import {
   ANTICIPO_POR_DEFECTO,
   ETIQUETA_INSIGNIA,
@@ -93,6 +94,7 @@ export const VehicleCard = ({
           </div>
         )}
 
+        <AccionesTarjeta vehiculoId={vehiculo.id} vendido={vendido} />
         {accionAdmin}
       </div>
 
