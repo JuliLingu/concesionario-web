@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ArrowLeft, Eye, MessageSquare, Timer, TrendingUp, ExternalLink } from "lucide-react";
+import { ArrowLeft, Camera, Eye, MessageSquare, Timer, TrendingUp, ExternalLink } from "lucide-react";
 import { formatFechaLarga } from "@/lib/formato";
 import { formatPrecioOriginal } from "@/lib/precio";
-import { DIAS_INMOVILIZADA, SENAL_COPY, type Senal } from "@/lib/metricas";
+import { DIAS_INMOVILIZADA, FOTOS_MINIMAS, SENAL_COPY, type Senal } from "@/lib/metricas";
 import type { RendimientoStock, UnidadRendimiento } from "@/services/metricas.service";
 
 interface MetricasViewProps {
@@ -63,7 +63,7 @@ export const MetricasView = ({ rendimiento, mostrarPrecios = true }: MetricasVie
         )}
 
         {/* ── Resumen ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
           <Tarjeta
             label="Días promedio en stock"
             valor={resumen.diasPromedioEnStock ?? "—"}
@@ -80,6 +80,12 @@ export const MetricasView = ({ rendimiento, mostrarPrecios = true }: MetricasVie
             valor={resumen.caras}
             icon={<Eye size={20} />}
             acento={resumen.caras > 0 ? "alerta" : undefined}
+          />
+          <Tarjeta
+            label={`Menos de ${FOTOS_MINIMAS} fotos`}
+            valor={resumen.pocasFotos}
+            icon={<Camera size={20} />}
+            acento={resumen.pocasFotos > 0 ? "alerta" : undefined}
           />
           <Tarjeta
             label="Días promedio hasta vender"
@@ -250,6 +256,7 @@ const Fila = ({
         <div className="text-xs text-[hsl(var(--muted-foreground))] font-medium mt-0.5">
           {unidad.anio}
           {mostrarPrecios && ` · ${formatPrecioOriginal(unidad.precio, unidad.moneda)}`}
+          {` · ${unidad.fotos} foto${unidad.fotos !== 1 ? "s" : ""}`}
         </div>
       </td>
 

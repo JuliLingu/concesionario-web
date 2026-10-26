@@ -57,11 +57,7 @@ export default async function DashboardPage() {
       borradores={borradores}
       consultasPendientes={consultasPendientes}
       tasacionesPendientes={tasacionesPendientes}
-      unidadesConSenal={
-        rendimiento.resumen.inmovilizadas +
-        rendimiento.resumen.caras +
-        rendimiento.resumen.invisibles
-      }
+      unidadesConSenal={rendimiento.resumen.paraRevisar}
       diasPromedioEnStock={rendimiento.resumen.diasPromedioEnStock}
       ultimasConsultas={ultimasConsultas}
       financiacionActiva={configuracion.financiacionActiva}

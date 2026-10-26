@@ -98,6 +98,13 @@ export const VISTAS_PARA_JUZGAR_PRECIO = 20;
  */
 export const DIAS_MINIMOS_PARA_JUZGAR = 7;
 
+/**
+ * Fotos mínimas de una publicación: frente, trasera, interior y tablero. Con
+ * menos, quien compra a distancia no tiene con qué decidir y pasa de largo, y
+ * eso en los números se confunde con un precio alto.
+ */
+export const FOTOS_MINIMAS = 4;
+
 // ── Señales ──────────────────────────────────────────────────────────────────
 
 export type Senal =
@@ -105,6 +112,8 @@ export type Senal =
   | "MIRAN_Y_NO_PREGUNTAN"
   /** No entra nadie a la ficha: foto, título o precio de publicación. */
   | "NADIE_LA_MIRA"
+  /** Menos de FOTOS_MINIMAS fotos: lo primero que hay que descartar antes de tocar el precio. */
+  | "POCAS_FOTOS"
   /** Más de tres meses en el playón. */
   | "INMOVILIZADA"
   /** Recién publicada: todavía no hay con qué juzgarla. */
@@ -129,6 +138,11 @@ export const SENAL_COPY: Record<
     label: "Nadie la mira",
     detalle: "No entra tráfico a la ficha: foto principal, título o precio de publicación.",
     tono: "alerta",
+  },
+  POCAS_FOTOS: {
+    label: "Pocas fotos",
+    detalle: `Tiene menos de ${FOTOS_MINIMAS} fotos. Sumá frente, trasera, interior y tablero antes de bajarle el precio.`,
+    tono: "aviso",
   },
   INMOVILIZADA: {
     label: `+${DIAS_INMOVILIZADA} días`,
@@ -170,6 +184,8 @@ export type UnidadMedida = {
   vistas: number;
   /** Consultas, solicitudes de crédito, permutas y clicks a WhatsApp, en la ventana. */
   contactos: number;
+  /** Imágenes cargadas en la publicación. */
+  fotos: number;
 };
 
 /**
@@ -181,28 +197,43 @@ export type UnidadMedida = {
  * respuesta es `SIN_NOVEDAD`.
  */
 export function senalesDeUnidad(unidad: UnidadMedida): Senal[] {
-  // Fuera de la vidriera no hay nada que medir, pero el reloj del playón corre
-  // igual: un borrador viejo sigue siendo capital parado y se lo dice.
-  if (unidad.visibilidad !== "PUBLICADA") {
-    const fuera: Senal = unidad.visibilidad === "PAUSADA" ? "PAUSADA" : "SIN_PUBLICAR";
-    return unidad.diasEnStock >= DIAS_INMOVILIZADA ? [fuera, "INMOVILIZADA"] : [fuera];
-  }
-
-  if (unidad.diasEnStock < DIAS_MINIMOS_PARA_JUZGAR) return ["EN_MEDICION"];
-
   const senales: Senal[] = [];
 
-  // Excluyentes por definición: o no la mira nadie, o la miran y no preguntan.
-  if (unidad.vistas === 0) {
+  if (unidad.visibilidad !== "PUBLICADA") {
+    // Fuera de la vidriera no hay nada que medir.
+    senales.push(unidad.visibilidad === "PAUSADA" ? "PAUSADA" : "SIN_PUBLICAR");
+  } else if (unidad.diasEnStock < DIAS_MINIMOS_PARA_JUZGAR) {
+    senales.push("EN_MEDICION");
+  } else if (unidad.vistas === 0) {
+    // Excluyentes por definición: o no la mira nadie, o la miran y no preguntan.
     senales.push("NADIE_LA_MIRA");
   } else if (unidad.vistas >= VISTAS_PARA_JUZGAR_PRECIO && unidad.contactos === 0) {
     senales.push("MIRAN_Y_NO_PREGUNTAN");
   }
 
+  // Las fotos no dependen del tráfico, así que se juzgan siempre: en un
+  // borrador o una recién subida es justo cuando conviene corregirlas. Va antes
+  // que los días porque es la causa más probable de lo anterior, y la más
+  // barata de arreglar.
+  if (unidad.fotos < FOTOS_MINIMAS) senales.push("POCAS_FOTOS");
+
+  // El reloj del playón corre aunque la unidad no esté a la vista: un borrador
+  // viejo sigue siendo capital parado y se lo dice.
   if (unidad.diasEnStock >= DIAS_INMOVILIZADA) senales.push("INMOVILIZADA");
 
   return senales.length > 0 ? senales : ["SIN_NOVEDAD"];
 }
+
+/**
+ * Señales que piden hacer algo. Es lo que cuenta el aviso de la portada del
+ * panel: una unidad con dos de estas es una sola unidad para revisar.
+ */
+export const SENALES_PARA_REVISAR: readonly Senal[] = [
+  "MIRAN_Y_NO_PREGUNTAN",
+  "NADIE_LA_MIRA",
+  "POCAS_FOTOS",
+  "INMOVILIZADA",
+];
 
 /** Promedio redondeado, o null si no hay de qué promediar. */
 export function promedio(valores: number[]): number | null {

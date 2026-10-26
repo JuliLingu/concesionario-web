@@ -22,7 +22,7 @@ interface DashboardViewProps {
   borradores: number;
   consultasPendientes: number;
   tasacionesPendientes: number;
-  /** Unidades con algo para revisar: añejas, caras o que no mira nadie. */
+  /** Unidades con algo para revisar: añejas, caras, sin visitas o con pocas fotos. */
   unidadesConSenal: number;
   /** Null mientras no haya stock del que promediar. */
   diasPromedioEnStock: number | null;

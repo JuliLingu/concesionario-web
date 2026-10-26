@@ -11,6 +11,7 @@ import { prisma } from "@/lib/prisma";
 import { registrarError } from "@/lib/log";
 import {
   DIAS_INMOVILIZADA,
+  SENALES_PARA_REVISAR,
   VENTANA_DIAS,
   diaLocal,
   diaLocalHace,
@@ -106,6 +107,7 @@ export type UnidadRendimiento = {
   clicksWhatsapp: number;
   /** Consultas + solicitudes de crédito + permutas + clicks, en la ventana. */
   contactos: number;
+  fotos: number;
   senales: Senal[];
 };
 
@@ -129,6 +131,12 @@ export type RendimientoStock = {
     inmovilizadas: number;
     caras: number;
     invisibles: number;
+    pocasFotos: number;
+    /**
+     * Unidades distintas con al menos una señal para revisar. No es la suma de
+     * las de arriba: una unidad cara y añeja es una sola unidad.
+     */
+    paraRevisar: number;
     /** Null hasta que haya una venta con fecha: la rotación no se inventa. */
     diasPromedioHastaLaVenta: number | null;
   };
@@ -190,6 +198,8 @@ export async function getRendimientoStock(
         publicacion: true,
         createdAt: true,
         vendidoAt: true,
+        // Un COUNT por unidad y no las filas de imágenes: acá solo importa cuántas son.
+        _count: { select: { imagenes: true } },
       },
       orderBy: { createdAt: "asc" },
     }),
@@ -261,11 +271,13 @@ export async function getRendimientoStock(
       vistas,
       clicksWhatsapp,
       contactos,
+      fotos: v._count.imagenes,
       senales: senalesDeUnidad({
         visibilidad: VISIBILIDAD[v.publicacion],
         diasEnStock: dias,
         vistas,
         contactos,
+        fotos: v._count.imagenes,
       }),
     });
   }
@@ -286,6 +298,8 @@ export async function getRendimientoStock(
       inmovilizadas: unidades.filter((u) => u.diasEnStock >= DIAS_INMOVILIZADA).length,
       caras: unidades.filter((u) => tiene(u, "MIRAN_Y_NO_PREGUNTAN")).length,
       invisibles: unidades.filter((u) => tiene(u, "NADIE_LA_MIRA")).length,
+      pocasFotos: unidades.filter((u) => tiene(u, "POCAS_FOTOS")).length,
+      paraRevisar: unidades.filter((u) => u.senales.some((s) => SENALES_PARA_REVISAR.includes(s))).length,
       diasPromedioHastaLaVenta: promedio(ventas.map((v) => v.diasHastaLaVenta)),
     },
   };

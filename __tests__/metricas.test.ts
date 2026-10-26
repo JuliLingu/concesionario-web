@@ -13,6 +13,7 @@ import { ipUnica } from "./helpers/entorno";
 import {
   DIAS_INMOVILIZADA,
   DIAS_MINIMOS_PARA_JUZGAR,
+  FOTOS_MINIMAS,
   VISTAS_PARA_JUZGAR_PRECIO,
   diaLocal,
   diasEnStock,
@@ -85,6 +86,7 @@ describe("senalesDeUnidad", () => {
     diasEnStock: 30,
     vistas: 50,
     contactos: 4,
+    fotos: 8,
     ...extra,
   });
 
@@ -140,6 +142,7 @@ describe("senalesDeUnidad", () => {
       diasEnStock: DIAS_INMOVILIZADA + 10,
       vistas: 0,
       contactos: 0,
+      fotos: 8,
     });
 
     // Sin visitas porque nadie la puede ver: acusarla de "nadie la mira" sería
@@ -153,6 +156,7 @@ describe("senalesDeUnidad", () => {
       diasEnStock: 40,
       vistas: 0,
       contactos: 0,
+      fotos: 8,
     });
 
     expect(senales).toEqual(["SIN_PUBLICAR"]);
@@ -160,6 +164,35 @@ describe("senalesDeUnidad", () => {
 
   it("nunca devuelve vacío", () => {
     expect(senalesDeUnidad(publicada())).toEqual(["SIN_NOVEDAD"]);
+  });
+
+  it("separa las fotos del precio: una cara con pocas fotos dice las dos cosas", () => {
+    const senales = senalesDeUnidad(
+      publicada({ vistas: VISTAS_PARA_JUZGAR_PRECIO, contactos: 0, fotos: FOTOS_MINIMAS - 1 }),
+    );
+
+    expect(senales).toEqual(["MIRAN_Y_NO_PREGUNTAN", "POCAS_FOTOS"]);
+  });
+
+  it("con las fotos mínimas no hay aviso", () => {
+    expect(senalesDeUnidad(publicada({ fotos: FOTOS_MINIMAS }))).toEqual(["SIN_NOVEDAD"]);
+  });
+
+  it("juzga las fotos aunque la unidad no esté a la vista ni tenga una semana", () => {
+    // Las fotos no dependen del tráfico: el borrador y la recién subida son
+    // justo el momento de corregirlas.
+    expect(
+      senalesDeUnidad({ visibilidad: "SIN_PUBLICAR", diasEnStock: 2, vistas: 0, contactos: 0, fotos: 1 }),
+    ).toEqual(["SIN_PUBLICAR", "POCAS_FOTOS"]);
+    expect(senalesDeUnidad(publicada({ diasEnStock: 1, fotos: 0 }))).toEqual(["EN_MEDICION", "POCAS_FOTOS"]);
+  });
+
+  it("va antes que los días: es la causa más barata de arreglar", () => {
+    const senales = senalesDeUnidad(
+      publicada({ diasEnStock: DIAS_INMOVILIZADA, vistas: 0, contactos: 0, fotos: 2 }),
+    );
+
+    expect(senales).toEqual(["NADIE_LA_MIRA", "POCAS_FOTOS", "INMOVILIZADA"]);
   });
 });
 
