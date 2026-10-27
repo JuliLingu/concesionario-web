@@ -769,10 +769,10 @@ export const SettingsClient = ({
                   </Link>
                   , y lo que llegue se lee en{" "}
                   <Link
-                    href="/dashboard/tasaciones"
+                    href="/dashboard/bandeja?tipo=TASACION"
                     className="font-bold text-[hsl(var(--primary))] hover:underline"
                   >
-                    Tasaciones
+                    la bandeja
                   </Link>
                   .
                 </p>

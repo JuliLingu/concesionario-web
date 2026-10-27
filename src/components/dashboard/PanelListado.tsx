@@ -5,21 +5,28 @@ import { whatsappDeCliente } from "@/lib/telefono";
 import type { EstadoConsulta } from "../../../generated/prisma";
 
 /**
- * Marco común de las bandejas del panel (consultas y solicitudes de crédito).
+ * Marco de la bandeja del panel: enlace de vuelta, encabezado con contador y
+ * globo de pendientes, barra de pestañas por estado y la tarjeta blanca con
+ * scroll horizontal. Las columnas de la tabla llegan como `children`.
  *
- * Las dos pantallas eran ~200 líneas prácticamente idénticas: mismo enlace de
- * vuelta, mismo encabezado con contador y globo de pendientes, misma barra de
- * pestañas y misma tarjeta blanca con scroll horizontal. Lo único propio de
- * cada una son las columnas de la tabla, que llegan como `children`.
+ * Nació para las tres bandejas separadas (consultas, solicitudes, tasaciones),
+ * que eran casi idénticas; hoy las une `/dashboard/bandeja`.
  */
 interface PanelListadoProps {
   titulo: string;
-  /** Ej: "12 consultas". Lo arma quien llama porque el plural cambia por pantalla. */
+  /** Ej: "12 pedidos". Lo arma quien llama porque el plural cambia por pantalla. */
   resumen: string;
   pendientes: number;
-  /** Ruta base para los enlaces de las pestañas. Ej: "/dashboard/consultas". */
+  /** Ruta base para los enlaces de las pestañas. Ej: "/dashboard/bandeja". */
   basePath: string;
+  /**
+   * Otros parámetros que las pestañas de estado tienen que conservar, como el
+   * `?tipo=` de la bandeja: cambiar de estado no debería quitar el filtro.
+   */
+  parametros?: Record<string, string>;
   estadoActivo?: EstadoConsulta;
+  /** Filtros propios de la pantalla, encima de las pestañas de estado. */
+  filtros?: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -28,7 +35,9 @@ export const PanelListado = ({
   resumen,
   pendientes,
   basePath,
+  parametros = {},
   estadoActivo,
+  filtros,
   children,
 }: PanelListadoProps) => (
   <div className="min-h-screen bg-[hsl(var(--background))] pt-header pb-8">
@@ -57,10 +66,14 @@ export const PanelListado = ({
         </div>
       </div>
 
-      <div className="inline-flex gap-1 mb-4 bg-white p-1 rounded border border-[#e5e7eb] shadow-sm">
+      {filtros}
+
+      <div className="flex flex-wrap gap-1 mb-4 bg-white p-1 rounded border border-[#e5e7eb] shadow-sm w-fit max-w-full">
         {TABS_ESTADO.map((tab) => {
           const activa = tab.value === "TODAS" ? !estadoActivo : estadoActivo === tab.value;
-          const href = tab.value === "TODAS" ? basePath : `${basePath}?estado=${tab.value}`;
+          const query = new URLSearchParams(parametros);
+          if (tab.value !== "TODAS") query.set("estado", tab.value);
+          const href = query.size > 0 ? `${basePath}?${query}` : basePath;
           return (
             <Link
               key={tab.value}

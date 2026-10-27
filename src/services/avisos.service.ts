@@ -155,7 +155,7 @@ export async function avisarConsulta(datos: DatosConsulta): Promise<void> {
       ["Mensaje", datos.mensaje],
     ];
 
-    const enlace = enlaceAlPanel("/dashboard/consultas");
+    const enlace = enlaceAlPanel("/dashboard/bandeja?tipo=CONSULTA");
 
     await enviarMail(destinatario.destino, {
       asunto: vehiculo
@@ -206,7 +206,7 @@ export async function avisarSolicitud(datos: DatosSolicitud): Promise<void> {
       ["Cuotas pedidas", String(datos.cuotas)],
     ];
 
-    const enlace = enlaceAlPanel("/dashboard/solicitudes");
+    const enlace = enlaceAlPanel("/dashboard/bandeja?tipo=SOLICITUD");
 
     await enviarMail(destinatario.destino, {
       asunto: `Nueva solicitud de financiación — ${nombreCompleto}`,
@@ -278,7 +278,7 @@ export async function avisarTasacion(datos: DatosTasacion): Promise<void> {
       ["Comentarios", datos.observaciones],
     ];
 
-    const enlace = enlaceAlPanel("/dashboard/tasaciones");
+    const enlace = enlaceAlPanel("/dashboard/bandeja?tipo=TASACION");
 
     await enviarMail(destinatario.destino, {
       asunto: `Nueva tasación ${datos.referencia}: ${ofrecido} — ${datos.nombre}`,

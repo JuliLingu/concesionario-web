@@ -9,6 +9,7 @@ import { after } from "next/server";
 import { EstadoConsulta } from "../../generated/prisma";
 import { getConfiguracion } from "@/services/configuracion.service";
 import { avisarSolicitud } from "@/services/avisos.service";
+import { vincularContacto } from "@/services/contactos.service";
 import {
   REGLAS,
   esperaRestante,
@@ -112,13 +113,20 @@ export const createSolicitud = async (values: z.infer<typeof SolicitudFinanciaci
   registrarIntento(clave, REGLAS.SOLICITUD_POR_IP);
 
   try {
+    const contactoId = await vincularContacto({
+      email: validated.data.email,
+      nombre: `${validated.data.nombre} ${validated.data.apellido}`,
+      telefono: validated.data.telefono,
+    });
+
     await prisma.solicitudFinanciacion.create({
       data: {
         ...validated.data,
         vehiculoId: validated.data.vehiculoId || null,
+        contactoId,
       },
     });
-    revalidatePath("/dashboard/solicitudes");
+    revalidatePath("/dashboard/bandeja");
 
     // Mismo criterio que en la consulta: el aviso no bloquea la respuesta. Sin
     // DNI ni ingresos en el correo, eso queda del lado del panel.
@@ -139,24 +147,7 @@ export const createSolicitud = async (values: z.infer<typeof SolicitudFinanciaci
   }
 };
 
-export const getSolicitudes = async (estado?: EstadoConsulta) => {
-  const session = await auth();
-  if (session?.user?.role !== "ADMIN") return [];
-
-  try {
-    return await prisma.solicitudFinanciacion.findMany({
-      where: estado ? { estado } : undefined,
-      include: {
-        vehiculo: {
-          select: { id: true, marca: true, modelo: true, anio: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-  } catch {
-    return [];
-  }
-};
+// La lectura de solicitudes se mudó a `services/contactos.service.ts` (bandeja unificada).
 
 export const updateSolicitudEstado = async (id: string, estado: EstadoConsulta) => {
   const session = await auth();
@@ -167,7 +158,7 @@ export const updateSolicitudEstado = async (id: string, estado: EstadoConsulta) 
       where: { id },
       data: { estado },
     });
-    revalidatePath("/dashboard/solicitudes");
+    revalidatePath("/dashboard/bandeja");
     return { success: true };
   } catch {
     return { error: "Error al actualizar el estado" };

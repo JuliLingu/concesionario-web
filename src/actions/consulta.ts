@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { EstadoConsulta } from "../../generated/prisma";
 import { avisarConsulta } from "@/services/avisos.service";
+import { vincularContacto } from "@/services/contactos.service";
 import {
   REGLAS,
   esperaRestante,
@@ -31,8 +32,11 @@ export const createConsulta = async (values: ConsultaInput) => {
   registrarIntento(clave, REGLAS.CONSULTA_POR_IP);
 
   try {
+    const contactoId = await vincularContacto(validated.data);
+
     await prisma.consulta.create({
       data: {
+        contactoId,
         nombre:    validated.data.nombre,
         email:     validated.data.email,
         telefono:  validated.data.telefono,
@@ -43,7 +47,7 @@ export const createConsulta = async (values: ConsultaInput) => {
       },
     });
 
-    revalidatePath("/dashboard/consultas");
+    revalidatePath("/dashboard/bandeja");
 
     // El aviso sale con la respuesta ya entregada: el visitante ve la
     // confirmación al instante y no espera a que conteste el proveedor de
@@ -67,25 +71,8 @@ export const createConsulta = async (values: ConsultaInput) => {
   }
 };
 
-// ── Obtener todas las consultas (solo ADMIN) ─────────────────────────────────
-export const getConsultas = async (estado?: EstadoConsulta) => {
-  const session = await auth();
-  if (session?.user?.role !== "ADMIN") return [];
-
-  try {
-    return await prisma.consulta.findMany({
-      where: estado ? { estado } : undefined,
-      include: {
-        vehiculo: {
-          select: { id: true, marca: true, modelo: true, anio: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-  } catch {
-    return [];
-  }
-};
+// La lectura de la bandeja se mudó a `services/contactos.service.ts`, que la
+// une con tasaciones y solicitudes. Acá quedan las escrituras.
 
 // ── Cambiar estado de consulta (solo ADMIN) ───────────────────────────────────
 export const updateConsultaEstado = async (id: string, estado: EstadoConsulta) => {
@@ -97,7 +84,7 @@ export const updateConsultaEstado = async (id: string, estado: EstadoConsulta) =
       where: { id },
       data: { estado },
     });
-    revalidatePath("/dashboard/consultas");
+    revalidatePath("/dashboard/bandeja");
     return { success: true };
   } catch {
     return { error: "Error al actualizar el estado" };

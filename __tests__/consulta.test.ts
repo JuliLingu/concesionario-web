@@ -12,7 +12,12 @@ import { ipUnica, type ResultadoAccion } from "./helpers/entorno";
 const mocks = vi.hoisted(() => ({
   crearConsulta: vi.fn(),
   avisarConsulta: vi.fn(),
+  vincularContacto: vi.fn(),
   ip: "10.0.0.0",
+}));
+
+vi.mock("@/services/contactos.service", () => ({
+  vincularContacto: mocks.vincularContacto,
 }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -64,6 +69,7 @@ beforeEach(() => {
   mocks.ip = ipUnica();
   mocks.crearConsulta.mockResolvedValue({ id: "c_1" });
   mocks.avisarConsulta.mockResolvedValue(undefined);
+  mocks.vincularContacto.mockResolvedValue("cto_1");
 });
 
 describe("createConsulta", () => {
@@ -77,6 +83,26 @@ describe("createConsulta", () => {
       email: "ana@ejemplo.com",
       vehiculoId: "veh_1",
     });
+  });
+
+  it("la ata al contacto de ese email", async () => {
+    await enviar(CONSULTA_VALIDA);
+
+    expect(mocks.vincularContacto).toHaveBeenCalledWith(
+      expect.objectContaining({ email: "ana@ejemplo.com", nombre: "Ana Gómez" }),
+    );
+    expect(mocks.crearConsulta.mock.calls[0][0].data.contactoId).toBe("cto_1");
+  });
+
+  it("si no se pudo agendar el contacto, la consulta se guarda igual", async () => {
+    // Perder una consulta porque falló el CRM sería perder justo lo que el CRM
+    // tiene que cuidar.
+    mocks.vincularContacto.mockResolvedValue(null);
+
+    const resultado = await enviar(CONSULTA_VALIDA);
+
+    expect(resultado.success).toBeTruthy();
+    expect(mocks.crearConsulta.mock.calls[0][0].data.contactoId).toBeNull();
   });
 
   it("rechaza un email inválido sin llegar a la base", async () => {

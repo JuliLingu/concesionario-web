@@ -9,6 +9,7 @@ import { after } from "next/server";
 import { EstadoConsulta } from "../../generated/prisma";
 import { getConfiguracion } from "@/services/configuracion.service";
 import { avisarTasacion } from "@/services/avisos.service";
+import { vincularContacto } from "@/services/contactos.service";
 import { codigoDeReferencia } from "@/lib/referencia";
 import {
   REGLAS,
@@ -63,12 +64,13 @@ export const createTasacion = async (values: z.infer<typeof TasacionSchema>) => 
   registrarIntento(clave, REGLAS.TASACION_POR_IP);
 
   try {
-    const vehiculoInteresId = await unidadDeInteresValida(
-      validated.data.vehiculoInteresId,
-    );
+    const [vehiculoInteresId, contactoId] = await Promise.all([
+      unidadDeInteresValida(validated.data.vehiculoInteresId),
+      vincularContacto(validated.data),
+    ]);
 
     const tasacion = await prisma.tasacion.create({
-      data: { ...validated.data, vehiculoInteresId },
+      data: { ...validated.data, vehiculoInteresId, contactoId },
       select: { id: true },
     });
 
@@ -76,7 +78,7 @@ export const createTasacion = async (values: z.infer<typeof TasacionSchema>) => 
     // que las fotos que lleguen por WhatsApp se aten a esta fila sin preguntar.
     const referencia = codigoDeReferencia(tasacion.id);
 
-    revalidatePath("/dashboard/tasaciones");
+    revalidatePath("/dashboard/bandeja");
 
     // El aviso sale con la respuesta ya entregada: quien completó el formulario
     // ve la confirmación al instante y no espera al proveedor de correo. Va
@@ -110,24 +112,7 @@ export const createTasacion = async (values: z.infer<typeof TasacionSchema>) => 
 
 // ── Bandeja del panel (solo ADMIN) ───────────────────────────────────────────
 
-export const getTasaciones = async (estado?: EstadoConsulta) => {
-  const session = await auth();
-  if (session?.user?.role !== "ADMIN") return [];
-
-  try {
-    return await prisma.tasacion.findMany({
-      where: estado ? { estado } : undefined,
-      include: {
-        vehiculoInteres: {
-          select: { id: true, marca: true, modelo: true, anio: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-  } catch {
-    return [];
-  }
-};
+// La lectura se mudó a `services/contactos.service.ts` (bandeja unificada).
 
 export const updateTasacionEstado = async (id: string, estado: EstadoConsulta) => {
   const session = await auth();
@@ -138,7 +123,7 @@ export const updateTasacionEstado = async (id: string, estado: EstadoConsulta) =
       where: { id },
       data: { estado },
     });
-    revalidatePath("/dashboard/tasaciones");
+    revalidatePath("/dashboard/bandeja");
     return { success: true };
   } catch {
     return { error: "Error al actualizar el estado" };

@@ -1,150 +1,16 @@
-import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/sesion";
-import { getTasaciones, updateTasacionEstado } from "@/actions/tasacion";
+import { redirect } from "next/navigation";
 import { estadoDeUrl } from "@/lib/estados";
-import { etiquetaEnum } from "@/lib/etiquetas";
-import { formatFechaLarga } from "@/lib/formato";
-import { formatNumeroAr, formatPrecioOriginal } from "@/lib/precio";
-import { codigoDeReferencia } from "@/lib/referencia";
-import { getConfiguracion } from "@/services/configuracion.service";
-import { EstadoButton } from "@/components/dashboard/EstadoButton";
-import {
-  CeldaVehiculo,
-  Contacto,
-  PanelListado,
-  SinResultados,
-  TablaPanel,
-  TelefonoCliente,
-  Th,
-} from "@/components/dashboard/PanelListado";
 
-interface TasacionesPageProps {
+interface PageProps {
   searchParams: Promise<{ estado?: string }>;
 }
 
-export default async function TasacionesPage({ searchParams }: TasacionesPageProps) {
-  // Tasación apagada desde Configuración: las propuestas guardadas siguen en la
-  // base, pero la pantalla no es alcanzable. El chequeo va antes de requireAdmin
-  // para que quien no es administrador no pueda distinguir "la ruta no existe"
-  // de "no tenés permiso".
-  if (!(await getConfiguracion()).tasacionActiva) notFound();
-
-  await requireAdmin();
-
+/**
+ * La pantalla de tasaciones pasó a la bandeja unificada (`/dashboard/bandeja`). La ruta
+ * queda para que los enlaces viejos —avisos por correo ya enviados, marcadores
+ * del navegador— sigan llevando al mismo lugar, con el filtro de estado.
+ */
+export default async function Page({ searchParams }: PageProps) {
   const estado = estadoDeUrl((await searchParams).estado);
-
-  const [tasaciones, pendientes] = await Promise.all([
-    getTasaciones(estado),
-    prisma.tasacion.count({ where: { estado: "PENDIENTE" } }),
-  ]);
-
-  return (
-    <PanelListado
-      titulo="Tasaciones"
-      resumen={`${tasaciones.length} tasaci${tasaciones.length !== 1 ? "ones" : "ón"}`}
-      pendientes={pendientes}
-      basePath="/dashboard/tasaciones"
-      estadoActivo={estado}
-    >
-      {tasaciones.length === 0 ? (
-        <SinResultados texto="No hay tasaciones en esta categoría." />
-      ) : (
-        <TablaPanel>
-          <thead className="bg-[#f3f3f6]">
-            <tr className="border-b border-[#e5e7eb]">
-              <Th>Cliente</Th>
-              <Th>Ofrece</Th>
-              <Th>Pretende</Th>
-              <Th oculta="lg">Le interesa</Th>
-              <Th oculta="md">Fecha</Th>
-              <Th>Estado</Th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasaciones.map((t) => {
-              const fichaTecnica = [
-                t.version,
-                t.combustible && etiquetaEnum(t.combustible),
-                t.transmision && etiquetaEnum(t.transmision),
-              ].filter(Boolean);
-
-              return (
-                <tr
-                  key={t.id}
-                  className="border-b border-[#e5e7eb]/50 hover:bg-[hsl(var(--surface-low))] transition align-top"
-                >
-                  <td className="py-3 px-4">
-                    <div className="font-bold text-sm text-[hsl(var(--foreground))]">
-                      {t.nombre}
-                    </div>
-                    {/* El mismo código que el visitante repite al mandar las
-                        fotos por WhatsApp desde un número que puede no ser el
-                        de abajo. Es lo que permite atar ese chat a esta fila. */}
-                    <div className="text-[10px] font-black tracking-widest text-[hsl(var(--muted-foreground))] mt-0.5">
-                      {codigoDeReferencia(t.id)}
-                    </div>
-                    <Contacto href={`mailto:${t.email}`} texto={t.email} />
-                    <TelefonoCliente telefono={t.telefono} />
-                  </td>
-
-                  <td className="py-3 px-4">
-                    <div className="text-sm font-bold text-[hsl(var(--foreground))]">
-                      {t.marca} {t.modelo} {t.anio}
-                    </div>
-                    <div className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">
-                      {formatNumeroAr(t.kilometraje)} km
-                    </div>
-                    {fichaTecnica.length > 0 && (
-                      <div className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">
-                        {fichaTecnica.join(" · ")}
-                      </div>
-                    )}
-                    {t.observaciones && (
-                      <div className="text-xs text-[hsl(var(--muted-foreground))] mt-1 italic line-clamp-2 max-w-[260px]">
-                        &ldquo;{t.observaciones}&rdquo;
-                      </div>
-                    )}
-                  </td>
-
-                  <td className="py-3 px-4">
-                    {t.precioPretendido !== null ? (
-                      <span className="text-sm font-bold text-[hsl(var(--foreground))] whitespace-nowrap">
-                        {formatPrecioOriginal(t.precioPretendido.toNumber(), t.moneda)}
-                      </span>
-                    ) : (
-                      <span className="text-xs text-[hsl(var(--muted-foreground))] italic">
-                        No lo indicó
-                      </span>
-                    )}
-                  </td>
-
-                  <td className="py-3 px-4 hidden lg:table-cell">
-                    <CeldaVehiculo
-                      vehiculo={t.vehiculoInteres}
-                      textoSinUnidad="No eligió unidad"
-                    />
-                  </td>
-
-                  <td className="py-3 px-4 hidden md:table-cell">
-                    <span className="text-xs text-[hsl(var(--muted-foreground))] font-medium whitespace-nowrap">
-                      {formatFechaLarga(t.createdAt)}
-                    </span>
-                  </td>
-
-                  <td className="py-3 px-4">
-                    <EstadoButton
-                      id={t.id}
-                      estadoActual={t.estado}
-                      cambiarEstadoAction={updateTasacionEstado}
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </TablaPanel>
-      )}
-    </PanelListado>
-  );
+  redirect(`/dashboard/bandeja?tipo=TASACION${estado ? `&estado=${estado}` : ""}`);
 }

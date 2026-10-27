@@ -1,113 +1,16 @@
-import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/sesion";
-import { getSolicitudes, updateSolicitudEstado } from "@/actions/financiacion";
+import { redirect } from "next/navigation";
 import { estadoDeUrl } from "@/lib/estados";
-import { formatFechaLarga } from "@/lib/formato";
-import { formatArs } from "@/lib/precio";
-import { getConfiguracion } from "@/services/configuracion.service";
-import { EstadoButton } from "@/components/dashboard/EstadoButton";
-import {
-  CeldaVehiculo,
-  Contacto,
-  PanelListado,
-  SinResultados,
-  TablaPanel,
-  TelefonoCliente,
-  Th,
-} from "@/components/dashboard/PanelListado";
 
-interface SolicitudesPageProps {
+interface PageProps {
   searchParams: Promise<{ estado?: string }>;
 }
 
-export default async function SolicitudesPage({ searchParams }: SolicitudesPageProps) {
-  // Financiación apagada desde Configuración: las solicitudes guardadas siguen
-  // en la base, pero la pantalla no es alcanzable.
-  if (!(await getConfiguracion()).financiacionActiva) notFound();
-
-  await requireAdmin();
-
+/**
+ * La pantalla de solicitudes de crédito pasó a la bandeja unificada (`/dashboard/bandeja`). La ruta
+ * queda para que los enlaces viejos —avisos por correo ya enviados, marcadores
+ * del navegador— sigan llevando al mismo lugar, con el filtro de estado.
+ */
+export default async function Page({ searchParams }: PageProps) {
   const estado = estadoDeUrl((await searchParams).estado);
-
-  const [solicitudes, pendientes] = await Promise.all([
-    getSolicitudes(estado),
-    prisma.solicitudFinanciacion.count({ where: { estado: "PENDIENTE" } }),
-  ]);
-
-  return (
-    <PanelListado
-      titulo="Solicitudes de Crédito"
-      resumen={`${solicitudes.length} solicitud${solicitudes.length !== 1 ? "es" : ""}`}
-      pendientes={pendientes}
-      basePath="/dashboard/solicitudes"
-      estadoActivo={estado}
-    >
-      {solicitudes.length === 0 ? (
-        <SinResultados texto="No hay solicitudes en esta categoría." />
-      ) : (
-        <TablaPanel>
-          <thead className="bg-[#f3f3f6]">
-            <tr className="border-b border-[#e5e7eb]">
-              <Th>Cliente / DNI</Th>
-              <Th oculta="lg">Vehículo</Th>
-              <Th>Financiación</Th>
-              <Th oculta="md">Fecha</Th>
-              <Th>Estado</Th>
-            </tr>
-          </thead>
-          <tbody>
-            {solicitudes.map((s) => (
-              <tr
-                key={s.id}
-                className="border-b border-[#e5e7eb]/50 hover:bg-[hsl(var(--surface-low))] transition align-top"
-              >
-                <td className="py-3 px-4">
-                  <div className="font-bold text-sm text-[hsl(var(--foreground))]">
-                    {s.nombre} {s.apellido}
-                  </div>
-                  <div className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">
-                    DNI: {s.dni}
-                  </div>
-                  <Contacto href={`mailto:${s.email}`} texto={s.email} />
-                  <TelefonoCliente telefono={s.telefono} />
-                </td>
-                <td className="py-3 px-4 hidden lg:table-cell">
-                  <CeldaVehiculo vehiculo={s.vehiculo} />
-                </td>
-                <td className="py-3 px-4">
-                  <div className="text-sm font-bold text-[hsl(var(--foreground))]">
-                    {s.cuotas} Cuotas
-                  </div>
-                  <div className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">
-                    Anticipo: {formatArs(s.anticipo.toNumber())}
-                  </div>
-                  <div className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">
-                    Ingresos: {s.ingresos ? formatArs(s.ingresos.toNumber()) : "No especificado"}
-                  </div>
-                  {s.mensaje && (
-                    <div className="text-xs text-[hsl(var(--muted-foreground))] mt-1 italic line-clamp-2">
-                      &ldquo;{s.mensaje}&rdquo;
-                    </div>
-                  )}
-                </td>
-                <td className="py-3 px-4 hidden md:table-cell">
-                  <span className="text-xs text-[hsl(var(--muted-foreground))] font-medium whitespace-nowrap">
-                    {formatFechaLarga(s.createdAt)}
-                  </span>
-                </td>
-                <td className="py-3 px-4">
-                  <EstadoButton
-                    id={s.id}
-                    estadoActual={s.estado}
-                    cambiarEstadoAction={updateSolicitudEstado}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </TablaPanel>
-      )}
-    </PanelListado>
-  );
+  redirect(`/dashboard/bandeja?tipo=SOLICITUD${estado ? `&estado=${estado}` : ""}`);
 }

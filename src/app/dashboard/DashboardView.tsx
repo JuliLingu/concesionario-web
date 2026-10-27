@@ -72,7 +72,7 @@ export const DashboardView = ({
           {/* Con el stock vacío no hay promedio que mostrar: va un guion y no un
               cero, que se leería como "se venden el mismo día". */}
           <MetricCard label="Días Promedio En Stock" value={diasPromedioEnStock ?? "—"} icon={<Timer size={20} />} href="/dashboard/metricas" />
-          <MetricCard label="Consultas Pendientes" value={consultasPendientes} icon={<MessageSquare size={20} />} href="/dashboard/consultas" accent={consultasPendientes > 0 ? "primary" : undefined} />
+          <MetricCard label="Consultas Pendientes" value={consultasPendientes} icon={<MessageSquare size={20} />} href="/dashboard/bandeja?tipo=CONSULTA&estado=PENDIENTE" accent={consultasPendientes > 0 ? "primary" : undefined} />
         </div>
 
         {/* ── Quick Actions ── */}
@@ -96,12 +96,12 @@ export const DashboardView = ({
             <QuickAction href="/dashboard/categorias" icon={<Tags size={18} />} label="Categorías" description="Administrar tipos de vehículos" />
           </div>
           <div className="md:col-span-6 lg:col-span-1">
-            <QuickAction href="/dashboard/consultas" icon={<MessageSquare size={18} />} label="Ver Consultas" description={consultasPendientes > 0 ? `${consultasPendientes} sin atender` : "Historial completo"} badge={consultasPendientes > 0 ? consultasPendientes : undefined} />
+            <QuickAction href="/dashboard/bandeja" icon={<MessageSquare size={18} />} label="Bandeja" description={consultasPendientes > 0 ? `${consultasPendientes} consultas sin atender` : "Consultas, tasaciones y créditos"} badge={consultasPendientes > 0 ? consultasPendientes : undefined} />
           </div>
           {financiacionActiva && (
             <>
               <div className="md:col-span-6 lg:col-span-1">
-                <QuickAction href="/dashboard/solicitudes" icon={<Wallet size={18} />} label="Solicitudes Crédito" description="Ver pedidos de financiación" />
+                <QuickAction href="/dashboard/bandeja?tipo=SOLICITUD" icon={<Wallet size={18} />} label="Solicitudes Crédito" description="Ver pedidos de financiación" />
               </div>
               <div className="md:col-span-6 lg:col-span-1">
                 <QuickAction href="/dashboard/planes" icon={<CreditCard size={18} />} label="Planes Financiación" description="Configurar tasas y cuotas" />
@@ -110,7 +110,7 @@ export const DashboardView = ({
           )}
           {tasacionActiva && (
             <div className="md:col-span-6 lg:col-span-1">
-              <QuickAction href="/dashboard/tasaciones" icon={<Handshake size={18} />} label="Tasaciones" description={tasacionesPendientes > 0 ? `${tasacionesPendientes} sin revisar` : "Usados que nos ofrecen"} badge={tasacionesPendientes > 0 ? tasacionesPendientes : undefined} />
+              <QuickAction href="/dashboard/bandeja?tipo=TASACION" icon={<Handshake size={18} />} label="Tasaciones" description={tasacionesPendientes > 0 ? `${tasacionesPendientes} sin revisar` : "Usados que nos ofrecen"} badge={tasacionesPendientes > 0 ? tasacionesPendientes : undefined} />
             </div>
           )}
           <div className="md:col-span-6 lg:col-span-1">
@@ -125,7 +125,7 @@ export const DashboardView = ({
               <h2 className="text-lg font-bold uppercase tracking-tight text-[hsl(var(--foreground))]">
                 Consultas Pendientes
               </h2>
-              <Link href="/dashboard/consultas" className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--primary))] flex items-center gap-1 hover:underline">
+              <Link href="/dashboard/bandeja?tipo=CONSULTA&estado=PENDIENTE" className="text-[10px] font-black uppercase tracking-widest text-[hsl(var(--primary))] flex items-center gap-1 hover:underline">
                 Ver todas <ArrowRight size={11} />
               </Link>
             </div>

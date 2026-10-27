@@ -126,7 +126,7 @@ describe("avisarConsulta", () => {
     await avisarConsulta(CONSULTA);
 
     // Sin barra repetida aunque APP_URL venga con una al final.
-    expect(ultimoEnvio().text).toContain("https://autosdelsur.test/dashboard/consultas");
+    expect(ultimoEnvio().text).toContain("https://autosdelsur.test/dashboard/bandeja?tipo=CONSULTA");
   });
 
   it("no escribe HTML vivo con lo que mandó un desconocido", async () => {

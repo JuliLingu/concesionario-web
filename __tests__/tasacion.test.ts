@@ -27,6 +27,12 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+// El CRM se prueba por separado (bandeja.test, contactos.test): acá alcanza
+// con que no toque la base de verdad.
+vi.mock("@/services/contactos.service", () => ({
+  vincularContacto: async () => "cto_1",
+}));
+
 vi.mock("@/services/avisos.service", () => ({
   avisarTasacion: mocks.avisarTasacion,
 }));
